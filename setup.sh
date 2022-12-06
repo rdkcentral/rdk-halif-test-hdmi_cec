@@ -1,0 +1,6 @@
+#!/bin/sh 
+TOOLCHAIN_PATH="/home/acheri988/source/rdk/rdkv/axi6_22Q4_sprint_1/build-arrisxi6/tmp/work/cortexa15t2hf-neon-rdk-linux-gnueabi/"
+export CC="$TOOLCHAIN_PATH/ave-drm/1.99+git999-r0/recipe-sysroot-native/usr/bin/arm-rdk-linux-gnueabi/arm-rdk-linux-gnueabi-gcc  -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a15       --sysroot=$TOOLCHAIN_PATH/hdmicecheader/1.99+git999-r0/recipe-sysroot"
+
+#export REM_YLDFLAGS=" -L/home/acheri988/source/rdk/rdkv/axi6_22Q4_sprint/build-arrisxi6/tmp/work/cortexa15t2hf-neon-rdk-linux-gnueabi/hdmicec/1.99+git999-r0/recipe-sysroot/lib -L/home/acheri988/source/rdk/rdkv/axi6_22Q4_sprint/build-arrisxi6/tmp/work/cortexa15t2hf-neon-rdk-linux-gnueabi/hdmicec/1.99+git999-r0/recipe-sysroot/usr/lib/arm-rdk-linux-gnueabi/9.3.0 -L/home/acheri988/source/rdk/rdkv/axi6_22Q4_sprint/build-arrisxi6/tmp/work/cortexa15t2hf-neon-rdk-linux-gnueabi/hdmicec/1.99+git999-r0/recipe-sysroot/usr/lib -lstdc++ -lm -lc -lgcc_s -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a15 --sysroot=/home/acheri988/source/rdk/rdkv/axi6_22Q4_sprint/build-arrisxi6/tmp/work/cortexa15t2hf-neon-rdk-linux-gnueabi/hdmicec/1.99+git999-r0/recipe-sysroot -pthread -Os -g -Wl,-O1 -Wl,--hash-style=gnu -Wl,-z -Wl,relro -Wl,--no-as-needed -Wl,--as-needed   -pthread -Wl,-soname"
+
