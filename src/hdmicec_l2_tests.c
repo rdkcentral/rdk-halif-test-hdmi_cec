@@ -49,12 +49,15 @@ int isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
  */
 void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char *buf, int len)
 {
+    int result = HDMI_CEC_IO_GENERAL_ERROR;
     if (len>1){
         printf ("\nBuffer generated: %x length: %d\n",buf[1], len);
+        result = HDMI_CEC_IO_SUCCESS;
         if (buf[1] == bufferExpected_g){
             isExpectedBufferReceived_g = HDMI_CEC_IO_SUCCESS;
         }
     }
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 }
 
 /**
@@ -67,6 +70,7 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
 void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
 {
     printf ("\ncallbackData returned: %x result: %d\n",callbackData, result);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 }
 
 /**
