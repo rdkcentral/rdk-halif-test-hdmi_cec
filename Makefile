@@ -24,7 +24,7 @@ TOP_DIR := $(ROOT_DIR)
 SRC_DIRS = $(ROOT_DIR)/src
 INC_DIRS := $(ROOT_DIR)/../include
 HAL_LIB := RCECHal
-MOCK_SRCS := $(ROOT_DIR)/skeletons/src/hdmi_cec_driver.c
+SKELTON_SRCS := $(ROOT_DIR)/skeletons/src/hdmi_cec_driver.c
 
 ifeq ($(TARGET),)
 $(info TARGET NOT SET )
@@ -37,9 +37,9 @@ $(info TARGET [$(TARGET)])
 
 ifeq ($(TARGET),arm)
 HAL_LIB_DIR := $(ROOT_DIR)/libs
-YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB) $(REM_YLDFLAGS)
+YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)
 ifeq ("$(wildcard $(HAL_LIB_DIR)/lib$(HAL_LIB).so)","")
-SETUP_MOCK_LIBS := mock
+SETUP_SKELTON_LIBS := skelton
 endif
 endif
 
@@ -53,16 +53,18 @@ export TARGET
 export TOP_DIR
 export HAL_LIB_DIR
 
-.PHONY: clean list build mock
+.PHONY: clean list build skelton
 
 
-build: $(SETUP_MOCK_LIBS)
-	echo "SETUP_MOCK_LIBS $(SETUP_MOCK_LIBS)"
+build: $(SETUP_SKELTON_LIBS)
+	echo "SETUP_SKELTON_LIBS $(SETUP_SKELTON_LIBS)"
 	@echo UT [$@]
 	make -C ./ut-core
-mock:
+
+#Build against the real library leads to the SOC library dependency also.SOC lib dependency cannot be specified in the ut Makefile, since it is supposed to be common across may platforms. So in order to over come this situation, creating a template skelton library with empty templates so that the template library wont have any other Soc dependency. And in the real platform mount copy bind with the actual library will work fine.
+skelton:
 	echo $(CC)
-	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include $(MOCK_SRCS) -o lib$(HAL_LIB).so
+	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include $(SKELTON_SRCS) -o lib$(HAL_LIB).so
 	mkdir -p $(HAL_LIB_DIR)
 	cp $(ROOT_DIR)/lib$(HAL_LIB).so $(HAL_LIB_DIR)
 

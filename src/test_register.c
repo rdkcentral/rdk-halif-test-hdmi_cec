@@ -27,18 +27,10 @@ extern int test_hdmicec_hal_l1_register( void );
 
 
 /* L2 Testing Functions */
-extern int test_wifi_hal_l2_register( void );
+extern int test_hdmicec_hal_l2_register( void );
 
-int singleTimeInitCall ( void )
-{
-    #if 0
-    IARM_Result_t retVal = IARM_RESULT_SUCCESS;
-    IARM_Bus_Init(IARM_BUS_CECMGR_NAME);
-    IARM_Bus_Connect();
-    #endif
-}
 
-int register_hal_l1_tests( void )
+int register_hdmicec_hal_l1_tests( void )
 {
     int registerFailed=0;
 
@@ -47,7 +39,7 @@ int register_hal_l1_tests( void )
     return registerFailed;
 }
 
-int register_hal_l2_tests( void )
+int register_hdmicec_hal_l2_tests( void )
 {
     int registerFailed=0;
 

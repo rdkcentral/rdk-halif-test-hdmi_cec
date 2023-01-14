@@ -19,6 +19,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <ut.h>
 #include "hdmi_cec_driver.h"
@@ -26,16 +27,26 @@
 #define __UT_STB__
 #define HDMICEC_RESPONSE_TIMEOUT 2
 
-void test_hdmicec_hal_l2_function(void)
-{
-	UT_FAIL("Need to implement");
-    /* Positive */
-    /* Negative */
-} 
-
+/**
+ * @brief Expected cec message buffer in the L2 scenario
+ * 
+ */
 unsigned char bufferExpected_g = 0x00;
+
+/**
+ * @brief Status variable to check if expected cec message received in the respective L2 scenario.
+ * 
+ */
 int isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
+/**
+ * @brief callback to receive the hdmicec receive messages
+ * 
+ * @param handle Hdmi device handle
+ * @param callbackData callback data passed
+ * @param buf receive message buffer passed
+ * @param len receive message buffer length
+ */
 void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char *buf, int len)
 {
     if (len>1){
@@ -46,11 +57,24 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
     }
 }
 
+/**
+ * @brief callback to get the async send message status
+ * 
+ * @param handle Hdmi device handle
+ * @param callbackData callback data passed
+ * @param result async send status.
+ */
 void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
 {
     printf ("\ncallbackData returned: %x result: %d\n",callbackData, result);
 }
 
+/**
+ * @brief This routine will verify Hdmicec module is working fine
+ * This function will wait query the hdmicec version using hdmi get cec version opcode
+ * and check if hdmi set cec version opcode is received form the other end with in the
+ * expected time interval
+ */
 void test_hdmicec_hal_l2_getCecVersion( void )
 {
     int result=0;
@@ -108,6 +132,12 @@ void test_hdmicec_hal_l2_getCecVersion( void )
     /* #TODO: Unclear how the function will fail, maybe this function should be void? */
 }
 
+/**
+ * @brief This routine will verify Hdmicec module is working fine
+ * This function will wait query the vendor id using hdmi get vendor ID opcode
+ * and check if hdmi set vendor ID opcode is received form the other end with in the
+ * expected time interval
+ */
 void test_hdmicec_hal_l2_getVendorID( void )
 {
     int result=0;
@@ -166,17 +196,22 @@ void test_hdmicec_hal_l2_getVendorID( void )
     /* #TODO: Unclear how the function will fail, maybe this function should be void? */
 }
 
+/**
+ * @brief This routine will verify Hdmicec module is working fine
+ * This function will wait query the power status using hdmi get power status opcode
+ * and check if hdmi set power status opcode is received form the other end with in the
+ * expected time interval
+ */
 void test_hdmicec_hal_l2_getPowerStatus( void )
 {
     int result=0;
-    int ret=0;
     int handle = 0;
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
 
     int len = 2;
     //Give vendor id
-    //Simply asuming sender as 3 and broadcast
+    //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, 0x8F };
 
     /* Positive result */
