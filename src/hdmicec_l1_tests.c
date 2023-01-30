@@ -38,7 +38,13 @@
  * @brief This function will do the unit testing of HdmiCecOpen ()
  * This function will ensure underlying API implementation is handling
  * the invalid call sequences to the API properly.
- * HDMI_CEC_IO_SUCCESS: will be returned if HdmiCecOpen is called successfully.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities.
+ * In all the invalid call sequence 
+ * scenarios API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS: will be returned if HdmiCecOpen is executed successfully.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if HdmiCecOpen is called second time or 
  * underlying platform implementation is failed.
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -65,8 +71,14 @@ void test_hdmicec_hal_l1_open( void )
 /**
  * @brief This function will do the unit testing of HdmiCecClose ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecClose () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecClose () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -104,8 +116,14 @@ void test_hdmicec_hal_l1_close( void )
 /**
  * @brief This function will do the unit testing of HdmiCecSetLogicalAddress ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecSetLogicalAddress () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecSetLogicalAddress () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -155,8 +173,14 @@ void test_hdmicec_hal_l1_setLogicalAddress( void )
 /**
  * @brief This function will do the unit testing of HdmiCecGetPhysicalAddress ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecGetPhysicalAddress () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecGetPhysicalAddress () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -192,8 +216,14 @@ void test_hdmicec_hal_l1_getPhysicalAddress( void )
 /**
  * @brief This function will do the unit testing of HdmiCecAddLogicalAddress ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecAddLogicalAddress () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecAddLogicalAddress () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -235,8 +265,14 @@ void test_hdmicec_hal_l1_addLogicalAddress( void )
 /**
  * @brief This function will do the unit testing of HdmiCecRemoveLogicalAddress ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecRemoveLogicalAddress () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecRemoveLogicalAddress () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -289,8 +325,14 @@ void test_hdmicec_hal_l1_removeLogicalAddress( void )
 /**
  * @brief This function will do the unit testing of HdmiCecGetLogicalAddress ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecGetLogicalAddress () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecGetLogicalAddress () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -371,8 +413,14 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
 /**
  * @brief This function will do the unit testing of HdmiCecSetRxCallback ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecSetRxCallback () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecSetRxCallback () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -428,8 +476,14 @@ void test_hdmicec_hal_l1_setRxCallback( void )
 /**
  * @brief This function will do the unit testing of HdmiCecSetTxCallback ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecSetTxCallback () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecSetTxCallback () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -472,8 +526,14 @@ void test_hdmicec_hal_l1_setTxCallback( void )
 /**
  * @brief This function will do the unit testing of HdmiCecTx ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecTx () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecTx () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
@@ -546,8 +606,14 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
 /**
  * @brief This function will do the unit testing of HdmiCecTxAsync ()
  * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API
- * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecTxAsync () is called successfully.
+ * the invalid arguments passed and invalid call sequences to the API.
+ * This UT implementation will verify it by calling the function in all
+ * invalid possibilities and passing invalid arguments to the respective APIs
+ * In all the invalid cases
+ * API should return the expected error codes defined in the respective HAL
+ * documentation. Please see all the expected error codes and respective scenarios
+ * in which the error codes will be returned.
+ * HDMI_CEC_IO_SUCCESS  : will be returned if HdmiCecTxAsync () is executed successfully.
  * HDMI_CEC_IO_INVALID_ARGUMENT Indicates error due to invalid parameter value.
  * HDMI_CEC_IO_INVALID_STATE : will be returned if this api is called before calling HdmiCecOpen()
  * HDMI_CEC_IO_GENERAL_ERROR: Not able to simulate this condition with the UT implementation
