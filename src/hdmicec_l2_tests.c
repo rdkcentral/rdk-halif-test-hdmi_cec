@@ -41,6 +41,7 @@ int isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
 /**
  * @brief callback to receive the hdmicec receive messages
+ * Ensure  getting expected reply messages form the other CEC peer divices, for all the CEC message queries form this device.
  * 
  * @param handle Hdmi device handle
  * @param callbackData callback data passed
@@ -62,7 +63,7 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
 
 /**
  * @brief callback to get the async send message status
- * 
+ * Ensure all the async CEC queries from this device is delivered successfully.
  * @param handle Hdmi device handle
  * @param callbackData callback data passed
  * @param result async send status.

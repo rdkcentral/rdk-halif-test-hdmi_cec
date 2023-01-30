@@ -23,10 +23,14 @@
 
 #include <ut.h>
 #include "hdmi_cec_driver.h"
-#define __UT_STB__
 #ifdef __UT_STB__
+    //Setting CEC play back logical address here.
+    //More about CEC logical address read the documentation here
+    //https://www.kernel.org/doc/html/v4.11/media/kapi/cec-core.html
+    //https://elinux.org/CEC_(Consumer_Electronics_Control)_over_HDMI
     #define DEFAULT_LOGICAL_ADDRESS 3
 #else
+    //Setting the CEC sink (Dispaly divice) logical address here.
     #define DEFAULT_LOGICAL_ADDRESS 0
 #endif
 
@@ -85,12 +89,12 @@ void test_hdmicec_hal_l1_close( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);  
 
     /*calling hdmicec_close second time */
-    result = HdmiCecClose (handle); //FIXME Seems like HdmiCecClose Getting stuck in amlogc HAL
+    result = HdmiCecClose (handle); //#FIXME Seems like HdmiCecClose Getting stuck in amlogc HAL
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
 
     handle = INT_MAX;
     /*calling hdmicec_close with invalid handle should return the invalid argument error*/
-    result = HdmiCecClose (handle); //FIXME Seems like HdmiCecClose Getting stuck in amlogc HAL
+    result = HdmiCecClose (handle); //#FIXME Seems like HdmiCecClose Getting stuck in amlogc HAL
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
 
     /* #TODO: Unclear how the function will fail, maybe this function should be void? */
@@ -514,11 +518,11 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     /* Invalid input */
-    result = HdmiCecTx(handle, buf, len, NULL); //FIXME Seems like amlogc HAL crashes here.
+    result = HdmiCecTx(handle, buf, len, NULL); //#TODO Seems like amlogc HAL crashes here.
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
     /* Invalid input */
-    result = HdmiCecTx(handle, NULL, len, &ret); //FIXME Seems like amlogc HAL crashes here.
+    result = HdmiCecTx(handle, NULL, len, &ret); //#TODO Seems like amlogc HAL crashes here.
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
     /* Invalid input */
@@ -588,10 +592,10 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     /* Invalid input */
-    result = HdmiCecTxAsync(handle, NULL, len); //FIXME Axi6 crashes here
+    result = HdmiCecTxAsync(handle, NULL, len); //#TODO Axi6 crashes here
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
-    result = HdmiCecTxAsync(0, buf, len); //FIXME Axi6 crashes here
+    result = HdmiCecTxAsync(0, buf, len); //#TODO Axi6 crashes here
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
     /* Invalid input */
