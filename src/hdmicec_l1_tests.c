@@ -36,7 +36,13 @@
 
 /**
  * @brief This function will do the unit testing of HdmiCecOpen ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecOpen () opens an instance of CEC driver.
+ * Params of HdmiCecOpen
+ *    handle - The handle used by application to uniquely identify the driver instance.
+ * Return of HdmiCecOpen: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecOpen () API implementation is handling
  * the invalid call sequences to the API properly.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities.
@@ -70,8 +76,14 @@ void test_hdmicec_hal_l1_open( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecClose ()
- * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API.
+ * 
+ * HdmiCecClose () close an instance of CEC driver.
+ * Params of HdmiCecClose:
+ *     handle - The handle returned from the HdmiCecOpen() function.
+ * Return of HdmiCecClose: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecClose API implementation is handling
+ * the invalid arguments passed and invalid call sequences to the API properly.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
  * In all the invalid cases
@@ -115,8 +127,23 @@ void test_hdmicec_hal_l1_close( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecSetLogicalAddress ()
- * This function will ensure underlying API implementation is handling
- * the invalid arguments passed and invalid call sequences to the API.
+ * 
+ * HdmiCecSetLogicalAddress () Sets the Logical Addresses claimed by host device.
+ * HdmiCecSetLogicalAddress function sets multiple logical addresses used by the host.  The host
+ * has claimed these logical address through the Discovery process.  Once 
+ * set, the host shall receive all CEC packets destined to these addresses.
+ * Params of HdmiCecSetLogicalAddress:
+ *     handle - The handle returned from the HdmiCecOpen() function.
+ *     logicalAddresses - The logicalAddresses set or replace addresses claimed by host. A null value clears the current list. 
+ *     num - The number of logical addresses.  If any logical address in the list
+ *                 cannot be set, none of them should be set upon return. Success
+ *                 return indicates that all addresses in the list are set. Maximum possible value is 0xE
+ * 
+ * Return of HdmiCecSetLogicalAddress: respective HDMI_CEC_IO_ERROR
+ * 
+ * 
+ * This UT function will ensure underlying HdmiCecSetLogicalAddress () API implementation is handling
+ * the invalid arguments passed and invalid call sequences to the API .
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
  * In all the invalid cases
@@ -153,9 +180,12 @@ void test_hdmicec_hal_l1_setLogicalAddress( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
     result = HdmiCecSetLogicalAddress(handle, NULL, num);;
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     result = HdmiCecSetLogicalAddress(handle, logicalAddresses, 0);;
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    result = HdmiCecSetLogicalAddress(handle, logicalAddresses, 0xF);;
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
     /*calling hdmicec_close should pass */
@@ -172,7 +202,14 @@ void test_hdmicec_hal_l1_setLogicalAddress( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecGetPhysicalAddress ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecGetPhysicalAddress () function get the Physical address for the device.
+ * Params of HdmiCecGetPhysicalAddress:
+ *     handle - The handle returned from the HdmiCecOpen() function.
+ *     physicalAddress - physical address acquired
+ * Return of HdmiCecGetPhysicalAddress: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecGetPhysicalAddress () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
@@ -203,19 +240,34 @@ void test_hdmicec_hal_l1_getPhysicalAddress( void )
     HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     //Passing valid handle to the HdmiCecGetPhysicalAddress api should pass
 
+    HdmiCecGetPhysicalAddress(handle, NULL);
+    //TODO: passing NULL shouldn't cash.
+
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     //Calling api after close, should give invalid argument
     HdmiCecGetPhysicalAddress(handle, &physicalAddress);
+    //TODO: Calling after close shouldn't crash.
 
     /* #TODO: Unclear how the function will fail, maybe this function should be void? */
 }
 
 /**
  * @brief This function will do the unit testing of HdmiCecAddLogicalAddress ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecAddLogicalAddress (): The function shall return HDMI_CEC_IO_SUCCESS if the POLL message is sent
+ * successfully and not ACK'd by any device on the bus. From this point on the
+ * driver shall forward all received messages with destination being the acquired
+ * logical address. Driver should ACK all POLL messages destined to this logical
+ * address.
+ * Params of HdmiCecGetPhysicalAddress:
+ *     handle - The handle returned from the HdmiCecOpen() function.
+ *     logicalAddresses - The logical address to be acquired. Min value is 0x0 Max value is 0xE
+ * Return of HdmiCecGetPhysicalAddress: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecAddLogicalAddress () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
@@ -251,6 +303,12 @@ void test_hdmicec_hal_l1_addLogicalAddress( void )
     result = HdmiCecAddLogicalAddress(0, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
+    result = HdmiCecAddLogicalAddress(0, -1);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+
+    result = HdmiCecAddLogicalAddress(0, 0xF);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
@@ -264,7 +322,16 @@ void test_hdmicec_hal_l1_addLogicalAddress( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecRemoveLogicalAddress ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecRemoveLogicalAddress (): function releases the previously acquired logical address.  Once
+ * released, driver should not ACK any POLL message destined to the
+ * released address.
+ * Params of HdmiCecRemoveLogicalAddress:
+ *     handle - The handle returned from the HdmiCecOpen() function.
+ *     logicalAddresses - The logicalAddresses to be released. Min value is 0x0 Max value is 0xE
+ * Return of HdmiCecRemoveLogicalAddress: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecRemoveLogicalAddress () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
@@ -307,7 +374,11 @@ void test_hdmicec_hal_l1_removeLogicalAddress( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
     //trying with invalid value
-    logicalAddress = INT_MAX;
+    logicalAddress = 0xF;
+    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+
+    logicalAddress = -1;
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
@@ -324,7 +395,15 @@ void test_hdmicec_hal_l1_removeLogicalAddress( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecGetLogicalAddress ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecGetLogicalAddress (): function get the logical address for the specified device type.
+ * Params of HdmiCecGetLogicalAddress:
+ *     handle - The handle returned from the HdmiCecOpen() function.
+ *     devType - The device type (tuner, record, playback etc.).
+ *     logicalAddress - The logical address acquired. Should be valid address.
+ * Return of HdmiCecGetLogicalAddress: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecGetLogicalAddress () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
@@ -412,7 +491,25 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
 
 /**
  * @brief This function will do the unit testing of HdmiCecSetRxCallback ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecSetRxCallback (): Sets CEC packet Receive callback.  
+ *
+ * HdmiCecSetRxCallback function sets a callback function to be invoked for each packet arrival.   
+ * The packet contained in the buffer is expected to follow this format:
+ *
+ * (ref <HDMI Specification 1-4> Section <CEC 6.1>)
+ * 
+ * complete packet = header block + data block;
+ * header block = destination logical address (4-bit) + source address (4-bit)
+ * data   block = opcode block (8-bit) + operand block (N-bytes)
+ * 
+ * Params of HdmiCecSetRxCallback:
+ *     handle - The handle returned from the HdmiCecOpen(() function.
+ *     cbfunc - A callback function to be invoked when a complete packet is received. This call back function is re-entrant
+ *     data - the data used when invoking callback function. 
+ * Return of HdmiCecSetRxCallback: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecSetRxCallback () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
@@ -475,7 +572,19 @@ void test_hdmicec_hal_l1_setRxCallback( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecSetTxCallback ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecSetTxCallback (): function sets a callback function to be invoked once the async transmit
+ * result is available. This is only necessary if application choose to transmit
+ * the packet asynchronously.
+ *
+ * HdmiCecSetTxCallback function should block if callback invocation is in progress.
+ * Params of HdmiCecSetRxCallback:
+ *     handle  - The handle returned from the HdmiCecOpen(() function.
+ *     cbfunc - Function pointer to be invoked when a complete packet is received.
+ *     data - It is used when invoking callback function.
+ * Return of HdmiCecSetRxCallback: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecSetTxCallback () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
@@ -525,7 +634,24 @@ void test_hdmicec_hal_l1_setTxCallback( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecTx ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecTx (): function writes a complete CEC packet onto the CEC bus and wait for ACK.
+ * application should check for result when return value of the function is 0;
+ *
+ * The bytes in buf that is to be transmitted should follow the buffer
+ * byte format required for receiving buffer. (See detailed description from 
+ * HdmiCecSetRxCallback)
+ *
+ * Params of HdmiCecTx:
+ *    handle - The handle returned from the HdmiCecOpen(() function.
+ *    buf - The buffer contains a complete CEC packet.
+ *    len - Number of bytes in the packet.
+ *    result - Output of the send. Possible results are SENT_AND_ACKD,
+ *                    SENT_BUT_NOT_ACKD (e.g. no follower at the destination),
+ *                    SENT_FAILED (e.g. collision).
+ * Return of HdmiCecTx: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecTx () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
@@ -540,7 +666,7 @@ void test_hdmicec_hal_l1_setTxCallback( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx( void )
 {
-    int result=0;
+    int result=SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -605,7 +731,18 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
 
 /**
  * @brief This function will do the unit testing of HdmiCecTxAsync ()
- * This function will ensure underlying API implementation is handling
+ * 
+ * HdmiCecTxAsync (): function writes a complete CEC packet onto the CEC bus but does not wait 
+ * for ACK. The result will be reported via HdmiCecRxCallback_t if return value
+ * of this function is 0.
+ *
+ * Params of HdmiCecTxAsync:
+ *     handle - The handle returned from the HdmiCecOpen(() function.
+ *     buf - Buffer contains a complete CEC packet.
+ *     len - Number of bytes in the packet.
+ * Return of HdmiCecTxAsync: respective HDMI_CEC_IO_ERROR
+ * 
+ * This UT function will ensure underlying HdmiCecTxAsync () API implementation is handling
  * the invalid arguments passed and invalid call sequences to the API.
  * This UT implementation will verify it by calling the function in all
  * invalid possibilities and passing invalid arguments to the respective APIs
