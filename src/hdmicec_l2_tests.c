@@ -17,6 +17,23 @@
  * limitations under the License.
 */
 
+/**
+* @file hdmicec_l2_tests.c
+* @page HDMI_CEC_L2_Tests HDMI CEC Level 2 Tests
+* **Component Owner:** Amit Patel@n
+* **Component Architect:** Amit Patel@n
+* **Review Team:** Amit Patel, Gerald Weatherup, Anjali Thampi@n
+*
+* ## Module's Role
+* This module includes Level 2 functional tests (success and failure scenarios).
+* This is to ensure that the API meets the operational requirements of the HDMI CEC across all vendors.
+*
+* **Pre-Conditions:**  None@n
+* **Dependencies:** None@n
+*
+* Ref to API Definition specification documentation : [halSpec.md](../../../docs/halSpec.md)
+*/
+
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -40,7 +57,7 @@ int isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
 /**
  * @brief callback to receive the hdmicec receive messages
- * Ensure  getting expected reply messages form the other CEC peer divices, for all the CEC message queries form this device.
+ * Ensure  getting expected reply messages form the other CEC peer devices, for all the CEC message queries form this device.
  * 
  * @param handle Hdmi device handle
  * @param callbackData callback data passed
@@ -74,10 +91,17 @@ void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
 }
 
 /**
- * @brief This routine will verify Hdmicec module is working fine
- * This function will wait query the hdmicec version using hdmi get cec version opcode
+ * @brief This function will do the functionality verification of  HdmiCec get version query
+ * This function will send the query the hdmicec version using hdmi get cec version opcode
  * and check if hdmi set cec version opcode is received form the other end with in the
  * expected time interval
+ * 
+ * **Test Group ID:** 02@n
+ * **Test Case ID:** 001@n
+ * **Priority:** Low@n
+ *
+ * **Test Procedure:**
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getCecVersion( void )
 {
@@ -89,7 +113,7 @@ void test_hdmicec_hal_l2_getCecVersion( void )
 
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
-    //Simply asuming sender as 3 and broadcast
+    //Simply assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, 0x9F};
 
     /* Positive result */
@@ -137,10 +161,17 @@ void test_hdmicec_hal_l2_getCecVersion( void )
 }
 
 /**
- * @brief This routine will verify Hdmicec module is working fine
- * This function will wait query the vendor id using hdmi get vendor ID opcode
+ * @brief This function will do the functionality verification of  HdmiCec get vendor id
+ * This function will send the query the vendor id using hdmi get vendor ID opcode
  * and check if hdmi set vendor ID opcode is received form the other end with in the
  * expected time interval
+ * 
+ * **Test Group ID:** 02@n
+ * **Test Case ID:** 002@n
+ * **Priority:** Low@n
+ *
+ * **Test Procedure:**
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getVendorID( void )
 {
@@ -201,10 +232,17 @@ void test_hdmicec_hal_l2_getVendorID( void )
 }
 
 /**
- * @brief This routine will verify Hdmicec module is working fine
- * This function will wait query the power status using hdmi get power status opcode
+ * @brief This function will do the functionality verification of  HdmiCec get power status
+ * This function will send the query the power status using hdmi get power status opcode
  * and check if hdmi set power status opcode is received form the other end with in the
  * expected time interval
+ * 
+ * **Test Group ID:** 02@n
+ * **Test Case ID:** 003@n
+ * **Priority:** Low@n
+ *
+ * **Test Procedure:**
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getPowerStatus( void )
 {

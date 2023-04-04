@@ -18,7 +18,7 @@
 */
 
 /**
-* @file test_L1_hdmi_cec_driver.c
+* @file hdmicec_l1_tests.c
 * @page HDMI_CEC_L1_Tests HDMI CEC Level 1 Tests
 * **Component Owner:** Amit Patel@n
 * **Component Architect:** Amit Patel@n
@@ -135,8 +135,8 @@ void test_hdmicec_hal_l1_open( void )
  * 4. Passing invalid handle address will return HDMI_CEC_IO_INVALID_ARGUMENT
  * 5. Once Hdmi Cec module is open. should be able to close the handle with HdmiCecClose api
  * 
- * **Test Group ID:** Basic: 02@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 002@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
@@ -207,8 +207,8 @@ void test_hdmicec_hal_l1_close( void )
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 4. Once module is closed api returns Module is not initialised error.
  * 
- * **Test Group ID:** Basic: 03@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 003@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
@@ -291,8 +291,8 @@ void test_hdmicec_hal_l1_addLogicalAddress( void )
  * 4. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 5. Once module is closed api returns Module is not initialised error.
  * 
- * **Test Group ID:** Basic: 04@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 004@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
@@ -388,8 +388,8 @@ void test_hdmicec_hal_l1_removeLogicalAddress( void )
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 4. Once module is closed api returns Module is not initialised error.
  * 
- * **Test Group ID:** Basic: 05@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 005@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
@@ -512,8 +512,8 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 4. Able to successfully set the RX callback after module is closed.
  * 
- * **Test Group ID:** Basic: 06@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 006@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
@@ -608,8 +608,8 @@ void test_hdmicec_hal_l1_setRxCallback( void )
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 4. Able to successfully set the TX callback after module is closed.
  * 
- * **Test Group ID:** Basic: 07@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 007@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
@@ -699,8 +699,8 @@ void test_hdmicec_hal_l1_setTxCallback( void )
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 4. Once module is closed api returns Module is not initialised error.
  * 
- * **Test Group ID:** Basic: 08@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 008@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
@@ -814,8 +814,8 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 4. Once module is closed api returns Module is not initialised error.
  * 
- * **Test Group ID:** Basic: 09@n
- * **Test Case ID:** 001@n
+ * **Test Group ID:** Basic: 01@n
+ * **Test Case ID:** 009@n
  * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
