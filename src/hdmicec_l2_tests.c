@@ -24,7 +24,6 @@
 #include <ut.h>
 #include "hdmi_cec_driver.h"
 
-#define __UT_STB__
 #define HDMICEC_RESPONSE_TIMEOUT 2
 
 /**
