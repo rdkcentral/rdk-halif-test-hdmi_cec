@@ -20,9 +20,6 @@
 /**
 * @file hdmicec_l2_tests.c
 * @page HDMI_CEC_L2_Tests HDMI CEC Level 2 Tests
-* **Component Owner:** Amit Patel@n
-* **Component Architect:** Amit Patel@n
-* **Review Team:** Amit Patel, Gerald Weatherup, Anjali Thampi@n
 *
 * ## Module's Role
 * This module includes Level 2 functional tests (success and failure scenarios).

@@ -20,9 +20,6 @@
 /**
 * @file hdmicec_l1_tests.c
 * @page HDMI_CEC_L1_Tests HDMI CEC Level 1 Tests
-* **Component Owner:** Amit Patel@n
-* **Component Architect:** Amit Patel@n
-* **Review Team:** Amit Patel, Gerald Weatherup, Anjali Thampi@n
 *
 * ## Module's Role
 * This module includes Level 1 functional tests (success and failure scenarios).
@@ -43,53 +40,41 @@
 #include "hdmi_cec_driver.h"
 #ifdef __UT_STB__
     /**
-     * Setting CEC play back logical address here.
+     * Set CEC play back logical address here
      * More about CEC logical address read the documentation here
      * https://www.kernel.org/doc/html/v4.11/media/kapi/cec-core.html
      * https://elinux.org/CEC_(Consumer_Electronics_Control)_over_HDMI
      */
     #define DEFAULT_LOGICAL_ADDRESS 3
 #else
-    ///Setting the CEC sink (Dispaly divice) logical address here.
+    /// Set the CEC sink (Display device) logical address here
     #define DEFAULT_LOGICAL_ADDRESS 0
 #endif
 
 /**
- * @brief Ensure HdmiCecOpen api returns proper error codes, during all api invocation scenarios
+ * @brief Ensure HdmiCecOpen() returns correct error codes during all of this API's invocation scenarios
  * 
- * HdmiCecOpen (): will initialize the module
- * Params of HdmiCecOpen:
- *     handle - The handle used by application to uniquely identify the HAL instance.
- * Return of HdmiCecOpen: respective HDMI_CEC_IO_ERROR
- * Expected error codes form HdmiCecOpen are
- * HDMI_CEC_IO_SUCCESS          - Success
- * HDMI_CEC_IO_INVALID_STATE    - Function is already open
- * HDMI_CEC_IO_INVALID_ARGUMENT - Parameter passed to this function is invalid
- * HDMI_CEC_IO_GENERAL_ERROR    - Underlying undefined platform error. Not able to simulate this scenario
- * 
- * 
- * This api ensure following conditions
- * 1. HdmiCecOpen is successful, if called first time during module initialization
- * 2. HdmiCecOpen will return HDMI_CEC_IO_INVALID_STATE during successive calls.
+ * This test case ensures the following conditions :
+ * 1. HdmiCecOpen() is successful, if called first time during module initialization
+ * 2. HdmiCecOpen() will return HDMI_CEC_IO_INVALID_STATE during successive calls
  * 4. Passing invalid handle address will return HDMI_CEC_IO_INVALID_ARGUMENT
- * 3. Once Hdmi Cec module is open. should be able to close the handle with HdmiCecClose api
+ * 3. Once Hdmi Cec module is open, should be able to close the handle with HdmiCecClose()
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 001@n
- * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
  * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecOpen(&hdmiHandle) - repeat the call | handle | HDMI_CEC_IO_INVALID_STATE| Should fail |
- * |03|call HdmiCecOpen(&hdmiHandle) - call api with invalid handle | handle | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
+ * |02|call HdmiCecOpen(&hdmiHandle) - repeat the call | handle | HDMI_CEC_IO_INVALID_STATE| Should Pass |
+ * |03|call HdmiCecOpen(&hdmiHandle) - call API with invalid handle | handle | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |04|call HdmiCecClose(hdmiHandle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * 
  */
@@ -97,137 +82,100 @@ void test_hdmicec_hal_l1_open( void )
 {
     int result;
     int handle = 0;
-    /* Positive result */
-    result = HdmiCecOpen (&handle);
+
+    result = HdmiCecOpen( &handle );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    /*calling hdmicec_init second time should pass and return the valid pointer*/
-    result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
+    result = HdmiCecOpen( &handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 
-    result = HdmiCecOpen (NULL);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+    result = HdmiCecOpen( NULL );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
-    /*calling hdmicec_close should pass */
-    result = HdmiCecClose (handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecClose( handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    /* #TODO: Unclear how the function will fail, maybe this function should be void? */
 }
 
 /**
- * @brief Ensure HdmiCecClose api returns proper error codes, during all api invocation scenarios
+ * @brief Ensure HdmiCecClose() returns correct error codes, during all of this API's invocation scenarios
  * 
- * HdmiCecClose() : will uninitialize the module
- * Params of HdmiCecClose:
- *     handle - The handle returned from the HdmiCecOpen() function.
- * Return of HdmiCecClose: respective HDMI_CEC_IO_ERROR
- * Expected error codes form HdmiCecClose are
- * HDMI_CEC_IO_SUCCESS          - Success
- * HDMI_CEC_IO_INVALID_STATE    - Module is not initialised
- * HDMI_CEC_IO_INVALID_ARGUMENT - Parameter passed to this function is invalid
- * HDMI_CEC_IO_GENERAL_ERROR    - Underlying undefined platform error.  Not able to simulate this scenario
- * 
- * This api ensure following conditions
- * 1. HdmiCecClose will return HDMI_CEC_IO_INVALID_STATE, if called before HdmiCecOpen is invoked.
- * 2. HdmiCecClose will return HDMI_CEC_IO_SUCCESS if a valid handle is passed.
- * 3. HdmiCecClose will return HDMI_CEC_IO_INVALID_STATE during successive calls.
+ * This ensure the following conditions :
+ * 1. HdmiCecClose() will return HDMI_CEC_IO_INVALID_STATE, if called before HdmiCecOpen() is invoked
+ * 2. HdmiCecClose() will return HDMI_CEC_IO_SUCCESS if a valid handle is passed
+ * 3. HdmiCecClose() will return HDMI_CEC_IO_INVALID_STATE during successive calls
  * 4. Passing invalid handle address will return HDMI_CEC_IO_INVALID_ARGUMENT
- * 5. Once Hdmi Cec module is open. should be able to close the handle with HdmiCecClose api
+ * 5. Once Hdmi Cec module is open. should be able to close the handle with HdmiCecClose()
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 002@n
- * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None@n
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecClose(hdmiHandle) - close interface even before opening it | handle | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecClose(hdmiHandle) - close interface even before opening it | handle | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecClose (handle) - call api with invalid handle | handle | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
+ * |03|call HdmiCecClose (handle) - call with invalid handle | handle | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |04|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecClose (handle) - close interface again | handle=hdmiHandle | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |05|call HdmiCecClose (handle) - close interface again | handle=hdmiHandle | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_close( void )
 {
     int result;
     int handle = 0;
 
-    /*calling hdmicec_close before calling open, should return the invalid argument error*/
-    result = HdmiCecClose (handle);//Code crash here
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
+    result = HdmiCecClose( handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 
-    /* Positive result */
-    result = HdmiCecOpen (&handle);
+    result = HdmiCecOpen( &handle );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    handle = INT_MAX;
-    /*calling hdmicec_close with invalid handle should return the invalid argument error*/
-    result = HdmiCecClose (handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
+    result = HdmiCecClose( NULL );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 
-    /*calling hdmicec_close should pass */
-    result = HdmiCecClose (handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);  
+    result = HdmiCecClose( handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );  
 
-    /*calling hdmicec_close second time */
-    result = HdmiCecClose (handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
-
-    /* #TODO: Unclear how the function will fail, maybe this function should be void? */
+    result = HdmiCecClose( handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 }
 
 
 /**
- * @brief Ensure HdmiCecAddLogicalAddress api returns proper error codes, during all api invocation scenarios
+ * @brief Ensure HdmiCecAddLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
  * 
- * HdmiCecAddLogicalAddress (): will block until the intended logical address is secured by the module.
- * Params of HdmiCecAddLogicalAddress:
- *     handle - The handle returned from the HdmiCecOpen() function.
- *     logicalAddress - The logical address to be acquired
- * Return of HdmiCecAddLogicalAddress: respective HDMI_CEC_IO_ERROR
- * 
- * Expected error codes form HdmiCecAddLogicalAddress are
- * @retval HDMI_CEC_IO_SUCCESS                    - POLL message is sent successfully and not ACK'd by any device on the bus.
- * @retval HDMI_CEC_IO_INVALID_STATE              - Module is not initialised
- * @retval HDMI_CEC_IO_INVALID_ARGUMENT           - Parameter passed to this function is invalid
- * @retval HDMI_CEC_IO_GENERAL_ERROR              - Underlying undefined platform error. Not able to simulate this scenario
- * @retval HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE - POLL message is sent and ACK'd by a device on the bus. Not able to simulate this scenario
- * @retval HDMI_CEC_IO_SENT_FAILED                - POLL message send failed. Not able to simulate this scenario
- * 
- * This api ensure following conditions
- * 1. Module is not initialised error is returned if api is called with out initialising the module.
- * 2. Able to successfully add the logical address once module is initialized.
- * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
- * 4. Once module is closed api returns Module is not initialised error.
+ * This test ensure following conditions :
+ * 1. Module not initialised error is returned if called without initialising
+ * 2. Able to successfully add the logical address once module is initialized
+ * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
+ * 4. Once module is closed, return not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 003@n
- * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:**None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecAddLogicalAddress(handle, logicalAddress) - trying to add logical address even before opening the module | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecAddLogicalAddress(handle, logicalAddress) - trying to add logical address even before opening the module | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call api with valid arguments | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecAddLogicalAddress(0, logicalAddress) - call api with invalid handle | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |05|call HdmiCecAddLogicalAddress(0, -1) - call api with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |06|call HdmiCecAddLogicalAddress(0, 0xF) - call api with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
+ * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call with valid arguments | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |04|call HdmiCecAddLogicalAddress(0, logicalAddress) - call with invalid handle | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |05|call HdmiCecAddLogicalAddress(0, -1) - call with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |06|call HdmiCecAddLogicalAddress(0, 0xF) - call with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |08|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call api after module is closed | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |08|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call after module is closed | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_addLogicalAddress( void )
 {
@@ -235,86 +183,68 @@ void test_hdmicec_hal_l1_addLogicalAddress( void )
     int handle = 0;
     int logicalAddress = INT_MAX;
 
-    //Calling api before open, should give invalid argument
-    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
+    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 
-    /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
     logicalAddress = DEFAULT_LOGICAL_ADDRESS;
 
-    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //Using invalid handle
-    result = HdmiCecAddLogicalAddress(0, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+    result = HdmiCecAddLogicalAddress( 0, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
-    result = HdmiCecAddLogicalAddress(0, -1);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+    result = HdmiCecAddLogicalAddress( 0, -1 );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
-    result = HdmiCecAddLogicalAddress(0, 0xF);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+    result = HdmiCecAddLogicalAddress( 0, 0xF );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
-    /*calling hdmicec_close should pass */
-    result = HdmiCecClose (handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecClose( handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //Calling api after close, should give invalid argument
-    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
+    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 
-    /* #TODO: Unclear how the function will fail, maybe this function should be void? */
 }
 
 /**
- * @brief Ensure HdmiCecRemoveLogicalAddress api returns proper error codes, during all api invocation scenarios.
+ * @brief Ensure HdmiCecRemoveLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
  * 
- * HdmiCecRemoveLogicalAddress (): This function releases the previously acquired logical address
- * Params of HdmiCecRemoveLogicalAddress:
- *     handle - The handle returned from the HdmiCecOpen() function.
- *     logicalAddress - The logicalAddresses to be released
- * Return of HdmiCecRemoveLogicalAddress: respective HDMI_CEC_IO_ERROR
- * Expected error codes form HdmiCecAddLogicalAddress are
- * HDMI_CEC_IO_SUCCESS          - Success
- * HDMI_CEC_IO_INVALID_STATE    - Module is not initialised
- * HDMI_CEC_IO_INVALID_ARGUMENT - Parameter passed to this function is invalid
- * HDMI_CEC_IO_GENERAL_ERROR    - Underlying undefined platform error. Not able to simulate this scenario
- * 
- * This api ensure following conditions
- * 1. Module is not initialised error is returned if api is called with out initialising the module.
- * 2. Removing the unallocated logical address should give success.
- * 3. Able to successfully remove the logical address once module is initialized.
+ * This test ensure following conditions :
+ * 1. Module not initialised error is returned if called without initialising
+ * 2. Removing the unallocated logical address should give success
+ * 3. Able to successfully remove the logical address once module is initialized
  * 4. Removing logical address twice should give success.
- * 4. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
- * 5. Once module is closed api returns Module is not initialised error.
+ * 4. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
+ * 5. Once module is closed return not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 004@n
- * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - trying to remove logical address even before opening the module | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - trying to remove logical address even before opening the module | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - removing unallocated logical address | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call api with valid arguments | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |04|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call with valid arguments | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |05|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - remove allocated logical address | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |06|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - remove same logical address again | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecRemoveLogicalAddress(0, logicalAddress) - call api with invalid handle | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |08|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - call api with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |09|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call api with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |10|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |11|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call api after module is closed | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |07|call HdmiCecRemoveLogicalAddress(0, logicalAddress) - call with invalid handle | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |08|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - call with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call with invalid logical address | handle | logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |10|call HdmiCecClose(handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |11|call HdmiCecRemoveLogicalAddress(handle, logicalAddress) - call after module is closed | handle | logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_removeLogicalAddress( void )
 {
@@ -323,91 +253,71 @@ void test_hdmicec_hal_l1_removeLogicalAddress( void )
     int logicalAddress = DEFAULT_LOGICAL_ADDRESS;
 
 
-    //Calling api before open, should give invalid argument
-    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress); //Code crash here
+    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
 
-    /* Positive result */
-    result = HdmiCecOpen (&handle);
+    result = HdmiCecOpen(&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
+    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecRemoveLogicalAddress( 0, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
-    result = HdmiCecRemoveLogicalAddress(0, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
-
-    //trying with invalid value
     logicalAddress = 0xF;
-    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
     logicalAddress = -1;
-    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
+    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
-    /*calling hdmicec_close should pass */
-    result = HdmiCecClose (handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecClose(handle);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //Calling api after close
-    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
+    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 
-    /* #TODO: Unclear how the function will fail, maybe this function should be void? */
 }
 
 /**
- * @brief Ensure HdmiCecGetLogicalAddress api returns proper error codes, during all api invocation scenarios.
+ * @brief Ensure HdmiCecGetLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
  * 
- * HdmiCecGetLogicalAddress (): function get the logical address for the specified device type.
- * Params of HdmiCecGetLogicalAddress:
- *     handle - The handle returned from the HdmiCecOpen() function.
- *     devType - The device type (tuner, record, playback etc.).
- *     logicalAddress - The logical address acquired. Should be valid address.
- * Return of HdmiCecGetLogicalAddress: respective HDMI_CEC_IO_ERROR
- * 
- * Expected error codes form HdmiCecAddLogicalAddress are
- * HDMI_CEC_IO_SUCCESS          - Success
- * HDMI_CEC_IO_INVALID_STATE    - Module is not initialised
- * HDMI_CEC_IO_INVALID_ARGUMENT - Parameter passed to this function is invalid
- * HDMI_CEC_IO_GENERAL_ERROR    - Underlying undefined platform error. Not able to simulate this scenario
- * 
- * This api ensure following conditions
- * 1. Module is not initialised error, is returned if api is called with out initialising the module.
+ * This test ensure following conditions:
+ * 1. Module not initialised error is returned if called without initialising
  * 2. Able to successfully get the logical address once module is initialized.
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
- * 4. Once module is closed api returns Module is not initialised error.
+ * 4. Once module is closed returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 005@n
- * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - trying to get logical address even before opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecGetLogicalAddress(handle, devType, &logicalAddress) - trying to get logical address even before opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call api with valid arguments after opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |08|call HdmiCecGetLogicalAddress(0, devType,  &logicalAddress) - call api with invalid handle | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |09|call HdmiCecGetLogicalAddress(0, devType,  NULL) - call api with invalid logical address handle | handle | devType | &logicalAddress  | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
+ * |03|call HdmiCecGetLogicalAddress(handle, devType, &logicalAddress) - call api with valid arguments after opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |08|call HdmiCecGetLogicalAddress(0, devType, &logicalAddress) - call api with invalid handle | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecGetLogicalAddress(0, devType, NULL) - call api with invalid logical address handle | handle | devType | &logicalAddress  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |10|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |11|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress)  - call api after module is closed | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |11|call HdmiCecGetLogicalAddress(handle, devType, &logicalAddress)  - call api after module is closed | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_getLogicalAddress( void )
 {
@@ -483,57 +393,36 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
 }
 
 /**
- * @brief Ensure HdmiCecSetRxCallback api returns proper error codes, during all api invocation scenarios.
+ * @brief Ensure HdmiCecSetRxCallback() returns correct error codes, during all of this API's invocation scenarios
  * 
- * HdmiCecSetRxCallback (): Sets CEC packet Receive callback.  
- *
- * HdmiCecSetRxCallback function sets a callback function to be invoked for each packet arrival.   
- * The packet contained in the buffer is expected to follow this format:
- *
- * (ref <HDMI Specification 1-4> Section <CEC 6.1>)
- * 
- * complete packet = header block + data block;
- * header block = destination logical address (4-bit) + source address (4-bit)
- * data   block = opcode block (8-bit) + operand block (N-bytes)
- * 
- * Params of HdmiCecSetRxCallback:
- * handle                    - The handle returned from the HdmiCecOpen(() function
- * cbfunc                    - Function pointer to be invoked when a complete packet is received
- * data                      - Callback data
- * 
- * Expected error codes form HdmiCecAddLogicalAddress are
- * HDMI_CEC_IO_SUCCESS          - Success
- * HDMI_CEC_IO_INVALID_STATE    - Module is not initialised
- * HDMI_CEC_IO_INVALID_ARGUMENT - Parameter passed to this function is invalid
- * 
- * This api ensure following conditions
- * 1. Setting RX callback even before module is initialized, should fail.
+ * This test ensure following conditions:
+ * 1. Setting RX callback even before module is initialized, Should Pass.
  * 2. Able to successfully set the RX callback after module is initialized.
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
  * 4. Setting the RX callback after module is closed should, fail.
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 006@n
- * **Priority:** Medium@n
+
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecSetRxCallback(handle, DriverReceiveCallback, 0) - trying set RX callback even before opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecSetRxCallback(handle, DriverReceiveCallback, 0) - trying to set RX callback even before opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle | devType | &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |08|call HdmiCecSetRxCallback(handle, DriverReceiveCallback, 0) - set RX call back with valid parameters | handle | DriverReceiveCallback | data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |09|call HdmiCecSetRxCallback(0, NULL, 0) - set RX call back with invalid handle | handle | DriverReceiveCallback | data address  | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
+ * |09|call HdmiCecSetRxCallback(0, NULL, 0) - set RX call back with invalid handle | handle | DriverReceiveCallback | data address  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |08|call HdmiCecSetRxCallback(handle, NULL, 0) - set RX call back with NULL callback | handle | DriverReceiveCallback | data address | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |10|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |11|call HdmiCecSetRxCallback(handle, DriverReceiveCallback, 0)  - call api after module is closed | handle | DriverReceiveCallback | data address | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |11|call HdmiCecSetRxCallback(handle, DriverReceiveCallback, 0)  - call api after module is closed | handle | DriverReceiveCallback | data address | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_setRxCallback( void )
 {
@@ -584,7 +473,7 @@ void test_hdmicec_hal_l1_setRxCallback( void )
 }
 
 /**
- * @brief Ensure HdmiCecSetTxCallback api returns proper error codes, during all api invocation scenarios.
+ * @brief Ensure HdmiCecSetTxCallback() returns correct error codes, during all of this API's invocation scenarios
  * 
  * HdmiCecSetTxCallback (): function sets a callback function to be invoked, once the async transmit
  * result is available. This is only necessary if application choose to transmit
@@ -602,127 +491,91 @@ void test_hdmicec_hal_l1_setRxCallback( void )
  * HDMI_CEC_IO_INVALID_STATE    - Module is not initialised
  * HDMI_CEC_IO_INVALID_ARGUMENT - Parameter passed to this function is invalid
  * 
- * This api ensure following conditions
- * 1. Setting TX callback even before module is initialized, should fail.
- * 2. Able to successfully set the TX callback after module is initialized.
- * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
- * 4. Setting the TX callback after module is closed, should fail.
+ * This test ensure following conditions:
+ * 1. Setting TX callback even before initialization should pass
+ * 2. Able to successfully set the TX callback after initialization
+ * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
+ * 4. Setting the TX callback after module is closed, should pass
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 007@n
- * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0) - trying set TX callback even before opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0) - trying set TX callback even before opening the module | handle | devType | &logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|call HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0) - set TX call back with valid parameters | handle | DriverTransmitCallback | data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecSetTxCallback(0, NULL, 0) - set TX call back with invalid handle | handle | DriverTransmitCallback | data address  | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
+ * |04|call HdmiCecSetTxCallback(0, NULL, 0) - set TX call back with invalid handle | handle | DriverTransmitCallback | data address  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |05|call HdmiCecSetTxCallback(handle, NULL, 0)  - set RX call back with NULL callback | handle | DriverTransmitCallback | data address | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0)  - call api after module is closed | handle | DriverTransmitCallback | data address | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |07|call HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0)  - call after module is closed | handle | DriverTransmitCallback | data address | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_setTxCallback( void )
 {
     int result;
     int handle = 0;
 
-    //Calling api before open, should pass
-    result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
+    result = HdmiCecSetTxCallback( handle, DriverTransmitCallback, 0 );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 
-    /* Positive result */
-    result = HdmiCecOpen (&handle);
+    result = HdmiCecOpen ( &handle );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    /* Positive result */
-    result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecSetTxCallback( handle, DriverTransmitCallback, 0 );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //Using NULL callback
-    result = HdmiCecSetTxCallback(handle, NULL, 0);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-
-    //Using NULL callback
     result = HdmiCecSetTxCallback(0, NULL, 0);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
-    /*calling hdmicec_close should pass */
-    result = HdmiCecClose (handle);
+    result = HdmiCecSetTxCallback( handle, NULL, 0 );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Calling api after close, should return success
-    result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
-    /* #TODO: Unclear how the function will fail, maybe this function should be void? */
+    result = HdmiCecClose( handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    result = HdmiCecSetTxCallback( handle, DriverTransmitCallback, 0 );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE );
 }
 
 /**
- * @brief Ensure HdmiCecTx api returns proper error codes, during all api invocation scenarios.
+ * @brief Ensure HdmiCecTx() returns correct error codes, during all of this API's invocation scenarios
  * 
- * HdmiCecTx (): function writes a complete CEC packet onto the CEC bus and wait for ACK.
- * application should check for result when return value of the function is 0;
- *
- * The bytes in buf that is to be transmitted should follow the buffer
- * byte format required for receiving buffer. (See detailed description from 
- * HdmiCecSetRxCallback)
- *
- * Params of HdmiCecTx:
- *  handle                              - The handle returned from the HdmiCecOpen() function.
- *  buf                                 - The buffer contains a complete CEC packet to send.
- *  len                                 - Number of bytes in the packet.
- *  result                             - send status buffer. Possible results are SENT_AND_ACKD,
- *                    SENT_BUT_NOT_ACKD (e.g. no follower at the destination),
- *                    SENT_FAILED (e.g. collision).
- * Return of HdmiCecTx: respective HDMI_CEC_IO_ERROR
- * 
- * Expected error codes form HdmiCecAddLogicalAddress are
- * HDMI_CEC_IO_SUCCESS                    - Success
- * HDMI_CEC_IO_INVALID_STATE              - Module is not initialised
- * HDMI_CEC_IO_INVALID_ARGUMENT           - Parameter passed to this function is invalid
- * HDMI_CEC_IO_GENERAL_ERROR              - Underlying undefined platform error. Not able to simulate this scenario
- * HDMI_CEC_IO_SENT_AND_ACKD              - Cec message is send and acknowledged. Not able to simulate this scenario
- * HDMI_CEC_IO_SENT_BUT_NOT_ACKD          - Message send but not acknowledged by the receiver. Not able to simulate this scenario
- * HDMI_CEC_IO_SENT_FAILED                - send message failed. Not able to simulate this scenario
- * HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE - receiver logical address is not available. Not able to simulate this scenario
- *  
- * This api ensure following conditions
- * 1. Module is not initialised error, is returned if api is called with out initialising the module.
- * 2. Able to successfully transmit the cec messages once module is initialized.
- * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
- * 4. Once module is closed api returns Module is not initialised error.
+ * This test ensure following conditions:
+ * 1. Module not initialised error is returned if called without initialising
+ * 2. Able to successfully transmit the cec messages once module is initialized
+ * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT
+ * 4. Once module is closed returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 008@n
- * **Priority:** Medium@n
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecTx(handle, buf, len, &ret) - trying to send cec messages, before opening the module | handle | buf | len | &ret | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecTx(handle, buf, len, &ret) - trying to send cec messages, before opening the module | handle | buf | len | &ret | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle | devType | &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message after proper module initialization | handle | buf | len | &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecTx(handle, buf, len, NULL) - call cec message send with invalid argument | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |07|call HdmiCecTx(handle, NULL, len, &ret) - call cec message send with invalid argument | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |08|call HdmiCecTx(0, buf, len, &ret) - call cec message send with invalid argument | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |09|call HdmiCecTx(handle, buf, INT_MIN, &ret) - call cec message send with invalid argument | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |10|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |11|call HdmiCecTx(handle, buf, len, &ret)  - call api after module is closed | handle | buf | len | &ret | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message after correct module initialization | handle | buf | len | &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |06|call HdmiCecTx(handle, buf, len, NULL) - call cec message send with invalid ret | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |07|call HdmiCecTx(handle, NULL, len, &ret) - call cec message send with invalid buffer | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |08|call HdmiCecTx(0, buf, len, &ret) - call cec message send with invalid handle | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecTx(handle, buf, INT_MIN, &ret) - call cec message send with invalid buffer length | handle | buf | len | &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |10|call HdmiCecClose(handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |11|call HdmiCecTx(handle, buf, len, &ret)  - call module is closed | handle | buf | len | &ret | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_hdmiCecTx( void )
 {
@@ -790,7 +643,7 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
 }
 
 /**
- * @brief Ensure HdmiCecTxAsync api returns proper error codes, during all api invocation scenarios.
+ * @brief Ensure HdmiCecTxAsync() returns correct error codes, during all of this API's invocation scenarios
  * 
  * HdmiCecTxAsync (): function writes a complete CEC packet onto the CEC bus but does not wait 
  * for ACK. The result will be reported via HdmiCecRxCallback_t if return value
@@ -808,36 +661,36 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
  * HDMI_CEC_IO_INVALID_ARGUMENT           - Parameter passed to this function is invalid
  * HDMI_CEC_IO_GENERAL_ERROR              - Underlying undefined platform error. Not able to simulate this scenario
  * 
- * This api ensure following conditions
- * 1. Module is not initialised error, is returned if api is called with out initialising the module.
+ * This test ensure following conditions:
+ * 1. Module not initialised error is returned if called without initialising
  * 2. Able to successfully transmit the cec messages once module is initialized.
  * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
- * 4. Once module is closed api returns Module is not initialised error.
+ * 4. Once module is closed returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 009@n
- * **Priority:** Medium@n
+
  * 
  * **Pre-Conditions:**@n
  * None
  * 
- * **Dependencies:** Module must be installed for use@n
- * **User Interaction:** N/A
+ * **Dependencies:** None@n
+ * **User Interaction:** None
  * 
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecTxAsync(handle, buf, len) - trying to send cec messages, before opening the module | handle | buf | len | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |01|call HdmiCecTxAsync(handle, buf, len) - trying to send cec messages, before opening the module | handle | buf | len | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * |02|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle | logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle | devType | &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTxAsync(handle, buf, len) - send the cec message after proper module initialization | handle | buf | len | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecTxAsync(handle, NULL, len) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |07|call HdmiCecTx(handle, NULL, len, &ret) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |08|call HdmiCecTxAsync(0, buf, len) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
- * |09|call HdmiCecTxAsync(handle, buf, INT_MIN) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should fail |
+ * |05|call HdmiCecTxAsync(handle, buf, len) - send the cec message after correct module initialization | handle | buf | len | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |06|call HdmiCecTxAsync(handle, NULL, len) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |07|call HdmiCecTx(handle, NULL, len, &ret) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |08|call HdmiCecTxAsync(0, buf, len) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecTxAsync(handle, buf, INT_MIN) - call cec message send with invalid argument | handle | buf | len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |10|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |11|call HdmiCecTxAsync(handle, buf, len)  - call api after module is closed | handle | buf | len | HDMI_CEC_IO_INVALID_STATE| Should fail |
+ * |11|call HdmiCecTxAsync(handle, buf, len)  - call api after module is closed | handle | buf | len | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  * 
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync( void )
