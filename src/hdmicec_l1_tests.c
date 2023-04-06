@@ -475,22 +475,6 @@ void test_hdmicec_hal_l1_setRxCallback( void )
 /**
  * @brief Ensure HdmiCecSetTxCallback() returns correct error codes, during all of this API's invocation scenarios
  * 
- * HdmiCecSetTxCallback (): function sets a callback function to be invoked, once the async transmit
- * result is available. This is only necessary if application choose to transmit
- * the packet asynchronously.
- *
- * HdmiCecSetTxCallback function should block if callback invocation is in progress.
- * Params of HdmiCecSetRxCallback:
- * handle                    - The handle returned from the HdmiCecOpen() function.
- * cbfunc                    - Function pointer to be invoked when a complete packet is transmitted
- * data                      - Callback data
- * Return of HdmiCecSetRxCallback: respective HDMI_CEC_IO_ERROR
- * 
- * Expected error codes form HdmiCecAddLogicalAddress are
- * HDMI_CEC_IO_SUCCESS          - Success
- * HDMI_CEC_IO_INVALID_STATE    - Module is not initialised
- * HDMI_CEC_IO_INVALID_ARGUMENT - Parameter passed to this function is invalid
- * 
  * This test ensure following conditions:
  * 1. Setting TX callback even before initialization should pass
  * 2. Able to successfully set the TX callback after initialization
@@ -598,12 +582,15 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
+#ifndef __UT_STB__
     logicalAddress = DEFAULT_LOGICAL_ADDRESS;
 
     //Set logical address for TV.
     //logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+#endif
+
     buf[0] = 0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address
@@ -644,22 +631,6 @@ void test_hdmicec_hal_l1_hdmiCecTx( void )
 
 /**
  * @brief Ensure HdmiCecTxAsync() returns correct error codes, during all of this API's invocation scenarios
- * 
- * HdmiCecTxAsync (): function writes a complete CEC packet onto the CEC bus but does not wait 
- * for ACK. The result will be reported via HdmiCecRxCallback_t if return value
- * of this function is 0.
- *
- * Params of HdmiCecTxAsync:
- *  handle                              - The handle returned from the HdmiCecOpen() function.
- *  buf                                 - The buffer contains a complete CEC packet to send.
- *  len                                 - Number of bytes in the packet.
- * Return of HdmiCecTxAsync: respective HDMI_CEC_IO_ERROR
- * 
- * Expected error codes form HdmiCecAddLogicalAddress are
- * HDMI_CEC_IO_SUCCESS                    - Success
- * HDMI_CEC_IO_INVALID_STATE              - Module is not initialised
- * HDMI_CEC_IO_INVALID_ARGUMENT           - Parameter passed to this function is invalid
- * HDMI_CEC_IO_GENERAL_ERROR              - Underlying undefined platform error. Not able to simulate this scenario
  * 
  * This test ensure following conditions:
  * 1. Module not initialised error is returned if called without initialising
@@ -717,10 +688,13 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync( void )
     result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
+#ifndef __UT_STB__
     //Set logical address for TV.
     logicalAddress = DEFAULT_LOGICAL_ADDRESS;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+#endif
+
     buf[0] = 0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address.
