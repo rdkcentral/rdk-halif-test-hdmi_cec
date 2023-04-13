@@ -133,7 +133,7 @@ void DriverTransmitCallback_hal_l2HdmiDisconnected(int handle, void *callbackDat
     UT_ASSERT_PTR_NULL(callbackData);
     UT_ASSERT_TRUE( (unsigned long long)callbackData!= (unsigned long long)0xDEADBEEF);
     printf ("\ncallbackData returned: %x result: %d\n",callbackData, result);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_FAILED);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
 }
 
 /**
@@ -437,7 +437,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected( void )
     isCallbackTriggered_g = false;
 
     result = HdmiCecTx(handle, buf1, len, &ret);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_FAILED);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
 
     //Wait for 2 sec for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
@@ -524,7 +524,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected( void )
 
     //Wait for 2 sec for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
-    //Check if expected buffer received.
+    //Check if rx callback is not triggered.
     UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
 
     if(false != isCallbackTriggered_g){
