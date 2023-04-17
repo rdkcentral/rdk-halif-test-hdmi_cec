@@ -223,7 +223,7 @@ void test_hdmicec_hal_l1_addLogicalAddressSinkDevice( void )
  * 4. Once module is closed, return not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 003@n
+ * **Test Case ID:** 004@n
  * 
  * **Pre-Conditions:**@n
  * None.
@@ -291,7 +291,7 @@ void test_hdmicec_hal_l1_addLogicalAddressSourceDevice( void )
  * 6. Once module is closed return not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 004@n
+ * **Test Case ID:** 005@n
  * 
  * **Pre-Conditions:**@n
  * None.
@@ -365,7 +365,7 @@ void test_hdmicec_hal_l1_removeLogicalAddressSinkDevice( void )
  * 4. Once module is closed return not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 004@n
+ * **Test Case ID:** 006@n
  * 
  * **Pre-Conditions:**@n
  * None.
@@ -432,7 +432,7 @@ void test_hdmicec_hal_l1_removeLogicalAddressSourceDevice( void )
  * 6. Once module is closed, API returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 005@n
+ * **Test Case ID:** 007@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -504,7 +504,7 @@ void test_hdmicec_hal_l1_getLogicalAddressSinkDevice( void )
  * 4. Once module is closed, API returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 005@n
+ * **Test Case ID:** 008@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -602,7 +602,7 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
  * 5. Setting the RX callback with invalid args after the module is closed should fail.
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 006@n
+ * **Test Case ID:** 009@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -685,7 +685,7 @@ void test_hdmicec_hal_l1_setRxCallback( void )
  * 5. Setting the TX callback with invalid args after the module is closed should fail.
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 007@n
+ * **Test Case ID:** 010@n
  * 
  * **Pre-Conditions:**@n
  * None
@@ -745,7 +745,7 @@ void test_hdmicec_hal_l1_setTxCallback( void )
  * 4. Once module is closed returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 008@n
+ * **Test Case ID:** 011@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -848,7 +848,7 @@ void test_hdmicec_hal_l1_hdmiCecTxSinkDevice( void )
  * 4. Once module is closed returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 008@n
+ * **Test Case ID:** 012@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -939,7 +939,7 @@ void test_hdmicec_hal_l1_hdmiCecTxSourceDevice( void )
  * 4. Once module is closed returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 009@n
+ * **Test Case ID:** 013@n
 
  * 
  * **Pre-Conditions:**@n
@@ -1036,7 +1036,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsyncSinkDevice( void )
  * 4. Once module is closed returns not initialised error
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 009@n
+ * **Test Case ID:** 014@n
 
  * 
  * **Pre-Conditions:**@n
