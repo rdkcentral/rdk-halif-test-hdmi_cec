@@ -541,7 +541,6 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice( void )
     int result;
     int handle = 0;
     int logicalAddress = 0;
-    int logicalAddressCrossCheck = INT_MIN;
     int devType = 3;//Trying some dev type.
 
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
