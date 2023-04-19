@@ -1,0 +1,301 @@
+# HDMI CEC Level 2 - Module Testing
+## History
+
+| Version | Date(YY-MM-DD) | Author |Comments |
+| -------| ----- | ----- | ----- |
+| 1.0.0 | 22/02/23 | Anjali Thampi| Inital Document |
+
+## Table of Contents
+
+- [Overview](#overview)
+  - [Acronyms](#acronyms)
+  - [Definitions](#definitions)
+  - [References](#references)
+- [Level 2 Test Suite](#level-2-test-suite)
+  - [Module Level Function to check the CEC transmit and receive](#module-level-function-to-check-the-CEC-transmit-and-receive)
+ 
+## Overview
+
+This document describes the level 2 testing suite for the HDMICEC module.
+
+### Acronyms, Terms and Abbreviations
+
+- `HAL` \- Hardware Abstraction Layer, may include some common components
+- `HAL.h`  \- Abstracted defined API to control the hardware
+- `HAL.c`  \- Implementation wrapper layer created by the `OEM` or `SoC` Vendor.
+- `RDK`  \- Reference Design Kit for All Devices
+- `RDK-B`  \- Reference Design Kit for Broadband Devices
+- `RDK-V`  \- Reference Design Kit for Video Devices
+- `UT`  \- Unit Test(s)
+- `OEM`  \- Original Equipment Manufacture (Sky is also an OEM)
+- `SoC`  \- System on a Chip
+
+### Definitions
+
+- `Broadcom` \- `SoC` manufacturer <https://www.broadcom.com/>
+- `Amlogic` \- `SoC` manufacturer <https://en.wikipedia.org/wiki/Amlogic>
+- `Soc Vendor` \- Definition to encompass multiple vendors
+- `Unit Tests` \- C Function tests that run on the target hardware
+- `Common Testing Framework` \- Off the shelf 3rd Party Testing Framework, or framework that does not require infrastructure to control it. That's not to say it cannot be controlled via infrastructure if required. Examples of which are.
+  - `GTest` \- Google Test Suit <https://google.github.io/googletest>
+  - `CUnit` \- C Testing Suit <http://cunit.sourceforge.net/>
+  - `Unity` \- C Embedded Testing Suit <http://www.throwtheswitch.org/unity>
+  - `ut-core` \- Common Testing Framework <https://github.com/comcast-sky/rdk-components-ut-core>, which wraps a open-source framework that can be expanded to the requirements for future comcast-sky framework.
+
+### References
+
+- `Feedback Loops` \- <https://www.softwaretestingnews.co.uk/4-methods-to-improve-your-feedback-loops-and-supercharge-your-testing-process/>
+- `Doxygen` \- SourceCode documentation tool - <https://www.doxygen.nl/index.html>
+- `Black Box Testing` \- <https://en.wikipedia.org/wiki/Black-box_testing>
+
+## Level 2 Test Suite
+
+The following functions are expecting to test the module operates correctly.
+
+### Module Level Function to check the CEC transmit and receive
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_getCecVersion_sink() |
+|Description| This function will do the functionality verification of  HdmiCec get version query. |
+|Test Group|02 (Module)|
+|Test Case ID|001|
+|Priority|Low|
+
+**Pre-Conditions :**
+-  There should be a HDMICEC enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+
+ |Variation / Step|Description|Test Data|Expected Result|Notes|
+ |:--:|---------|----------|--------------|-----|
+ |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the cec version after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |06|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_getVendorID_sink () |
+|Description| This function will do the functionality verification of  HdmiCec get vendor id |
+|Test Group|02 (Module)|
+|Test Case ID|002|
+|Priority|Low|
+
+**Pre-Conditions :**
+-  There should be a HDMICEC enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+ |Variation / Step|Description|Test Data|Expected Result|Notes|
+ |:--:|---------|----------|--------------|-----|
+ |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |06|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_getPowerStatus_sink () |
+|Description| This function will do the functionality verification of  HdmiCec get power status. |
+|Test Group|02 (Module)|
+|Test Case ID|003|
+|Priority|Low|
+
+**Pre-Conditions :**
+-  There should be a HDMICEC enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+ |Variation / Step|Description|Test Data|Expected Result|Notes|
+ |:--:|---------|----------|--------------|-----|
+ |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |06|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink () |
+|Description| This function will do the functionality verification of  HdmiCec get vendor id with HDMI disconnected. |
+|Test Group|02 (Module)|
+|Test Case ID|004|
+|Priority|Low|
+
+**Pre-Conditions :**
+-   All of the device HDMI ports should be disconnected.
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+|01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+|02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+|06|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink () |
+|Description| This function will do the functionality verification of  HdmiCec get power status with HDMI cable disconnected. |
+|Test Group|02 (Module)|
+|Test Case ID|005|
+|Priority|Low|
+
+**Pre-Conditions :**
+-   All of the device HDMI ports should be disconnected.
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+|01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+|02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+|06|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_getCecVersion_source ()|
+|Description| This function will do the functionality verification of  HdmiCec get version query for source devices. |
+|Test Group|02 (Module)|
+|Test Case ID|006|
+|Priority|Low|
+
+**Pre-Conditions :**
+-  There should be a HDMICEC enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+|01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+|02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the cec version after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+|05|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_getVendorID_source ()|
+|Description| This function will do the functionality verification of  HdmiCec get vendor id for source devices. |
+|Test Group|02 (Module)|
+|Test Case ID|007|
+|Priority|Low|
+
+**Pre-Conditions :**
+-  There should be a HDMICEC enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+|01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+|02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+|05|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_getPowerStatus_source ()|
+|Description| This function will do the functionality verification of  HdmiCec get power status for source devices. |
+|Test Group|02 (Module)|
+|Test Case ID|008|
+|Priority|Low|
+
+**Pre-Conditions :**
+-  There should be a HDMICEC enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+|01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+|02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+|05|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source ()|
+|Description| This function will do the functionality verification of  HdmiCec get vendor id for source devices with hdmi cable disconnected. |
+|Test Group|02 (Module)|
+|Test Case ID|009|
+|Priority|Low|
+
+**Pre-Conditions :**
+-   All of the device HDMI ports should be disconnected.
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+|01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+|02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+|05|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+|Title|Details|
+|--|--|
+|Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source ()|
+|Description| This function will do the functionality verification of  HdmiCec get power status for source devices with hdmi cable disconnected. |
+|Test Group|02 (Module)|
+|Test Case ID|010|
+|Priority|Low|
+
+**Pre-Conditions :**
+-   All of the device HDMI ports should be disconnected.
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+|01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+|02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+|04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+|05|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+|06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+

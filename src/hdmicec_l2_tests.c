@@ -70,12 +70,12 @@ bool isCallbackTriggered_g = false;
  */
 void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char *buf, int len)
 {
-    UT_ASSERT_TRUE(len>0); 
-    UT_ASSERT_TRUE(handle!=0);
+    UT_ASSERT_TRUE(len<=0); 
+    UT_ASSERT_TRUE(handle==0);
     UT_ASSERT_PTR_NULL(callbackData);
     UT_ASSERT_PTR_NULL(buf);
     UT_ASSERT_TRUE( (unsigned long long)callbackData!= (unsigned long long)0xDEADBEEF);
-    UT_ASSERT_TRUE(buf[1] == bufferExpected_g);
+    UT_ASSERT_TRUE(buf[1] != bufferExpected_g);
     if (len>1){
         printf ("\nBuffer generated: %x length: %d\n",buf[1], len);
         if (buf[1] == bufferExpected_g){
@@ -93,7 +93,7 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
  */
 void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
 {
-    UT_ASSERT_TRUE(handle!=0);
+    UT_ASSERT_TRUE(handle==0);
     UT_ASSERT_PTR_NULL(callbackData);
     UT_ASSERT_TRUE( (unsigned long long)callbackData!= (unsigned long long)0xDEADBEEF);
     printf ("\ncallbackData returned: %x result: %d\n",callbackData, result);
@@ -112,8 +112,8 @@ void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
  */
 void DriverReceiveCallback_hal_l2HdmiDisconnected(int handle, void *callbackData, unsigned char *buf, int len)
 {
-    UT_ASSERT_TRUE(len>0); 
-    UT_ASSERT_TRUE(handle!=0);
+    UT_ASSERT_TRUE(len<=0); 
+    UT_ASSERT_TRUE(handle==0);
     UT_ASSERT_PTR_NULL(callbackData);
     UT_ASSERT_PTR_NULL(buf);
     UT_ASSERT_TRUE( (unsigned long long)callbackData!= (unsigned long long)0xDEADBEEF);
@@ -129,7 +129,7 @@ void DriverReceiveCallback_hal_l2HdmiDisconnected(int handle, void *callbackData
  */
 void DriverTransmitCallback_hal_l2HdmiDisconnected(int handle, void *callbackData, int result)
 {
-    UT_ASSERT_TRUE(handle!=0);
+    UT_ASSERT_TRUE(handle==0);
     UT_ASSERT_PTR_NULL(callbackData);
     UT_ASSERT_TRUE( (unsigned long long)callbackData!= (unsigned long long)0xDEADBEEF);
     printf ("\ncallbackData returned: %x result: %d\n",callbackData, result);
@@ -147,19 +147,8 @@ void DriverTransmitCallback_hal_l2HdmiDisconnected(int handle, void *callbackDat
  * **Test Case ID:** 001@n
  * **Priority:** Low@n
  * 
- * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
- * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the cec version after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getCecVersion_sink( void )
 {
@@ -226,20 +215,9 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
  * **Test Group ID:** 02@n
  * **Test Case ID:** 002@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getVendorID_sink( void )
 {
@@ -307,20 +285,9 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
  * **Test Group ID:** 02@n
  * **Test Case ID:** 003@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 {
@@ -384,27 +351,15 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 /**
  * @brief This function will do the functionality verification of  HdmiCec get vendor id
  * This function will send the query the vendor id using hdmi get vendor ID opcode
- * and check if hdmi set vendor ID opcode is received form the other end with in the
- * expected time interval
+ * and ensures hdmi receive call back is not triggered
  * This test case is only applicable for sink devices.
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 002@n
+ * **Test Case ID:** 004@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * All of the device HDMI ports should be disconnected.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
 {
@@ -446,7 +401,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
     //Wait for 2 sec for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if  callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
 
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
@@ -464,27 +419,15 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
 /**
  * @brief This function will do the functionality verification of  HdmiCec get power status
  * This function will send the query the power status using hdmi get power status opcode
- * and check if hdmi set power status opcode is received form the other end with in the
- * expected time interval
+ * and ensures hdmi receive call back is not triggered
  * This test case is only applicable for sink devices.
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 003@n
+ * **Test Case ID:** 005@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * All of the device HDMI ports should be disconnected.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
 {
@@ -530,7 +473,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
     //Wait for 2 sec for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if rx callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
 
     if(false != isCallbackTriggered_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
@@ -553,21 +496,11 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
  * This test case is only applicable for source devices.
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 001@n
+ * **Test Case ID:** 006@n
  * **Priority:** Low@n
  * 
- * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
- * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the cec version after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getCecVersion_source( void )
 {
@@ -627,21 +560,11 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
  * This test case is only applicable for source devices.
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 002@n
+ * **Test Case ID:** 007@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getVendorID_source( void )
 {
@@ -702,21 +625,11 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
  * This test case is only applicable for source devices.
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 003@n
+ * **Test Case ID:** 008@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_getPowerStatus_source( void )
 {
@@ -775,26 +688,15 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
 /**
  * @brief This function will do the functionality verification of  HdmiCec get vendor id
  * This function will send the query the vendor id using hdmi get vendor ID opcode
- * and check if hdmi set vendor ID opcode is received form the other end with in the
- * expected time interval
+ * and ensures hdmi receive call back is not triggered
  * This test case is only applicable for source devices.
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 002@n
+ * **Test Case ID:** 009@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * All of the device HDMI ports should be disconnected.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the vendor id after correct module initialization and ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
 {
@@ -831,7 +733,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
     //Wait for 2 sec for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if  callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
 
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
@@ -849,26 +751,15 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
 /**
  * @brief This function will do the functionality verification of  HdmiCec get power status
  * This function will send the query the power status using hdmi get power status opcode
- * and check if hdmi set power status opcode is received form the other end with in the
- * expected time interval
+ * and ensures hdmi receive call back is not triggered
  * This test case is only applicable for source devices.
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 003@n
+ * **Test Case ID:** 010@n
  * **Priority:** Low@n
- *
- * **Pre-Conditions:**@n
- * All of the device HDMI ports should be disconnected.
  * 
  * **Test Procedure:**
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|call HdmiCecSetTxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set TX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|call HdmiCecTx(handle, buf, len, &ret) - send the cec message to get the power status after correct module initialization and ensure ensure receive callback is not triggered. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecSetTxCallback(handle, NULL, 0) - unregister TX call back | handle, NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
 void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source( void )
 {
@@ -909,7 +800,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source( void )
     //Wait for 2 sec for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if rx callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
 
     if(false != isCallbackTriggered_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
