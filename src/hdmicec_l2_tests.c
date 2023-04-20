@@ -344,7 +344,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 }
 
 /**
- * @brief This function will do the functionality verification of HDMI CEC vendor id request with HDMI disconnected.
+ * @brief This function will request the HDMI CEC vendor ID in HDMI disconnected state and check if HDMI CEC vendor ID opcode is not received within the expected time interval for sink devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 004@n
@@ -414,7 +414,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
 }
 
 /**
- * @brief This function will do the functionality verification of HDMI CEC get power status request with HDMI cable disconnected
+ * @brief This function will request the HDMI CEC power status in HDMI disconnected state and check if HDMI CEC power status opcode is not received within the expected time interval for sink devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 005@n
@@ -668,7 +668,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
 }
 
 /**
- * @brief This function will do the functionality verification of HDMI CEC vendor id request with HDMI disconnected for source devices.
+ * @brief This function will request the HDMI CEC vendor ID in HDMI disconnected state and check if HDMI CEC vendor ID opcode is not received within the expected time interval for source devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 009@n
@@ -732,7 +732,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
 }
 
 /**
- * @brief This function will do the functionality verification of HDMI CEC get power status request with HDMI disconnected for source devices.
+ * @brief This function will request the HDMI CEC power status in HDMI disconnected state and check if HDMI CEC power status opcode is not received within the expected time interval for source devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 010@n
