@@ -137,7 +137,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink () |
-|Description| This function will do the functionality verification of  `HDMI` `CEC` vendor id request with HDMI disconnected. |
+|Description| This function will request the `HDMI` `CEC` vendor ID in `HDMI` disconnected state and check if `HDMI` `CEC` vendor ID opcode is not received within the expected time interval for sink devices. |
 |Test Group|02 (Module)|
 |Test Case ID|004|
 |Priority|Low|
@@ -163,7 +163,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink () |
-|Description| This function will do the functionality verification of  `HDMI` `CEC` get power status request with HDMI cable disconnected. |
+|Description| This function will request the `HDMI` `CEC` power status in `HDMI` disconnected state and check if `HDMI` `CEC` power status opcode is not received within the expected time interval for sink devices. |
 |Test Group|02 (Module)|
 |Test Case ID|005|
 |Priority|Low|
@@ -266,7 +266,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source ()|
-|Description| This function will do the functionality verification of  `HDMI` `CEC` vendor id request with HDMI disconnected for source devices. |
+|Description| This function will request the `HDMI` `CEC` vendor ID in `HDMI` disconnected state and check if `HDMI` `CEC` vendor ID opcode is not received within the expected time interval for source devices. |
 |Test Group|02 (Module)|
 |Test Case ID|009|
 |Priority|Low|
@@ -291,7 +291,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source ()|
-|Description| This function will do the functionality verification of  `HDMI` `CEC` get power status request with HDMI disconnected for source devices. |
+|Description| This function will request the `HDMI` `CEC` power status in `HDMI` disconnected state and check if `HDMI` `CEC` power status opcode is not received within the expected time interval for source devices. |
 |Test Group|02 (Module)|
 |Test Case ID|010|
 |Priority|Low|
