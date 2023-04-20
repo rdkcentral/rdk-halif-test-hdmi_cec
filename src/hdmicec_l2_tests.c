@@ -67,7 +67,7 @@ int isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 bool isCallbackTriggered_g = false;
 
 /**
- * @brief callback to receive the hdmicec receive messages
+ * @brief callback to receive the HDMI CEC receive messages
  * Ensure  getting correct reply messages form the respective CEC peer devices, for all the CEC message queries form this device.
  * 
  * @param handle Hdmi device handle
@@ -109,7 +109,7 @@ void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
 }
 
 /**
- * @brief callback to receive the hdmicec receive messages
+ * @brief callback to receive the HDMI CEC receive messages
  * Ensure  getting correct reply messages form the respective CEC peer devices, for all the CEC message queries form this device.
  * 
  * @param handle Hdmi device handle
@@ -144,10 +144,7 @@ void DriverTransmitCallback_hal_l2HdmiDisconnected(int handle, void *callbackDat
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get version query.
- * This function will send the query, hdmi get cec version and check if hdmi set cec version opcode 
- * is received form the other end with in the expected time interval
- *  This test case is only applicable for sink devices.
+ * @brief This function will request the HDMI CEC version and check if HDMI CEC version opcode is received within the expected time interval for sink devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 001@n
@@ -185,7 +182,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
     opcodeExpected_g = CEC_VERSION;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -212,11 +209,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get vendor id
- * This function will send the query the vendor id using hdmi get vendor ID opcode
- * and check if hdmi set vendor ID opcode is received form the other end with in the
- * expected time interval
- * This test case is only applicable for sink devices.
+ * @brief This function will request the HDMI CEC vendor ID and check if HDMI CEC vendor ID opcode is received within the expected time interval for sink devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 002@n
@@ -254,7 +247,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = DEVICE_VENDOR_ID;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -282,11 +275,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get power status
- * This function will send the query the power status using hdmi get power status opcode
- * and check if hdmi set power status opcode is received form the other end with in the
- * expected time interval
- * This test case is only applicable for sink devices.
+ * @brief This function will request the HDMI CEC power status and check if HDMI CEC power status opcode is received within the expected time interval for sink devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 003@n
@@ -327,7 +316,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
     opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -355,10 +344,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get vendor id
- * This function will send the query the vendor id using hdmi get vendor ID opcode
- * and ensures hdmi receive call back is not triggered
- * This test case is only applicable for sink devices.
+ * @brief This function will do the functionality verification of HDMI CEC vendor id request with HDMI disconnected.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 004@n
@@ -401,7 +387,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = DEVICE_VENDOR_ID;
     isCallbackTriggered_g = false;
@@ -428,10 +414,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get power status
- * This function will send the query the power status using hdmi get power status opcode
- * and ensures hdmi receive call back is not triggered
- * This test case is only applicable for sink devices.
+ * @brief This function will do the functionality verification of HDMI CEC get power status request with HDMI cable disconnected
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 005@n
@@ -472,7 +455,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = REPORT_POWER_STATUS;
     isCallbackTriggered_g = false;
@@ -500,11 +483,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get version query
- * This function will send the query the hdmicec version using hdmi get cec version opcode
- * and check if hdmi set cec version opcode is received form the other end with in the
- * expected time interval
- * This test case is only applicable for source devices.
+ * @brief This function will request the HDMI CEC version and check if HDMI CEC version opcode is received within the expected time interval for source devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 006@n
@@ -537,7 +516,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     //Get logical address for STB.
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = CEC_VERSION;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -564,11 +543,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get vendor id
- * This function will send the query the vendor id using hdmi get vendor ID opcode
- * and check if hdmi set vendor ID opcode is received form the other end with in the
- * expected time interval
- * This test case is only applicable for source devices.
+ * @brief This function will request the HDMI CEC vendor ID and check if HDMI CEC vendor ID opcode is received within the expected time interval for source devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 007@n
@@ -601,7 +576,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     //Get logical address.
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = DEVICE_VENDOR_ID;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -629,11 +604,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get power status
- * This function will send the query the power status using hdmi get power status opcode
- * and check if hdmi set power status opcode is received form the other end with in the
- * expected time interval
- * This test case is only applicable for source devices.
+ * @brief This function will request the HDMI CEC power status and check if HDMI CEC power status opcode is received within the expected time interval for source devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 008@n
@@ -669,7 +640,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     //Get logical address for STB.
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -697,10 +668,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get vendor id
- * This function will send the query the vendor id using hdmi get vendor ID opcode
- * and ensures hdmi receive call back is not triggered
- * This test case is only applicable for source devices.
+ * @brief This function will do the functionality verification of HDMI CEC vendor id request with HDMI disconnected for source devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 009@n
@@ -737,7 +705,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
     //Get logical address.
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = DEVICE_VENDOR_ID;
     isCallbackTriggered_g = false;
@@ -764,10 +732,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
 }
 
 /**
- * @brief This function will do the functionality verification of  HdmiCec get power status
- * This function will send the query the power status using hdmi get power status opcode
- * and ensures hdmi receive call back is not triggered
- * This test case is only applicable for source devices.
+ * @brief This function will do the functionality verification of HDMI CEC get power status request with HDMI disconnected for source devices.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 010@n
@@ -803,7 +768,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source( void )
     //Get logical address for STB.
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
    opcodeExpected_g = REPORT_POWER_STATUS;
     isCallbackTriggered_g = false;
