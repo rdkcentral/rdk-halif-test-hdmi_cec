@@ -40,12 +40,19 @@
 #include "hdmi_cec_driver.h"
 
 #define HDMICEC_RESPONSE_TIMEOUT 2
+#define HDMICEC_USER_INTERACTION_PAUSE 20
+#define GET_CEC_VERSION (0x9F)
+#define CEC_VERSION (0x9E)
+#define DEVICE_VENDOR_ID (0x87)
+#define GIVE_DEVICE_VENDOR_ID (0x8C)
+#define GIVE_DEVICE_POWER_STATUS (0x8F)
+#define REPORT_POWER_STATUS (0x90)
 
 /**
  * @brief Expected cec message buffer in the L2 scenario
  * 
  */
-unsigned char bufferExpected_g = 0x00;
+unsigned char opcodeExpected_g = 0x00;
 
 /**
  * @brief Status variable to check if expected cec message received in the respective L2 scenario.
@@ -75,10 +82,10 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
     UT_ASSERT_PTR_NULL(callbackData);
     UT_ASSERT_PTR_NULL(buf);
     UT_ASSERT_TRUE( (unsigned long long)callbackData!= (unsigned long long)0xDEADBEEF);
-    UT_ASSERT_TRUE(buf[1] != bufferExpected_g);
+    UT_ASSERT_TRUE(buf[1] != opcodeExpected_g);
     if (len>1){
         printf ("\nBuffer generated: %x length: %d\n",buf[1], len);
-        if (buf[1] == bufferExpected_g){
+        if (buf[1] == opcodeExpected_g){
             isExpectedBufferReceived_g = HDMI_CEC_IO_SUCCESS;
         }
     }
@@ -138,9 +145,8 @@ void DriverTransmitCallback_hal_l2HdmiDisconnected(int handle, void *callbackDat
 
 /**
  * @brief This function will do the functionality verification of  HdmiCec get version query.
- * This function will send the query the hdmicec version using hdmi get cec version opcode
- * and check if hdmi set cec version opcode is received form the other end with in the
- * expected time interval
+ * This function will send the query, hdmi get cec version and check if hdmi set cec version opcode 
+ * is received form the other end with in the expected time interval
  *  This test case is only applicable for sink devices.
  * 
  * **Test Group ID:** 02@n
@@ -161,7 +167,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Simply assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x9F};
+    unsigned char buf1[] = {0x3F, GET_CEC_VERSION};
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -181,7 +187,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x9E;
+    opcodeExpected_g = CEC_VERSION;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
     /* Positive result */
     result = HdmiCecTx(handle, buf1, len, &ret);
@@ -230,7 +236,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     int len = 2;
     //Give vendor id
     //Simply asuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8C};
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_VENDOR_ID};
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -250,7 +256,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x87;
+   opcodeExpected_g = DEVICE_VENDOR_ID;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
     /* Positive result */
@@ -299,7 +305,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8F };
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_POWER_STATUS };
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -323,7 +329,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x90;
+    opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
     /* Positive result */
@@ -369,10 +375,15 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
 
+
+    printf ("\nPlease disconnect All the HDMI ports");
+    //Wait for the use to disconnect the HDMI Cable.
+    sleep (HDMICEC_USER_INTERACTION_PAUSE);
+
     int len = 2;
     //Give vendor id
-    //Simply asuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8C};
+    //Simply assuming sender as 3 and broadcast
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_VENDOR_ID};
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -392,7 +403,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x87;
+   opcodeExpected_g = DEVICE_VENDOR_ID;
     isCallbackTriggered_g = false;
 
     result = HdmiCecTx(handle, buf1, len, &ret);
@@ -439,7 +450,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8F };
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_POWER_STATUS };
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -463,7 +474,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x90;
+   opcodeExpected_g = REPORT_POWER_STATUS;
     isCallbackTriggered_g = false;
 
     /* Positive result */
@@ -513,7 +524,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Simply assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x9F};
+    unsigned char buf1[] = {0x3F, GET_CEC_VERSION};
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -528,7 +539,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x9E;
+   opcodeExpected_g = CEC_VERSION;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
     /* Positive result */
     result = HdmiCecTx(handle, buf1, len, &ret);
@@ -577,7 +588,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     int len = 2;
     //Give vendor id
     //Simply asuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8C};
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_VENDOR_ID};
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -592,7 +603,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x87;
+   opcodeExpected_g = DEVICE_VENDOR_ID;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
     /* Positive result */
@@ -641,7 +652,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8F };
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_POWER_STATUS };
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -660,7 +671,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x90;
+   opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
     /* Positive result */
@@ -706,10 +717,14 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
 
+    printf ("\nPlease disconnect All the HDMI ports");
+    //Wait for the use to disconnect the HDMI Cable.
+    sleep (HDMICEC_USER_INTERACTION_PAUSE);
+
     int len = 2;
     //Give vendor id
-    //Simply asuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8C};
+    //Simply assuming sender as 3 and broadcast
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_VENDOR_ID};
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -724,7 +739,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x87;
+   opcodeExpected_g = DEVICE_VENDOR_ID;
     isCallbackTriggered_g = false;
 
     result = HdmiCecTx(handle, buf1, len, &ret);
@@ -771,7 +786,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source( void )
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, 0x8F };
+    unsigned char buf1[] = {0x3F, GIVE_DEVICE_POWER_STATUS };
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -790,7 +805,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf1[0]);
 
-    bufferExpected_g = 0x90;
+   opcodeExpected_g = REPORT_POWER_STATUS;
     isCallbackTriggered_g = false;
 
     /* Positive result */
@@ -816,7 +831,8 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source( void )
 }
 
 
-static UT_test_suite_t *pSuite = NULL;
+static UT_test_suite_t *pSuiteHdmiConnected = NULL;
+static UT_test_suite_t *pSuiteHdmiDisConnected = NULL;
 
 /**
  * @brief Register the main tests for this module
@@ -826,24 +842,25 @@ static UT_test_suite_t *pSuite = NULL;
 int test_hdmicec_hal_l2_register( void )
 {
     /* add a suite to the registry */
-    pSuite = UT_add_suite("[L2 test_Example]", NULL, NULL);
-    if (NULL == pSuite) 
+    pSuiteHdmiConnected = UT_add_suite("[L2 test hdmi connected]", NULL, NULL);
+    //#TODO need have two separate suits with one hdmi connected state and another suite for disconnected states.
+    if (NULL == pSuiteHdmiConnected || NULL == pSuiteHdmiDisConnected) 
     {
         return -1;
     }
 
 #ifndef __UT_STB__
-    UT_add_test( pSuite, "getCecVersionSink", test_hdmicec_hal_l2_getCecVersion_sink);
-    UT_add_test( pSuite, "getVendorIDSink", test_hdmicec_hal_l2_getVendorID_sink);
-    UT_add_test( pSuite, "getPowerStatusSink", test_hdmicec_hal_l2_getPowerStatus_sink);
-    UT_add_test( pSuite, "sendMsgHdmiDisconnectedSink", test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink);
-    UT_add_test( pSuite, "sendMsgAsyncHdmiDisconnectedSink", test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink);
+    UT_add_test( pSuiteHdmiConnected, "getCecVersionSink", test_hdmicec_hal_l2_getCecVersion_sink);
+    UT_add_test( pSuiteHdmiConnected, "getVendorIDSink", test_hdmicec_hal_l2_getVendorID_sink);
+    UT_add_test( pSuiteHdmiConnected, "getPowerStatusSink", test_hdmicec_hal_l2_getPowerStatus_sink);
+    UT_add_test( pSuiteHdmiDisConnected, "sendMsgHdmiDisconnectedSink", test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink);
+    UT_add_test( pSuiteHdmiDisConnected, "sendMsgAsyncHdmiDisconnectedSink", test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink);
 #else
-    UT_add_test( pSuite, "getCecVersionSource", test_hdmicec_hal_l2_getCecVersion_source);
-    UT_add_test( pSuite, "getVendorIDSource", test_hdmicec_hal_l2_getVendorID_source);
-    UT_add_test( pSuite, "getPowerStatus", test_hdmicec_hal_l2_getPowerStatus_source);
-    UT_add_test( pSuite, "sendMsgHdmiDisconnectedSource", test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source);
-    UT_add_test( pSuite, "sendMsgAsyncHdmiDisconnectedSource", test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source);
+    UT_add_test( pSuiteHdmiConnected, "getCecVersionSource", test_hdmicec_hal_l2_getCecVersion_source);
+    UT_add_test( pSuiteHdmiConnected, "getVendorIDSource", test_hdmicec_hal_l2_getVendorID_source);
+    UT_add_test( pSuiteHdmiConnected, "getPowerStatus", test_hdmicec_hal_l2_getPowerStatus_source);
+    UT_add_test( pSuiteHdmiDisConnected, "sendMsgHdmiDisconnectedSource", test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source);
+    UT_add_test( pSuiteHdmiDisConnected, "sendMsgAsyncHdmiDisconnectedSource", test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source);
 #endif
 
     return 0;
