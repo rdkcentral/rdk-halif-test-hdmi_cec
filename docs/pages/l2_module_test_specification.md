@@ -150,6 +150,8 @@ The following functions are expecting to test the module operates correctly.
 **User Interaction :** N/A
 
 #### Test Procedure :
+|Variation / Step|Description|Test Data|Expected Result|Notes|
+|:--:|---------|----------|--------------|-----|
 |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
 |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
@@ -174,6 +176,8 @@ The following functions are expecting to test the module operates correctly.
 **User Interaction :** N/A
 
 #### Test Procedure :
+|Variation / Step|Description|Test Data|Expected Result|Notes|
+|:--:|---------|----------|--------------|-----|
 |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
 |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
@@ -198,6 +202,8 @@ The following functions are expecting to test the module operates correctly.
 **User Interaction :** N/A
 
 #### Test Procedure :
+|Variation / Step|Description|Test Data|Expected Result|Notes|
+|:--:|---------|----------|--------------|-----|
 |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
 |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
@@ -222,6 +228,8 @@ The following functions are expecting to test the module operates correctly.
 **User Interaction :** N/A
 
 #### Test Procedure :
+|Variation / Step|Description|Test Data|Expected Result|Notes|
+|:--:|---------|----------|--------------|-----|
 |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
 |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
@@ -246,6 +254,8 @@ The following functions are expecting to test the module operates correctly.
 **User Interaction :** N/A
 
 #### Test Procedure :
+|Variation / Step|Description|Test Data|Expected Result|Notes|
+|:--:|---------|----------|--------------|-----|
 |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
 |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
@@ -269,6 +279,8 @@ The following functions are expecting to test the module operates correctly.
 **User Interaction :** N/A
 
 #### Test Procedure :
+|Variation / Step|Description|Test Data|Expected Result|Notes|
+|:--:|---------|----------|--------------|-----|
 |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
 |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
@@ -292,6 +304,8 @@ The following functions are expecting to test the module operates correctly.
 **User Interaction :** N/A
 
 #### Test Procedure :
+|Variation / Step|Description|Test Data|Expected Result|Notes|
+|:--:|---------|----------|--------------|-----|
 |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
 |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
