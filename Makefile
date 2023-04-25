@@ -39,7 +39,7 @@ ifeq ($(TARGET),arm)
 HAL_LIB_DIR := $(ROOT_DIR)/libs
 YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)
 ifeq ("$(wildcard $(HAL_LIB_DIR)/lib$(HAL_LIB).so)","")
-SETUP_SKELTON_LIBS := skelton
+SETUP_SKELETON_LIBS := skeleton
 endif
 endif
 
@@ -53,16 +53,16 @@ export TARGET
 export TOP_DIR
 export HAL_LIB_DIR
 
-.PHONY: clean list build skelton
+.PHONY: clean list build skeleton
 
 
-build: $(SETUP_SKELTON_LIBS)
-	echo "SETUP_SKELTON_LIBS $(SETUP_SKELTON_LIBS)"
+build: $(SETUP_SKELETON_LIBS)
+	echo "SETUP_SKELETON_LIBS $(SETUP_SKELETON_LIBS)"
 	@echo UT [$@]
 	make -C ./ut-core
 
 #Build against the real library leads to the SOC library dependency also.SOC lib dependency cannot be specified in the ut Makefile, since it is supposed to be common across may platforms. So in order to over come this situation, creating a template skelton library with empty templates so that the template library wont have any other Soc dependency. And in the real platform mount copy bind with the actual library will work fine.
-skelton:
+skeleton:
 	echo $(CC)
 	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include $(SKELTON_SRCS) -o lib$(HAL_LIB).so
 	mkdir -p $(HAL_LIB_DIR)
