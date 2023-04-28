@@ -3,7 +3,7 @@
 
 | Version | Date(YY-MM-DD) |Comments |
 | -------| ----- | ----- |
-| 1.0.0 | 22/02/23 | Initial Document |
+| 1.0.0 | 23/04/28 | Initial Document |
 
 ## Table of Contents
 
@@ -12,7 +12,7 @@
   - [Definitions](#definitions)
   - [References](#references)
 - [Level 2 Test Suite](#level-2-test-suite)
-  - [Functions to check the `CEC`  transmit and receive messages](#functions-to-check-the-CEC-transmit-and-receive-messages)
+  - [Functions to check the `CEC` transmit and receive messages](#functions-to-check-the-CEC-transmit-and-receive-messages)
  
 ## Overview
 
@@ -49,15 +49,14 @@ This document describes the level 2 testing suite for the `HDMI` `CEC` module.
 
 ## Level 2 Test Suite
 
-The following functions test module level functionalities.
-#TODO need to change the above description
+The following functions test module functionality.
 
-### Functions to check the `CEC`  transmit and receive messages
+### Functions to check the `CEC` transmit and receive messages
 
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_getCecVersion_sink() |
-|Description| This function will request the `HDMI` `CEC` version and check if `HDMI` `CEC` version opcode is received within the expected time interval for sink devices.|
+|Description| This function will request the version from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|001|
 |Priority|Low|
@@ -85,7 +84,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_getVendorID_sink () |
-|Description| This function will request the `HDMI` `CEC` vendor ID and check if `HDMI` `CEC` vendor ID opcode is received within the expected time interval for sink devices.|
+|Description| This function will request the vendor ID from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|002|
 |Priority|Low|
@@ -111,7 +110,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_getPowerStatus_sink () |
-|Description| This function will request the `HDMI` `CEC` power status and check if `HDMI` `CEC` power status opcode is received within the expected time interval for sink devices. |
+|Description| This function will request the power status from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|003|
 |Priority|Low|
@@ -137,7 +136,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink () |
-|Description| This function will request the `HDMI` `CEC` vendor ID in `HDMI` disconnected state and check if `HDMI` `CEC` vendor ID opcode is not received within the expected time interval for sink devices. |
+|Description| This function will request the vendor ID from the connected devices during `HDMI` disconnected state and check if  opcode is not received within the expected time interval. |
 |Test Group|02 (Module)|
 |Test Case ID|004|
 |Priority|Low|
@@ -163,7 +162,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink () |
-|Description| This function will request the `HDMI` `CEC` power status in `HDMI` disconnected state and check if `HDMI` `CEC` power status opcode is not received within the expected time interval for sink devices. |
+|Description| This function will request the power status from the connected devices during `HDMI` disconnected state and check if opcode is not received within the expected time. |
 |Test Group|02 (Module)|
 |Test Case ID|005|
 |Priority|Low|
@@ -189,7 +188,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_getCecVersion_source ()|
-|Description| This function will request the `HDMI` `CEC` version and check if `HDMI` `CEC` version opcode is received within the expected time interval for source devices. |
+|Description| This function will request the version from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|006|
 |Priority|Low|
@@ -215,7 +214,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_getVendorID_source ()|
-|Description| This function will request the `HDMI` `CEC` vendor ID and check if `HDMI` `CEC` vendor ID opcode is received within the expected time interval for source devices. |
+|Description| This function will request the vendor ID from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|007|
 |Priority|Low|
@@ -241,7 +240,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_getPowerStatus_source ()|
-|Description| This function will request the `HDMI` `CEC` power status and check if `HDMI` `CEC` power status opcode is received within the expected time interval for source devices. |
+|Description| This function will request the power status from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|008|
 |Priority|Low|
@@ -266,7 +265,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source ()|
-|Description| This function will request the `HDMI` `CEC` vendor ID in `HDMI` disconnected state and check if `HDMI` `CEC` vendor ID opcode is not received within the expected time interval for source devices. |
+|Description| This function will request the vendor ID from the connected devices during `HDMI` disconnected state and check if  opcode is not received within the expected time interval. |
 |Test Group|02 (Module)|
 |Test Case ID|009|
 |Priority|Low|
@@ -291,7 +290,7 @@ The following functions test module level functionalities.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source ()|
-|Description| This function will request the `HDMI` `CEC` power status in `HDMI` disconnected state and check if `HDMI` `CEC` power status opcode is not received within the expected time interval for source devices. |
+|Description| This function will request the power status from the connected devices during `HDMI` disconnected state and check if  opcode is not received within the expected time interval. |
 |Test Group|02 (Module)|
 |Test Case ID|010|
 |Priority|Low|
