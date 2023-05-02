@@ -59,7 +59,6 @@ The following functions test module functionality.
 |Description| This function will request the version from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|001|
-|Priority|Low|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -87,7 +86,6 @@ The following functions test module functionality.
 |Description| This function will request the vendor ID from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|002|
-|Priority|Low|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -113,7 +111,6 @@ The following functions test module functionality.
 |Description| This function will request the power status from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|003|
-|Priority|Low|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -136,13 +133,12 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink () |
-|Description| This function will request the vendor ID from the connected devices during `HDMI` disconnected state and check if  opcode is not received within the expected time interval. |
+|Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
 |Test Case ID|004|
-|Priority|Low|
 
 **Pre-Conditions :**
--   All of the device HDMI ports should be disconnected.
+-   All of the device HDMI cable should be disconnected.
 
 **Dependencies :** N/A
 
@@ -162,13 +158,12 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink () |
-|Description| This function will request the power status from the connected devices during `HDMI` disconnected state and check if opcode is not received within the expected time. |
+|Description| This function will request the power status  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
 |Test Case ID|005|
-|Priority|Low|
 
 **Pre-Conditions :**
--   All of the device HDMI ports should be disconnected.
+-   All of the device HDMI cable should be disconnected.
 
 **Dependencies :** N/A
 
@@ -191,7 +186,6 @@ The following functions test module functionality.
 |Description| This function will request the version from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|006|
-|Priority|Low|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -217,7 +211,6 @@ The following functions test module functionality.
 |Description| This function will request the vendor ID from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|007|
-|Priority|Low|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -243,7 +236,6 @@ The following functions test module functionality.
 |Description| This function will request the power status from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
 |Test Case ID|008|
-|Priority|Low|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -265,13 +257,12 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source ()|
-|Description| This function will request the vendor ID from the connected devices during `HDMI` disconnected state and check if  opcode is not received within the expected time interval. |
+|Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
 |Test Case ID|009|
-|Priority|Low|
 
 **Pre-Conditions :**
--   All of the device HDMI ports should be disconnected.
+-   All of the device HDMI cable should be disconnected.
 
 **Dependencies :** N/A
 
@@ -290,13 +281,12 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source ()|
-|Description| This function will request the power status from the connected devices during `HDMI` disconnected state and check if  opcode is not received within the expected time interval. |
+|Description| This function will request the power status  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
 |Test Case ID|010|
-|Priority|Low|
 
 **Pre-Conditions :**
--   All of the device HDMI ports should be disconnected.
+-   All of the device HDMI cable should be disconnected.
 
 **Dependencies :** N/A
 
@@ -312,3 +302,4 @@ The following functions test module functionality.
 |05|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
 |06|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
 
+#TODO write a function to query the get power status if the device is in standby send image view on command and see device is waking up and if device in power on state send standby message and ensure device is going to sleep state.

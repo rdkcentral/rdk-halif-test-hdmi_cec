@@ -148,7 +148,6 @@ void DriverTransmitCallback_hal_l2HdmiDisconnected(int handle, void *callbackDat
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 001@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -213,7 +212,6 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 002@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -279,7 +277,6 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 003@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -348,7 +345,6 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 004@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -418,7 +414,6 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 005@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -487,7 +482,6 @@ void test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 006@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -547,7 +541,6 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 007@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -608,7 +601,6 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 008@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -672,7 +664,6 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 009@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
@@ -736,7 +727,6 @@ void test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source( void )
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 010@n
- * **Priority:** Low@n
  * 
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
