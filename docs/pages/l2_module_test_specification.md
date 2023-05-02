@@ -132,10 +132,35 @@ The following functions test module functionality.
 
 |Title|Details|
 |--|--|
+|Function Name|test_hdmicec_hal_l2_getPowerStatusAndToggle_sink () |
+|Description| This function will request the HDMI CEC power status and toggle the current power state of the connected device.|
+|Test Group|02 (Module)|
+|Test Case ID|004|
+
+**Pre-Conditions :**
+-  There should be a `HDMI` `CEC` enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+ |Variation / Step|Description|Test Data|Expected Result|Notes|
+ |:--:|---------|----------|--------------|-----|
+ |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |05|call HdmiCecTx(handle, buf, len, &ret) - send the `CEC`  message to get the power status after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |06|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+|Title|Details|
+|--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_sink () |
 |Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
-|Test Case ID|004|
+|Test Case ID|005|
 
 **Pre-Conditions :**
 -   All of the device HDMI cable should be disconnected.
@@ -160,7 +185,7 @@ The following functions test module functionality.
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_sink () |
 |Description| This function will request the power status  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
-|Test Case ID|005|
+|Test Case ID|006|
 
 **Pre-Conditions :**
 -   All of the device HDMI cable should be disconnected.
@@ -185,7 +210,7 @@ The following functions test module functionality.
 |Function Name|test_hdmicec_hal_l2_getCecVersion_source ()|
 |Description| This function will request the version from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
-|Test Case ID|006|
+|Test Case ID|007|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -210,7 +235,7 @@ The following functions test module functionality.
 |Function Name|test_hdmicec_hal_l2_getVendorID_source ()|
 |Description| This function will request the vendor ID from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
-|Test Case ID|007|
+|Test Case ID|008|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -235,7 +260,7 @@ The following functions test module functionality.
 |Function Name|test_hdmicec_hal_l2_getPowerStatus_source ()|
 |Description| This function will request the power status from the connected devices and check if the opcode is received within the expected time interval. In oder to be deterministic opcode should be fixed.|
 |Test Group|02 (Module)|
-|Test Case ID|008|
+|Test Case ID|009|
 
 **Pre-Conditions :**
 -  There should be a `HDMI` `CEC` enabled device connected via HDMI
@@ -259,7 +284,7 @@ The following functions test module functionality.
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source ()|
 |Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
-|Test Case ID|009|
+|Test Case ID|010|
 
 **Pre-Conditions :**
 -   All of the device HDMI cable should be disconnected.
@@ -283,7 +308,7 @@ The following functions test module functionality.
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source ()|
 |Description| This function will request the power status  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
-|Test Case ID|010|
+|Test Case ID|011|
 
 **Pre-Conditions :**
 -   All of the device HDMI cable should be disconnected.
