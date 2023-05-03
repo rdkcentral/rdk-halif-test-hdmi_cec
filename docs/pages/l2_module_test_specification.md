@@ -138,7 +138,7 @@ The following functions test module functionality.
 |Test Case ID|004|
 
 **Pre-Conditions :**
--  There should be a `HDMI` `CEC` enabled device connected via HDMI
+-  There should be one `HDMI` `CEC` enabled device connected via HDMI
 
 **Dependencies :** N/A
 
@@ -152,8 +152,10 @@ The following functions test module functionality.
  |03|call HdmiCecAddLogicalAddress(handle, logicalAddress) - call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  |04|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  |05|call HdmiCecTx(handle, buf, len, &ret) - send the `CEC`  message to get the power status after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- |06|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- |07|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |06|call HdmiCecTx(handle, buf, len, &ret) - Based on the power status from the other device toggle the power state by passing IMAGE_VIEW_ON when other device is in standby or passing STANDBY when the other device is is power on | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |07|call HdmiCecTx(handle, buf, len, &ret) - send the `CEC`  message to get the power status after toggling the power state and check expected power state is returned | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |08|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |09|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
 
 |Title|Details|
 |--|--|
@@ -281,10 +283,37 @@ The following functions test module functionality.
 
 |Title|Details|
 |--|--|
+|Function Name|test_hdmicec_hal_l2_getPowerStatusAndToggle_source () |
+|Description| This function will request the HDMI CEC power status and toggle the current power state of the connected device.|
+|Test Group|02 (Module)|
+|Test Case ID|010|
+
+**Pre-Conditions :**
+-  There should be one `HDMI` `CEC` enabled device connected via HDMI
+
+**Dependencies :** N/A
+
+**User Interaction :** N/A
+
+#### Test Procedure :
+ |Variation / Step|Description|Test Data|Expected Result|Notes|
+ |:--:|---------|----------|--------------|-----|
+ |01|call HdmiCecOpen(&hdmiHandle) - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |02|call HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, 0xDEADBEEF) - set RX call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |03|call HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress) - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |04|call HdmiCecTx(handle, buf, len, &ret) - send the `CEC`  message to get the power status after correct module initialization and ensure response is received with in expected response delay time. | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |07|call HdmiCecTx(handle, buf, len, &ret) - Based on the power status from the other device toggle the power state by passing IMAGE_VIEW_ON when other device is in standby or passing STANDBY when the other device is is power on | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |08|call HdmiCecTx(handle, buf, len, &ret) - send the `CEC`  message to get the power status after toggling the power state and check expected power state is returned | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |09|call HdmiCecSetRxCallback(handle, NULL, 0) - unregister RX call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ |10|call HdmiCecClose (handle) - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+
+
+|Title|Details|
+|--|--|
 |Function Name|test_hdmicec_hal_l2_sendMsgHdmiDisconnected_source ()|
 |Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
-|Test Case ID|010|
+|Test Case ID|011|
 
 **Pre-Conditions :**
 -   All of the device HDMI cable should be disconnected.
@@ -308,7 +337,7 @@ The following functions test module functionality.
 |Function Name|test_hdmicec_hal_l2_sendMsgAsyncHdmiDisconnected_source ()|
 |Description| This function will request the power status  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
 |Test Group|02 (Module)|
-|Test Case ID|011|
+|Test Case ID|012|
 
 **Pre-Conditions :**
 -   All of the device HDMI cable should be disconnected.
