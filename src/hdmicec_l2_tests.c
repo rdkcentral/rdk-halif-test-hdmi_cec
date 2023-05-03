@@ -39,8 +39,8 @@
 #include <ut.h>
 #include "hdmi_cec_driver.h"
 
-#define HDMICEC_RESPONSE_TIMEOUT 2
-#define HDMICEC_USER_INTERACTION_PAUSE 20
+#define HDMICEC_RESPONSE_TIMEOUT 5
+#define HDMICEC_USER_INTERACTION_PAUSE 2
 #define GET_CEC_VERSION (0x9F)
 #define CEC_VERSION (0x9E)
 #define DEVICE_VENDOR_ID (0x87)
@@ -53,7 +53,6 @@
 #define POWER_OFF (0x01)
 #define CEC_BROADCAST_ADDR (0xF)
 #define CEC_TUNER_ADDR (0x3)
-
 
 /**
  * @brief Expected cec message buffer in the L2 scenario
@@ -381,6 +380,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 void test_hdmicec_hal_l2_getPowerStatusAndToggle_sink( void )
 {
     int result=0;
+    int ret=0;
     int handle = 0;
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
@@ -421,7 +421,8 @@ void test_hdmicec_hal_l2_getPowerStatusAndToggle_sink( void )
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
 
     /* Positive result */
-    result = HdmiCecTxAsync(handle, buf1, len);
+    printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
+    result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     //Wait for 2 sec for the reply
@@ -451,7 +452,7 @@ void test_hdmicec_hal_l2_getPowerStatusAndToggle_sink( void )
         UT_ASSERT_TRUE(1);
     }
 
-    result = HdmiCecTxAsync(handle, buf1, len);
+    result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     //Wait for the response delay
     sleep (HDMICEC_RESPONSE_TIMEOUT);
@@ -461,7 +462,7 @@ void test_hdmicec_hal_l2_getPowerStatusAndToggle_sink( void )
     buf1[1] = GIVE_DEVICE_POWER_STATUS;
     printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
 
-    result = HdmiCecTxAsync(handle, buf1, len);
+    result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     //Wait for the response delay
     sleep (HDMICEC_RESPONSE_TIMEOUT);
@@ -1055,6 +1056,7 @@ int test_hdmicec_hal_l2_register( void )
 {
     /* add a suite to the registry */
     pSuiteHdmiConnected = UT_add_suite("[L2 test hdmi connected]", NULL, NULL);
+    pSuiteHdmiDisConnected = UT_add_suite("[L2 test hdmi disconnected]", NULL, NULL);
     //#TODO need have two separate suits with one hdmi connected state and another suite for disconnected states.
     if (NULL == pSuiteHdmiConnected || NULL == pSuiteHdmiDisConnected) 
     {
