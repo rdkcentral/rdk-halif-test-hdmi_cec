@@ -138,7 +138,7 @@ The following functions test module functionality.
 |Test Case ID|004|
 
 **Pre-Conditions :**
--  There should be one `HDMI` `CEC` enabled device connected via HDMI
+-  There should be any one of the `HDMI` `CEC` enabled device connected via HDMI
 
 **Dependencies :** N/A
 
@@ -289,7 +289,7 @@ The following functions test module functionality.
 |Test Case ID|010|
 
 **Pre-Conditions :**
--  There should be one `HDMI` `CEC` enabled device connected via HDMI
+-  There should be any one of the `HDMI` `CEC` enabled device connected via HDMI
 
 **Dependencies :** N/A
 
