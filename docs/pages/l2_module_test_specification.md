@@ -136,8 +136,6 @@ The following functions test module functionality.
 |Description| This function will toggle the current power state of the connected device.|
 |Test Group|02 (Module)|
 |Test Case ID|004|
-#TODO need to change the description and name in source side also.
-#TODO test procedure we don't have to keep the full function template. Just empty braces should be fine. Put inverted commas also. Fix the same in L1 also.
 #TODO in user interaction scenario, avoid sleep and use prompt. getch ("Connect and HDMI cable and press and enter here.")
 
 **Pre-Conditions :**
@@ -286,8 +284,8 @@ The following functions test module functionality.
 
 |Title|Details|
 |--|--|
-|Function Name|test_hdmicec_hal_l2_getPowerStatusAndToggle_source () |
-|Description| This function will request the HDMI CEC power status and toggle the current power state of the connected device.|
+|Function Name|test_hdmicec_hal_l2_TogglePowerState_source () |
+|Description| This function will toggle the current power state of the connected device.|
 |Test Group|02 (Module)|
 |Test Case ID|010|
 

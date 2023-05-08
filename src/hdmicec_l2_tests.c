@@ -49,6 +49,12 @@
 #define REPORT_POWER_STATUS (0x90)
 #define IMAGE_VIEW_ON (0x04)
 #define STANDBY (0x36)
+#define GIVE_PHYSICAL_ADDRESS (0x83)
+#define REPORT_PHYSICAL_ADDRESS (0x84)
+#define REPORT_PHYSICAL_ADDRESS (0x84)
+#define ACTIVE_SOURCE (0x82)
+#define SET_STREAM_PATH (0x86)
+
 #define POWER_ON (0x00)
 #define POWER_OFF (0x01)
 #define CEC_BROADCAST_ADDR (0xF)
@@ -71,6 +77,13 @@ int isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
  * 
  */
 unsigned char powerStatusReceived_g = POWER_OFF;
+
+/**
+ * @brief  variable to hold the physical address of the receiver.
+ * 
+ */
+unsigned char physicalAddressReceived1_g = 0x00;
+unsigned char physicalAddressReceived2_g = 0x00;
 
 /**
  * @brief  Variable to hold the logical address of the receiver.
@@ -107,11 +120,18 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
             isExpectedBufferReceived_g = HDMI_CEC_IO_SUCCESS;
             //If power status is received from the other device store it
             if (REPORT_POWER_STATUS == buf[1]){
-                powerStatusReceived_g = buf[1];
+                powerStatusReceived_g = buf[2];
                 receiverLogicalAddress_g = buf[0] & 0xF0 >> 4;
                 UT_ASSERT_TRUE(receiverLogicalAddress_g== CEC_BROADCAST_ADDR);
                 printf ("\nPower status received is : %x receiver logical address is %x",powerStatusReceived_g, receiverLogicalAddress_g);
-            }
+            } else if (REPORT_PHYSICAL_ADDRESS == buf[1]){
+                physicalAddressReceived1_g = buf[2];
+                physicalAddressReceived2_g = buf[3];
+                receiverLogicalAddress_g = buf[0] & 0xF0 >> 4;
+                UT_ASSERT_TRUE(receiverLogicalAddress_g== CEC_BROADCAST_ADDR);
+                printf ("\nPower status received is : %x receiver logical address is %x",powerStatusReceived_g, receiverLogicalAddress_g);
+            } 
+
         }
     }
 }
@@ -184,7 +204,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
+    int devType = 0;//Trying some dev type
 
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
@@ -215,7 +235,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
@@ -249,7 +269,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
+    int devType = 0;//Trying some dev type
 
     int len = 2;
     //Give vendor id
@@ -281,7 +301,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
@@ -314,7 +334,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     int result=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
+    int devType = 0;//Trying some dev type
 
     int len = 2;
     //Give vendor id
@@ -350,7 +370,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     result = HdmiCecTxAsync(handle, buf1, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
@@ -369,7 +389,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 }
 
 /**
- * @brief This function will request the HDMI CEC power status and toggle the current power state of the connected device.
+ * @brief This function will toggle the current power state of the connected device.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 004@n
@@ -377,23 +397,22 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
-void test_hdmicec_hal_l2_getPowerStatusAndToggle_sink( void )
+void test_hdmicec_hal_l2_TogglePowerState_sink( void )
 {
     int result=0;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
-    unsigned char expectedPowerStatus = POWER_OFF;
-
-    int len = 2;
+    int devType = 0;//Trying some dev type
 
     printf ("\nPlease connect only one cec enabled receiver to the device");
     //Wait for the use to connect only one cec enabled device.
     sleep (HDMICEC_USER_INTERACTION_PAUSE);
 
-    //Assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, GIVE_DEVICE_POWER_STATUS };
+    //Assuming sender as 3 and broadcast. 
+    //Set the receiver to standby state.
+    unsigned char buf1[] = {0x3F, STANDBY };
+    unsigned char buf4[] = {0x3F, SET_STREAM_PATH, 0x00, 0x00 };
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -415,63 +434,78 @@ void test_hdmicec_hal_l2_getPowerStatusAndToggle_sink( void )
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf0: 0x%x\n", buf1[0]);
+    /* Positive result */
+    //Broadcast set power state to standby here.
+    buf1[1] = STANDBY;
+    printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //Wait for response delay for the reply
+    sleep (HDMICEC_RESPONSE_TIMEOUT);
 
     opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
-
-    /* Positive result */
+    //After response delay check if power status set to standby
+    buf1[1] = GIVE_DEVICE_POWER_STATUS;
     printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
-    result = HdmiCecTx(handle, buf1, len, &ret);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
+    if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
+        printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
+    }
+    //Ensure power status returned is standby form the receiver
+    UT_ASSERT_EQUAL( powerStatusReceived_g, POWER_OFF);
 
+
+    //Request receiver physical address here.
+    opcodeExpected_g = REPORT_PHYSICAL_ADDRESS;
+    isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
+    //Request physical address from the receiver
+    buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress_g;
+    buf1[1] = GIVE_PHYSICAL_ADDRESS;
+    printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //Wait for response delay for the reply
+    sleep (HDMICEC_RESPONSE_TIMEOUT);
+    //Check if expected buffer received.
+    UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
     }
 
-    //If the other device is in standby wake it up
-    if (POWER_OFF == powerStatusReceived_g) {
-        //Send wake call
-        buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress_g;
-        buf1[1] = IMAGE_VIEW_ON;
-        printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
-        expectedPowerStatus = POWER_ON;
-    } else if (POWER_ON == powerStatusReceived_g) {
-        //Send standby call
-        buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress_g;
-        buf1[1] = STANDBY;
-        printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
-        expectedPowerStatus = POWER_OFF;
-    } else {
-        //Unexpected power status.
-        UT_ASSERT_TRUE(1);
-    }
 
-    result = HdmiCecTx(handle, buf1, len, &ret);
+    //Broadcast set stream path with receiver physical address.
+    buf4[0] = ((logicalAddress&0xFF)<<4)|0x0F; 
+    buf4[1] = SET_STREAM_PATH;
+    buf4[2] = physicalAddressReceived1_g;
+    buf4[3] = physicalAddressReceived2_g;
+    printf ("\n HDMI CEC buf4: 0x%x 0x%x 0x%x 0x%x\n", buf4[0], buf4[1], buf4[2], buf4[3]);
+    result = HdmiCecTx(handle, buf4, sizeof(buf4), &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    //Wait for the response delay
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     printf ("\n Please ensure connected device power status changed.\n");
 
     //Check the current power status now. Sender and receiver is same here. Just change the opcode.
+    opcodeExpected_g = REPORT_POWER_STATUS;
+    isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
     buf1[1] = GIVE_DEVICE_POWER_STATUS;
     printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
-
-    result = HdmiCecTx(handle, buf1, len, &ret);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     //Wait for the response delay
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
-
     //Check expected power state is received
-    UT_ASSERT_EQUAL( powerStatusReceived_g, expectedPowerStatus);
-
+    UT_ASSERT_EQUAL( powerStatusReceived_g, POWER_ON);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
     }
@@ -500,7 +534,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiVendorIdDisconnected_sink( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
+    int devType = 0;//Trying some dev type
 
 
     printf ("\nPlease disconnect All the HDMI ports");
@@ -536,7 +570,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiVendorIdDisconnected_sink( void )
     result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if  callback is not triggered.
     UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
@@ -568,7 +602,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_sink( void )
     int result=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
+    int devType = 0;//Trying some dev type
 
     int len = 2;
     //Give vendor id
@@ -604,7 +638,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_sink( void )
     result = HdmiCecTxAsync(handle, buf1, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if rx callback is not triggered.
     UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
@@ -664,7 +698,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
@@ -725,7 +759,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
@@ -789,7 +823,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     result = HdmiCecTxAsync(handle, buf1, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
@@ -808,7 +842,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
 }
 
 /**
- * @brief This function will request the HDMI CEC power status and toggle the current power state of the connected device.
+ * @brief This function will toggle the current power state of the connected device.
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 0010@n
@@ -816,22 +850,23 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
  * **Test Procedure:**
  * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
  */
-void test_hdmicec_hal_l2_getPowerStatusAndToggle_source( void )
+void test_hdmicec_hal_l2_TogglePowerState_source( void )
 {
     int result=0;
+    int ret=0;
     int handle = 0;
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
-    unsigned char expectedPowerStatus = POWER_OFF;
-
-    int len = 2;
+    unsigned int physicalAddress = 0x00;
 
     printf ("\nPlease connect only one cec enabled receiver to the device");
     //Wait for the use to connect only one cec enabled device.
     sleep (HDMICEC_USER_INTERACTION_PAUSE);
 
-    //Assuming sender as 3 and broadcast
-    unsigned char buf1[] = {0x3F, GIVE_DEVICE_POWER_STATUS };
+    //Assuming sender as 3 and broadcast. 
+    //Set the receiver to standby state.
+    unsigned char buf1[] = {0x3F, STANDBY };
+    unsigned char buf4[] = {0x3F, ACTIVE_SOURCE, 0x00, 0x00 };
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -848,62 +883,79 @@ void test_hdmicec_hal_l2_getPowerStatusAndToggle_source( void )
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
     buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf0: 0x%x\n", buf1[0]);
+    /* Positive result */
+    //Broadcast set power state to standby here.
+    buf1[1] = STANDBY;
+    printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //Wait for response delay for the reply
+    sleep (HDMICEC_RESPONSE_TIMEOUT);
 
     opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
-
-    /* Positive result */
-    result = HdmiCecTxAsync(handle, buf1, len);
+    //After response delay check if power status set to standby
+    buf1[1] = GIVE_DEVICE_POWER_STATUS;
+    printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
+    if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
+        printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
+    }
+    //Ensure power status returned is standby form the receiver
+    UT_ASSERT_EQUAL( powerStatusReceived_g, POWER_OFF);
 
+
+    //Request image view on here.
+    buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress_g;
+    buf1[1] = IMAGE_VIEW_ON;
+    printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //Wait for response delay for the reply
+    sleep (HDMICEC_RESPONSE_TIMEOUT);
+    //Check if expected buffer received.
+    UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
     }
 
-    //If the other device is in standby wake it up
-    if (POWER_OFF == powerStatusReceived_g) {
-        //Send wake call
-        buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress_g;
-        buf1[1] = IMAGE_VIEW_ON;
-        printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
-        expectedPowerStatus = POWER_ON;
-    } else if (POWER_ON == powerStatusReceived_g) {
-        //Send standby call
-        buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress_g;
-        buf1[1] = STANDBY;
-        printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
-        expectedPowerStatus = POWER_OFF;
-    } else {
-        //Unexpected power status.
-        UT_ASSERT_TRUE(1);
-    }
 
-    result = HdmiCecTxAsync(handle, buf1, len);
+    //Get device physical address here.
+    HdmiCecGetPhysicalAddress(handle, &physicalAddress);
+
+    //Broadcast active source here with device physical address.
+    buf4[0] = ((logicalAddress&0xFF)<<4)|0x0F; 
+    buf4[1] = ACTIVE_SOURCE;
+    buf4[2] = (physicalAddress >> 8) & 0xFF;;
+    buf4[3] = physicalAddress & 0xFF;
+    printf ("\n HDMI CEC buf4: 0x%x 0x%x 0x%x 0x%x\n", buf4[0], buf4[1], buf4[2], buf4[3]);
+    result = HdmiCecTx(handle, buf4, sizeof(buf4), &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    //Wait for the response delay
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     printf ("\n Please ensure connected device power status changed.\n");
 
+
     //Check the current power status now. Sender and receiver is same here. Just change the opcode.
+    opcodeExpected_g = REPORT_POWER_STATUS;
+    isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
     buf1[1] = GIVE_DEVICE_POWER_STATUS;
     printf ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
-
-    result = HdmiCecTxAsync(handle, buf1, len);
+    result = HdmiCecTx(handle, buf1, sizeof(buf1), &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     //Wait for the response delay
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
-
     //Check expected power state is received
-    UT_ASSERT_EQUAL( powerStatusReceived_g, expectedPowerStatus);
-
+    UT_ASSERT_EQUAL( powerStatusReceived_g, POWER_ON);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
     }
@@ -962,7 +1014,7 @@ void test_hdmicec_hal_l2_sendMsgVendorIdHdmiDisconnected_source( void )
     result = HdmiCecTx(handle, buf1, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if  callback is not triggered.
     UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
@@ -1025,7 +1077,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_source( void )
     result = HdmiCecTxAsync(handle, buf1, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Wait for 2 sec for the reply
+    //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if rx callback is not triggered.
     UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
@@ -1067,14 +1119,14 @@ int test_hdmicec_hal_l2_register( void )
     UT_add_test( pSuiteHdmiConnected, "getCecVersionSink", test_hdmicec_hal_l2_getCecVersion_sink);
     UT_add_test( pSuiteHdmiConnected, "getVendorIDSink", test_hdmicec_hal_l2_getVendorID_sink);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusSink", test_hdmicec_hal_l2_getPowerStatus_sink);
-    UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSink", test_hdmicec_hal_l2_getPowerStatusAndToggle_sink);
+    UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSink", test_hdmicec_hal_l2_TogglePowerState_sink);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgHdmiVendorIdDisconnectedSink", test_hdmicec_hal_l2_sendMsgHdmiVendorIdDisconnected_sink);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgAsyncPowerStatusHdmiDisconnectedSink", test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_sink);
 #else
     UT_add_test( pSuiteHdmiConnected, "getCecVersionSource", test_hdmicec_hal_l2_getCecVersion_source);
     UT_add_test( pSuiteHdmiConnected, "getVendorIDSource", test_hdmicec_hal_l2_getVendorID_source);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusSource", test_hdmicec_hal_l2_getPowerStatus_source);
-    UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSource", test_hdmicec_hal_l2_getPowerStatusAndToggle_source);
+    UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSource", test_hdmicec_hal_l2_TogglePowerState_source);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgVendorIdHdmiDisconnectedSource", test_hdmicec_hal_l2_sendMsgVendorIdHdmiDisconnected_source);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgAsyncPowerStatusHdmiDisconnectedSource", test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_source);
 #endif
