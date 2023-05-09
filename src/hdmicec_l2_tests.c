@@ -40,7 +40,6 @@
 #include "hdmi_cec_driver.h"
 
 #define HDMICEC_RESPONSE_TIMEOUT 10
-#define HDMICEC_USER_INTERACTION_PAUSE 2
 #define GET_CEC_VERSION (0x9F)
 #define CEC_VERSION (0x9E)
 #define DEVICE_VENDOR_ID (0x87)
@@ -91,6 +90,7 @@ unsigned char physicalAddressReceived2_g = 0x00;
  * 
  */
 bool isCallbackTriggered_g = false;
+bool isPingTriggered_g = false;
 
 /**
  * @brief callback to receive the HDMI CEC receive messages
@@ -107,9 +107,9 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
     UT_ASSERT_TRUE(handle!=0);
     UT_ASSERT_PTR_NULL(!callbackData);
     UT_ASSERT_PTR_NULL(!buf);
-    isCallbackTriggered_g = true;
     //UT_ASSERT_TRUE( (unsigned long long)(callbackData) == (unsigned long long)0xDEADBEEF);
     //TODO need to identify why callback is not equal
+    isPingTriggered_g = true;
     if (len>1){
         printf ("\nBuffer generated: %x length: %d\n",buf[1], len);
         if (buf[1] == opcodeExpected_g){
@@ -163,7 +163,12 @@ void DriverReceiveCallback_hal_l2HdmiDisconnected(int handle, void *callbackData
     UT_ASSERT_PTR_NULL(!buf);
     //UT_ASSERT_TRUE( (unsigned long long)callbackData == (unsigned long long)0xDEADBEEF);
     //TODO need to identify why callback is not equal
-    isCallbackTriggered_g = true;
+    if (len>1){
+       printf ("\nBuffer generated: %x length: %d\n",buf[1], len);
+       if (buf[1] == opcodeExpected_g){
+           isCallbackTriggered_g = true;
+       }
+    }
 }
 
 /**
@@ -193,7 +198,7 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
     int result=0;
     int ret=0;
     unsigned char buf = 0x00;
-    isCallbackTriggered_g = false;
+    isPingTriggered_g = false;
     //Ping all logical address and determine which device is connected.
     for(int i=0; i< CEC_BROADCAST_ADDR; i++ ) {
 	unsigned char addr = i & 0xFF; 
@@ -202,7 +207,7 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
 	    result = HdmiCecTx(handle, &buf, sizeof(&buf), &ret);
 	    sleep (1);
 	    printf ("\n buf is : 0x%x return value is  : 0x%x\n", buf, ret);
-	    if (isCallbackTriggered_g){
+	    if (isPingTriggered_g){
                 *receiverLogicalAddress = addr;
                 printf ("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
 		break;
@@ -444,10 +449,6 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
 
-    printf ("\nPlease connect only one cec enabled receiver to the device");
-    //Wait for the use to connect only one cec enabled device.
-    sleep (HDMICEC_USER_INTERACTION_PAUSE);
-
     //Assuming sender as 3 and broadcast. 
     //Set the receiver to standby state.
     unsigned char buf1[] = {0x3F, STANDBY };
@@ -577,12 +578,10 @@ void test_hdmicec_hal_l2_sendMsgHdmiVendorIdDisconnected_sink( void )
     int handle = 0;
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
-    unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
 
 
-    printf ("\nPlease disconnect All the HDMI ports");
-    //Wait for the use to disconnect the HDMI Cable.
-    sleep (HDMICEC_USER_INTERACTION_PAUSE);
+    printf ("\nPlease disconnect All the HDMI ports. Please enter any key to contine"); getchar ();
 
     int len = 2;
     //Give vendor id
@@ -611,7 +610,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiVendorIdDisconnected_sink( void )
 
     buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; printf ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
 
-   opcodeExpected_g = DEVICE_VENDOR_ID;
+    opcodeExpected_g = DEVICE_VENDOR_ID;
     isCallbackTriggered_g = false;
 
     result = HdmiCecTx(handle, buf1, len, &ret);
@@ -620,7 +619,7 @@ void test_hdmicec_hal_l2_sendMsgHdmiVendorIdDisconnected_sink( void )
     //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if  callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
 
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
@@ -650,7 +649,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_sink( void )
     int handle = 0;
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
-    unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
 
     int len = 2;
     //Give vendor id
@@ -693,7 +692,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_sink( void )
     //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if rx callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
 
     if(false != isCallbackTriggered_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
@@ -927,9 +926,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     unsigned int physicalAddress = 0x00;
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
 
-    printf ("\nPlease connect only one cec enabled receiver to the device");
-    //Wait for the use to connect only one cec enabled device.
-    sleep (HDMICEC_USER_INTERACTION_PAUSE);
 
     //Assuming sender as 3 and broadcast. 
     //Set the receiver to standby state.
@@ -1056,11 +1052,9 @@ void test_hdmicec_hal_l2_sendMsgVendorIdHdmiDisconnected_source( void )
     int handle = 0;
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
-    unsigned char receiverLogicalAddress = CEC_TV_ADDR;
+    unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
 
-    printf ("\nPlease disconnect All the HDMI ports");
-    //Wait for the use to disconnect the HDMI Cable.
-    sleep (HDMICEC_USER_INTERACTION_PAUSE);
+    printf ("\nPlease disconnect All the HDMI ports. Please enter any key to contine"); getchar ();
 
     int len = 2;
     //Give vendor id
@@ -1093,7 +1087,7 @@ void test_hdmicec_hal_l2_sendMsgVendorIdHdmiDisconnected_source( void )
     //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if  callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
 
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
@@ -1123,7 +1117,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_source( void )
     int handle = 0;
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
-    unsigned char receiverLogicalAddress = CEC_TV_ADDR;
+    unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
 
     int len = 2;
     //Give vendor id
@@ -1161,7 +1155,7 @@ void test_hdmicec_hal_l2_sendMsgAsyncPowerStatusHdmiDisconnected_source( void )
     //Wait for response delay for the reply
     sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if rx callback is not triggered.
-    UT_ASSERT_EQUAL( isCallbackTriggered_g, true);
+    UT_ASSERT_EQUAL( isCallbackTriggered_g, false);
 
     if(false != isCallbackTriggered_g){
         printf ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
