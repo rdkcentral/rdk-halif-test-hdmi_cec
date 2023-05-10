@@ -51,6 +51,9 @@
     #define DEFAULT_LOGICAL_ADDRESS 0
 #endif
 
+#define GET_CEC_VERSION (0x9F)
+#define DEVICE_VENDOR_ID (0x87)
+
 /**
  * @brief Ensure HdmiCecOpen() returns correct error codes during all of this API's invocation scenarios
  * 
@@ -777,12 +780,13 @@ void test_hdmicec_hal_l1_setTxCallback( void )
  * |04|call HdmiCecAddLogicalAddress() - call add logical address for sink devices with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Specific to sink devices. Should Pass |
  * |05|call HdmiCecGetLogicalAddress() - call get logical address with valid arguments. API should return the logical address added in the above step | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |06|call HdmiCecTx() - send the cec message with valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|call HdmiCecTx() - invoke send cec message with invalid ret | handle, buf, len, &ret=NULL  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |08|call HdmiCecTx() - invoke send cec message with invalid buffer | handle, buf=NULL, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |09|call HdmiCecTx() - invoke send cec message with invalid handle | handle=0, buf, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |10|call HdmiCecTx() - invoke send cec message with invalid buffer length | handle, buf, len=INT_MIN, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |11|call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |12|call HdmiCecTx()  -  invoke send cec message once module is closed | handle, buf, len, &ret | HDMI_CEC_IO_INVALID_STATE| Should Pass |
+ * |07|call HdmiCecTx() - back to back send to ensure it is passing | handle, buf, len. &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |08|call HdmiCecTx() - invoke send cec message with invalid ret | handle, buf, len, &ret=NULL  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecTx() - invoke send cec message with invalid buffer | handle, buf=NULL, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |10|call HdmiCecTx() - invoke send cec message with invalid handle | handle=0, buf, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |11|call HdmiCecTx() - invoke send cec message with invalid buffer length | handle, buf, len=INT_MIN, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |12|call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |13|call HdmiCecTx()  -  invoke send cec message once module is closed | handle, buf, len, &ret | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
 {
@@ -795,7 +799,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, 0x9F};
+    unsigned char buf[] = {0x3F, GET_CEC_VERSION};
 
     //Calling api before open, should give invalid argument
     result = HdmiCecTx(handle, buf, len, &ret);
@@ -825,6 +829,11 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
     buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
+    result = HdmiCecTx(handle, buf, len, &ret);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    buf [1] = DEVICE_VENDOR_ID;
+    /*Back to back send and ensure send is not failed.*/
     result = HdmiCecTx(handle, buf, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -879,15 +888,17 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
  * |02|call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|call HdmiCecGetLogicalAddress() - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|call HdmiCecTx() - send the cec message with valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|call HdmiCecTx() - invoke send cec message with invalid ret | handle, buf, len, &ret=NULL  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |06|call HdmiCecTx() - invoke send cec message with invalid buffer | handle, buf=NULL, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |07|call HdmiCecTx() - invoke send cec message with invalid handle | handle=0, buf, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |08|call HdmiCecTx() - invoke send cec message with invalid buffer length | handle, buf, len=INT_MIN, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |09|call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |10|call HdmiCecTx()  -  invoke send cec message once module is closed | handle, buf, len, &ret | HDMI_CEC_IO_INVALID_STATE| Should Pass |
+ * |05|call HdmiCecTx() - back to back send to ensure it is passing | handle, buf, len. &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |06|call HdmiCecTx() - invoke send cec message with invalid ret | handle, buf, len, &ret=NULL  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |07|call HdmiCecTx() - invoke send cec message with invalid buffer | handle, buf=NULL, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |08|call HdmiCecTx() - invoke send cec message with invalid handle | handle=0, buf, len, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecTx() - invoke send cec message with invalid buffer length | handle, buf, len=INT_MIN, &ret  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |10|call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |11|call HdmiCecTx()  -  invoke send cec message once module is closed | handle, buf, len, &ret | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
 {
+    //#TODO transmit back to back functionality also.
     int result=HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
@@ -897,7 +908,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, 0x9F};
+    unsigned char buf[] = {0x3F, GET_CEC_VERSION};
 
     //Calling api before open, should give invalid argument
     result = HdmiCecTx(handle, buf, len, &ret);
@@ -917,6 +928,11 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
     buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
+    result = HdmiCecTx(handle, buf, len, &ret);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    buf [1] = DEVICE_VENDOR_ID;
+    /*Back to back send and ensure send is not failed.*/
     result = HdmiCecTx(handle, buf, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -973,11 +989,12 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
  * |03|call HdmiCecAddLogicalAddress() - call add logical address with valid arguments| handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|call HdmiCecGetLogicalAddress() - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |05|call HdmiCecTxAsync() - send the cec message after correct module initialization | handle, buf, len | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf=NULL, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |07|call HdmiCecTxAsync() - call cec message send with invalid argument | handle=0, buf, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |08|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf, len=INT_MIN | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |09|call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |10|call HdmiCecTxAsync()  - call api after module is closed | handle, buf, len | HDMI_CEC_IO_INVALID_STATE| Should Pass |
+ * |06|call HdmiCecTxAsync() - back to back send to ensure it is passing | handle, buf, len | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |07|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf=NULL, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |08|call HdmiCecTxAsync() - call cec message send with invalid argument | handle=0, buf, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf, len=INT_MIN | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |10|call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |11|call HdmiCecTxAsync()  - call api after module is closed | handle, buf, len | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
 {
@@ -989,7 +1006,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, 0x9F};
+    unsigned char buf[] = {0x3F, GET_CEC_VERSION};
 
     //Calling api before open, should give invalid argument
     result = HdmiCecTxAsync(handle, buf, len); //Code crash here
@@ -1020,6 +1037,11 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
     buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
+    result = HdmiCecTxAsync(handle, buf, len);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    buf [1] = DEVICE_VENDOR_ID;
+    /*Back to back send and ensure send is not failed.*/
     result = HdmiCecTxAsync(handle, buf, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -1070,11 +1092,12 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
  * |02|call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|call HdmiCecGetLogicalAddress() - call get logical address with valid arguments | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |05|call HdmiCecTxAsync() - send the cec message after correct module initialization | handle, buf, len | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf=NULL, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |07|call HdmiCecTxAsync() - call cec message send with invalid argument | handle=0, buf, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |08|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf, len=INT_MIN | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |09|call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |10|call HdmiCecTxAsync()  - call api after module is closed | handle, buf, len | HDMI_CEC_IO_INVALID_STATE| Should Pass |
+ * |06|call HdmiCecTxAsync() - back to back send to ensure it is passing | handle, buf, len | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |07|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf=NULL, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |08|call HdmiCecTxAsync() - call cec message send with invalid argument | handle=0, buf, len | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |09|call HdmiCecTxAsync() - call cec message send with invalid argument | handle, buf, len=INT_MIN | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |10|call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |11|call HdmiCecTxAsync()  - call api after module is closed | handle, buf, len | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
 {
@@ -1086,7 +1109,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, 0x9F};
+    unsigned char buf[] = {0x3F, GET_CEC_VERSION};
 
     //Calling api before open, should give invalid argument
     result = HdmiCecTxAsync(handle, buf, len); //Code crash here
@@ -1108,6 +1131,11 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
     buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
+    result = HdmiCecTxAsync(handle, buf, len);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    buf [1] = DEVICE_VENDOR_ID;
+    /*Back to back send and ensure send is not failed.*/
     result = HdmiCecTxAsync(handle, buf, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
