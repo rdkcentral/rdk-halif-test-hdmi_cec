@@ -168,27 +168,27 @@ void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
  * @param receiverLogicalAddress logical address of the receiver.
  */
 void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* receiverLogicalAddress) {
-    int result=0;
     int ret=0;
     unsigned char buf = 0x00;
     isPingTriggered_g = false;
     //Ping all logical address and determine which device is connected.
     for(int i=0; i< CEC_BROADCAST_ADDR; i++ ) {
-	unsigned char addr = i & 0xFF; 
-	if (logicalAddress != addr) {
+        unsigned char addr = i & 0xFF; 
+        if (logicalAddress != addr) {
             buf = ((logicalAddress&0xFF)<<4)|addr;
-	    result = HdmiCecTx(handle, &buf, sizeof(&buf), &ret);
-        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+	    //Noneed to check the retrun status of HdmiCecTx since function will called
+	    //to check the hdmi disconnected conditions also.
+            HdmiCecTx(handle, &buf, sizeof(&buf), &ret);
 
-        clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += 1;
-        sem_timedwait(&sem_g, &ts_g);
-	    printf ("\n buf is : 0x%x return value is  : 0x%x\n", buf, ret);
-	    if (isPingTriggered_g){
+            clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += 1;
+            sem_timedwait(&sem_g, &ts_g);
+            printf ("\n buf is : 0x%x return value is  : 0x%x\n", buf, ret);
+            if (isPingTriggered_g){
                 *receiverLogicalAddress = addr;
                 printf ("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
-		break;
-	    }
-	}
+                break;
+            }
+        }
     }
 }
 
@@ -587,7 +587,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     getReceiverLogicalAddress (handle, logicalAddress, &receiverLogicalAddress);
 
     //This point receiver address should be broadcast address. Since no other receiver is connected.
-    UT_ASSERT_TRUE(CEC_BROADCAST_ADDR!=receiverLogicalAddress);
+    UT_ASSERT_TRUE(CEC_BROADCAST_ADDR==receiverLogicalAddress);
     if(CEC_BROADCAST_ADDR!=receiverLogicalAddress){
         printf ("\nGot the receiver address: 0x%x\n", __FUNCTION__, __LINE__, receiverLogicalAddress);
     }
@@ -974,7 +974,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     getReceiverLogicalAddress (handle, logicalAddress, &receiverLogicalAddress);
 
     //This point receiver address should be broadcast address. Since no other receiver is connected.
-    UT_ASSERT_TRUE(CEC_BROADCAST_ADDR!=receiverLogicalAddress);
+    UT_ASSERT_TRUE(CEC_BROADCAST_ADDR==receiverLogicalAddress);
     if(CEC_BROADCAST_ADDR!=receiverLogicalAddress){
         printf ("\nGot the receiver address: 0x%x\n", __FUNCTION__, __LINE__, receiverLogicalAddress);
     }
