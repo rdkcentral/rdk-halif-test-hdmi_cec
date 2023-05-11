@@ -182,7 +182,6 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
 
         clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += 1;
         sem_timedwait(&sem_g, &ts_g);
-	    //sleep (1);
 	    printf ("\n buf is : 0x%x return value is  : 0x%x\n", buf, ret);
 	    if (isPingTriggered_g){
                 *receiverLogicalAddress = addr;
@@ -248,7 +247,6 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
 
@@ -321,7 +319,6 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
 
@@ -397,7 +394,6 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
 
@@ -471,7 +467,6 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
 
     opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -483,7 +478,6 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);      
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
@@ -505,7 +499,6 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
@@ -524,7 +517,6 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     printf ("\n Please ensure connected device power status changed.\n");
 
     //Check the current power status now. Sender and receiver is same here. Just change the opcode.
@@ -537,7 +529,6 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     //Wait for the response delay
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     //Check expected power state is received
@@ -660,7 +651,6 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
 
@@ -728,7 +718,6 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
 
@@ -799,7 +788,6 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
 
@@ -870,7 +858,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
 
     opcodeExpected_g = REPORT_POWER_STATUS;
     isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
@@ -882,7 +869,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
@@ -901,7 +887,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     if(HDMI_CEC_IO_SUCCESS != isExpectedBufferReceived_g){
@@ -923,7 +908,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Wait for response delay for the reply
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     printf ("\n Please ensure connected device power status changed.\n");
 
 
@@ -937,7 +921,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Wait for the response delay
     clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
     sem_timedwait(&sem_g, &ts_g);
-    //sleep (HDMICEC_RESPONSE_TIMEOUT);
     //Check if expected buffer received.
     UT_ASSERT_EQUAL( isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
     //Check expected power state is received
