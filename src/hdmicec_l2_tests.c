@@ -42,7 +42,7 @@
 #include "hdmi_cec_driver.h"
 
 //Set the MACRO for the stb platforms
-#define __UT_STB__ 1
+//#define __UT_STB__ 1
 
 #define HDMICEC_RESPONSE_TIMEOUT 10
 #define GET_CEC_VERSION (0x9F)
@@ -177,19 +177,24 @@ void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
  */
 void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* receiverLogicalAddress) {
     int ret=0;
-    unsigned char buf = 0x00;
+    unsigned char buf[] = {0x00};
     isPingTriggered_g = false;
     //Ping all logical address and determine which device is connected.
     for(int i=0; i< CEC_BROADCAST_ADDR; i++ ) {
-        unsigned char addr = i & 0xFF; 
+        unsigned char addr = i & 0x0F; 
         if (logicalAddress != addr) {
-            buf = ((logicalAddress&0xFF)<<4)|addr;
+            buf[0] = ((logicalAddress&0x0F)<<4)|addr;
 	    //Noneed to check the retrun status of HdmiCecTx since function will called
 	    //to check the hdmi disconnected conditions also.
-            HdmiCecTx(handle, &buf, 1, &ret);
+	    ret = HDMI_CEC_IO_SUCCESS;
+            int result = HdmiCecTx(handle, buf, sizeof (buf), &ret);
 
-            printf ("\n buf is : 0x%x return value is  : 0x%x\n", buf, ret);
-            if (HDMI_CEC_IO_SUCCESS == ret){
+            //Wait for response delay for the reply
+            clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += 1;
+            sem_timedwait(&sem_g, &ts_g);
+            printf ("\n buf is : 0x%x ret value is  : 0x%x result is : 0x%x \n", buf[0], ret, result);
+	    //TODO need to check why following condition is not working.
+            if (((HDMI_CEC_IO_SENT_AND_ACKD  == ret)||(HDMI_CEC_IO_SUCCESS==ret))&& (HDMI_CEC_IO_SUCCESS == result) ){
                 *receiverLogicalAddress = addr;
                 printf ("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
                 break;

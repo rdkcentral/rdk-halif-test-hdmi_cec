@@ -40,7 +40,7 @@
 #include "hdmi_cec_driver.h"
 
 //Set the MACRO for the stb platforms
-#define __UT_STB__ 1
+//#define __UT_STB__ 1
 
 #ifdef __UT_STB__
     /**
