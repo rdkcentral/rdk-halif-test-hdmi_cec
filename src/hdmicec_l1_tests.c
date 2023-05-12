@@ -38,6 +38,10 @@
 
 #include <ut.h>
 #include "hdmi_cec_driver.h"
+
+//Set the MACRO for the stb platforms
+#define __UT_STB__ 1
+
 #ifdef __UT_STB__
     /**
      * Set CEC play back logical address here

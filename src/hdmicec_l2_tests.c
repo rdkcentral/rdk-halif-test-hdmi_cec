@@ -41,6 +41,9 @@
 #include <ut.h>
 #include "hdmi_cec_driver.h"
 
+//Set the MACRO for the stb platforms
+#define __UT_STB__ 1
+
 #define HDMICEC_RESPONSE_TIMEOUT 10
 #define GET_CEC_VERSION (0x9F)
 #define CEC_VERSION (0x9E)
@@ -55,6 +58,11 @@
 #define REPORT_PHYSICAL_ADDRESS (0x84)
 #define ACTIVE_SOURCE (0x82)
 #define SET_STREAM_PATH (0x86)
+#define GIVE_OSD_NAME (0x46)
+#define SET_OSD_NAME (0x47)
+#define SET_OSD_NAME_VAL1 (0x54)
+#define SET_OSD_NAME_VAL2 (0x56)
+
 
 #define POWER_ON (0x00)
 #define POWER_OFF (0x01)
@@ -178,12 +186,10 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
             buf = ((logicalAddress&0xFF)<<4)|addr;
 	    //Noneed to check the retrun status of HdmiCecTx since function will called
 	    //to check the hdmi disconnected conditions also.
-            HdmiCecTx(handle, &buf, sizeof(&buf), &ret);
+            HdmiCecTx(handle, &buf, 1, &ret);
 
-            clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += 1;
-            sem_timedwait(&sem_g, &ts_g);
             printf ("\n buf is : 0x%x return value is  : 0x%x\n", buf, ret);
-            if (isPingTriggered_g){
+            if (HDMI_CEC_IO_SUCCESS == ret){
                 *receiverLogicalAddress = addr;
                 printf ("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
                 break;
@@ -829,6 +835,8 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     unsigned char buf1[] = {0x3F, STANDBY };
     unsigned char buf4[] = {0x3F, ACTIVE_SOURCE, 0x00, 0x00 };
 
+    printf ("\nPlease set the connected dispaly to standby. Please enter any key to continue"); getchar ();
+
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
@@ -848,7 +856,8 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Get the receiver logical address
     getReceiverLogicalAddress (handle, logicalAddress, &receiverLogicalAddress);
 
-    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n HDMI CEC buf0: 0x%x\n", buf1[0]);
+    //TODO need to check why standby signal is not working in tv panel.
+    buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; printf ("\n HDMI CEC buf0: 0x%x\n", buf1[0]);
     /* Positive result */
     //Broadcast set power state to standby here.
     buf1[1] = STANDBY;
@@ -894,11 +903,25 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     }
 
 
+    //set OSD name here.
+    buf4[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; 
+    buf4[1] = SET_OSD_NAME;
+    buf4[2] = SET_OSD_NAME_VAL1;
+    buf4[3] = SET_OSD_NAME_VAL2;
+    printf ("\n HDMI CEC buf4: 0x%x 0x%x 0x%x 0x%x\n", buf4[0], buf4[1], buf4[2], buf4[3]);
+    result = HdmiCecTx(handle, buf4, sizeof(buf4), &ret);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //Wait for response delay for the reply
+    clock_gettime(CLOCK_REALTIME, &ts_g); ts_g.tv_sec += HDMICEC_RESPONSE_TIMEOUT;
+    sem_timedwait(&sem_g, &ts_g);
+    printf ("\n Please ensure connected device power status changed.\n");
+
+
     //Get device physical address here.
     HdmiCecGetPhysicalAddress(handle, &physicalAddress);
 
     //Broadcast active source here with device physical address.
-    buf4[0] = ((logicalAddress&0xFF)<<4)|0x0F; 
+    buf4[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; 
     buf4[1] = ACTIVE_SOURCE;
     buf4[2] = (physicalAddress >> 8) & 0xFF;;
     buf4[3] = physicalAddress & 0xFF;
