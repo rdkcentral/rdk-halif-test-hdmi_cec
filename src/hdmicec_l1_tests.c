@@ -58,6 +58,31 @@
 #define GET_CEC_VERSION (0x9F)
 #define DEVICE_VENDOR_ID (0x87)
 
+#define ENABLE_LOG_DEBUG 1 // Set to 0 to disable debug logging
+#define ENABLE_LOG_WARNING 1 // Set to 0 to disable warning logging
+#define ENABLE_LOG_INFO 1 // Set to 0 to disable info logging
+
+#define LOG_DEBUG(...) do { \
+    if (ENABLE_LOG_DEBUG) { \
+        printf("\n[DEBUG] " __VA_ARGS__); \
+        printf("\n"); \
+    } \
+} while (0)
+
+#define LOG_WARNING(...) do { \
+    if (ENABLE_LOG_WARNING) { \
+        printf("\n[WARNING] " __VA_ARGS__); \
+        printf("\n"); \
+    } \
+} while (0)
+
+#define LOG_INFO(...) do { \
+    if (ENABLE_LOG_INFO) { \
+        printf("\n[INFO] " __VA_ARGS__); \
+        printf("\n"); \
+    } \
+} while (0)
+
 /**
  * @brief Ensure HdmiCecOpen() returns correct error codes during all of this API's invocation scenarios
  * 
@@ -586,7 +611,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice( void )
  */
 void DriverReceiveCallback(int handle, void *callbackData, unsigned char *buf, int len)
 {
-    printf ("\nBuffer generated: %x length: %d\n",buf, len);
+    LOG_DEBUG ("\nBuffer generated: %x length: %d\n",buf, len);
     UT_ASSERT_TRUE(len>0); 
     UT_ASSERT_TRUE(handle!=0);
     UT_ASSERT_PTR_NULL(!callbackData);
@@ -608,7 +633,7 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
     UT_ASSERT_PTR_NULL(!callbackData);
     //UT_ASSERT_TRUE( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
     //TODO need to identify why callback is not equal
-    printf ("\ncallbackData returned: %x result: %d\n",callbackData, result);
+    LOG_DEBUG ("\ncallbackData returned: %x result: %d\n",callbackData, result);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 }
 
@@ -823,14 +848,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    buf[0] = 0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = 0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    printf ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    LOG_DEBUG ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
+    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
     result = HdmiCecTx(handle, buf, len, &ret);
@@ -922,14 +947,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    buf[0] = 0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = 0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    printf ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    LOG_DEBUG ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
+    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
     result = HdmiCecTx(handle, buf, len, &ret);
@@ -1033,12 +1058,12 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    buf[0] = 0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = 0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address.
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
     result = HdmiCecTxAsync(handle, buf, len);
@@ -1127,12 +1152,12 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
     result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    buf[0] = 0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = 0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address.
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; printf ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
     result = HdmiCecTxAsync(handle, buf, len);
