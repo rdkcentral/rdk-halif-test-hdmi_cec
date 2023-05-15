@@ -603,6 +603,7 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
  */
 void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
 {
+    //TODO need to check why this function crashes when reciever device is connected.
     int result=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1026,6 +1027,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
  */
 void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
 {
+    //TODO need to check why this function crashes when reciever device is connected.
     int result=0;
     int handle = 0;
     int logicalAddress = 0;
