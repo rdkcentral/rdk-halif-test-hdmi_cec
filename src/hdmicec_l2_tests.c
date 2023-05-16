@@ -151,8 +151,8 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
 {
     UT_ASSERT_TRUE(len>0); 
     UT_ASSERT_TRUE(handle!=0);
-    UT_ASSERT_PTR_NULL(!callbackData);
-    UT_ASSERT_PTR_NULL(!buf);
+    UT_ASSERT_PTR_NULL((bool)(!callbackData));
+    UT_ASSERT_PTR_NULL((bool)(!buf));
     //UT_ASSERT_TRUE( (unsigned long long)(callbackData) == (unsigned long long)0xDEADBEEF);
     //TODO need to identify why callback is not equal
     isPingTriggered_g = true;
@@ -185,7 +185,7 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
 void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
 {
     UT_ASSERT_TRUE(handle!=0);
-    UT_ASSERT_PTR_NULL(!callbackData);
+    UT_ASSERT_PTR_NULL((bool)(!callbackData));
     //UT_ASSERT_TRUE( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
     //TODO need to identify why callback is not equal
     LOG_DEBUG ("\ncallbackData returned: %x result: %d\n",callbackData, result);
