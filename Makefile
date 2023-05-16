@@ -31,6 +31,7 @@ $(info TARGET NOT SET )
 $(info TARGET FORCED TO Linux)
 TARGET=linux
 SRC_DIRS += $(ROOT_DIR)/skeletons/src
+YLDFLAGS += -lpthread -lrt
 endif
 
 $(info TARGET [$(TARGET)])
