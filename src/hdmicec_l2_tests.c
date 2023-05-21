@@ -256,6 +256,9 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
@@ -326,6 +329,9 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -398,6 +404,9 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -474,6 +483,9 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -617,6 +629,9 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
@@ -677,6 +692,9 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -745,6 +763,9 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
@@ -811,6 +832,9 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -886,6 +910,9 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -1040,6 +1067,9 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
