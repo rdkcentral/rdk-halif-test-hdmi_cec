@@ -662,6 +662,10 @@ void DriverReceiveCallback(int handle, void *callbackData, unsigned char *buf, i
     UT_ASSERT_PTR_NULL((bool)(!buf));
     //UT_ASSERT_TRUE( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
     //TODO need to identify why callback is not equal
+    CEC_LOG_DEBUG ("\nCall back data generated is \n");
+    for (int index=0; index < len; index++) {
+        CEC_LOG_DEBUG ("buf at index : %d is %x", index, buf[index]);
+    }
 }
 
 /**

@@ -132,6 +132,12 @@ unsigned char cec_physicalAddressReceived1_g = 0x00;
 unsigned char cec_physicalAddressReceived2_g = 0x00;
 
 /**
+ * @brief  Status variable to hold the cec version value.
+ * 
+ */
+unsigned char cec_version_g = 0x00;
+
+/**
  * @brief Status variable to check if Hdmi RX callback is triggered in respective L2 scenarios.
  * 
  */
@@ -168,6 +174,10 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
     //UT_ASSERT_TRUE( (unsigned long long)(callbackData) == (unsigned long long)0xDEADBEEF);
     //TODO need to identify why callback is not equal
     cec_isPingTriggered_g = true;
+    CEC_LOG_DEBUG ("\nCall back data generated is \n");
+    for (int index=0; index < len; index++) {
+        CEC_LOG_DEBUG ("buf at index : %d is %x", index, buf[index]);
+    }
     if (len>1){
         CEC_LOG_DEBUG ("\nBuffer generated: %x length: %d\n",buf[1], len);
         if (buf[1] == cec_opcodeExpected_g){
@@ -180,6 +190,9 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
                 cec_physicalAddressReceived1_g = buf[2];
                 cec_physicalAddressReceived2_g = buf[3];
                 CEC_LOG_DEBUG ("\nPhysical address received is : %x %x", cec_physicalAddressReceived1_g, cec_physicalAddressReceived2_g);
+            }else if (CEC_VERSION == buf[1]){
+                cec_version_g = buf[2];
+                CEC_LOG_DEBUG ("\ncec version received is : %x", cec_version_g);
             }
             sem_post(&cec_sem_g);
 
@@ -220,7 +233,7 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
         unsigned char addr = i & 0x0F; 
         if (logicalAddress != addr) {
             buf[0] = ((logicalAddress&0x0F)<<4)|addr;
-	        //No need to check the retrun status of HdmiCecTx since function will called
+	        //No need to check the return status of HdmiCecTx since function will called
 	        //to check the hdmi disconnected conditions also.
 	        ret = HDMI_CEC_IO_SUCCESS;
             int result = HdmiCecTx(handle, buf, sizeof (buf), &ret);
@@ -481,6 +494,9 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 
     //Using NULL callback
     result = HdmiCecSetRxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    result = HdmiCecSetTxCallback(handle, NULL, 0);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     /*calling hdmicec_close should pass */
@@ -1031,8 +1047,8 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     UT_ASSERT_EQUAL( cec_powerStatusReceived_g, CEC_POWER_OFF);
 
 
-    //Request image view on here.
-    buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress;
+    //broadcast image view on here.
+    buf1[0] = ((logicalAddress&0xFF)<<4)|0x0F;
     buf1[1] = CEC_IMAGE_VIEW_ON;
     CEC_LOG_DEBUG ("\n HDMI CEC buf: 0x%x 0x%x\n", buf1[0], buf1[1]);
     CEC_LOG_INFO ("\nSend image view on to the receiver");
@@ -1110,6 +1126,9 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
 
     //Using NULL callback
     result = HdmiCecSetRxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    result = HdmiCecSetTxCallback(handle, NULL, 0);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     /*calling hdmicec_close should pass */
