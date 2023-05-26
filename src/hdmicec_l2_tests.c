@@ -70,6 +70,7 @@
 #define CEC_TUNER_ADDR (0x3)
 #define CEC_TV_ADDR (0x0)
 
+//#TODO This section will be replaced with UT_LOG() when the feature is available
 #define CEC_ENABLE_CEC_LOG_DEBUG 1 // Set to 0 to disable debug logging
 #define CEC_ENABLE_CEC_LOG_WARNING 1 // Set to 0 to disable warning logging
 #define CEC_ENABLE_CEC_LOG_INFO 1 // Set to 0 to disable info logging
@@ -193,6 +194,8 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
             }else if (CEC_VERSION == buf[1]){
                 cec_version_g = buf[2];
                 CEC_LOG_DEBUG ("\ncec version received is : %x", cec_version_g);
+            } else if (CEC_DEVICE_VENDOR_ID == buf[1]){
+                CEC_LOG_DEBUG ("\ncec vendor id received is : %x", buf[2]);
             }
             sem_post(&cec_sem_g);
 
@@ -254,7 +257,7 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
 
 
 /**
- * @brief This function will request the version from the connected devices and check if the opcode is received within the expected time interval.
+ * @brief This function will request the version from the connected devices and check if the valid opcode is received within the expected time interval.
  *  In oder to be deterministic opcode should be fixed.
  * 
  * **Test Group ID:** 02@n
@@ -335,7 +338,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
 }
 
 /**
- * @brief This function will request the vendor ID from the connected devices and check if the opcode is received within the expected time interval. 
+ * @brief This function will request the vendor ID from the connected devices and check if the valid opcode is received within the expected time interval. 
  * In oder to be deterministic opcode should be fixed.
  * 
  * **Test Group ID:** 02@n
@@ -417,7 +420,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
 }
 
 /**
- * @brief This function will request the power status from the connected devices and check if the opcode is received within the expected time interval.
+ * @brief This function will request the power status from the connected devices and check if the valid opcode is received within the expected time interval.
  *  In oder to be deterministic opcode should be fixed.
  * 
  * **Test Group ID:** 02@n
@@ -626,7 +629,7 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     sem_timedwait(&cec_sem_g, &cec_ts_g);
     CEC_LOG_DEBUG ("\n Please ensure connected device power status changed.\n");
 
-    //Check the current power status now. Sender and receiver is same here. Just change the opcode.
+    //Check the current power status now. Sender and receiver is same here. Just change the valid opcode.
     cec_opcodeExpected_g = CEC_REPORT_POWER_STATUS;
     cec_isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
     buf1[1] = CEC_GIVE_DEVICE_POWER_STATUS;
@@ -731,7 +734,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
 }
 
 /**
- * @brief This function will request the version from the connected devices and check if the opcode is received within the expected time interval.
+ * @brief This function will request the version from the connected devices and check if the valid opcode is received within the expected time interval.
  *  In oder to be deterministic opcode should be fixed.
  * 
  * **Test Group ID:** 02@n
@@ -806,7 +809,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
 }
 
 /**
- * @brief This function will request the vendor ID from the connected devices and check if the opcode is received within the expected time interval.
+ * @brief This function will request the vendor ID from the connected devices and check if the valid opcode is received within the expected time interval.
  *  In oder to be deterministic opcode should be fixed.
  * 
  * **Test Group ID:** 02@n
@@ -882,7 +885,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
 }
 
 /**
- * @brief This function will request the power status from the connected devices and check if the opcode is received within the expected time interval.
+ * @brief This function will request the power status from the connected devices and check if the valid opcode is received within the expected time interval.
  *  In oder to be deterministic opcode should be fixed.
  * 
  * **Test Group ID:** 02@n
@@ -980,6 +983,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
 
 
+    //TODO need to send one broadcast event here. Check image view on can be broadcasted.
     //Assuming sender as 3 and broadcast. 
     //Set the receiver to CEC_STANDBY state.
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
@@ -1082,7 +1086,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Get device physical address here.
     HdmiCecGetPhysicalAddress(handle, &physicalAddress);
 
-    //Broadcast active source here with device physical address.
     buf4[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; 
     buf4[1] = CEC_ACTIVE_SOURCE;
     buf4[2] = (physicalAddress >> 8) & 0xFF;;
@@ -1097,7 +1100,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     CEC_LOG_DEBUG ("\n Please ensure connected device power status changed.\n");
 
 
-    //Check the current power status now. Sender and receiver is same here. Just change the opcode.
+    //Check the current power status now. Sender and receiver is same here. Just change the valid opcode.
     cec_opcodeExpected_g = CEC_REPORT_POWER_STATUS;
     cec_isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
     buf1[1] = CEC_GIVE_DEVICE_POWER_STATUS;
@@ -1135,6 +1138,10 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     result = HdmiCecClose (handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 }
+
+//TODO Need to have a scenario to evaluate the multiple CEC Commands getting sent on the network at the same time.  A test case that has two sink devices sending back to back commands for 10 to 15 times in a loop
+//TODO implement a separate case to send 10 -15 back to back commands.
+
 
 /**
  * @brief This function will request the vendor ID when HDMI is in disconnected state and will confirm that response is not received within the expected time interval.
