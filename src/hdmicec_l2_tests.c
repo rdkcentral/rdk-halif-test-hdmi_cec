@@ -70,6 +70,8 @@
 #define CEC_TUNER_ADDR (0x3)
 #define CEC_TV_ADDR (0x0)
 
+#define CEC_BACK_TO_BACK_SEND_LIMIT 15
+
 //#TODO This section will be replaced with UT_LOG() when the feature is available
 #define CEC_ENABLE_CEC_LOG_DEBUG 1 // Set to 0 to disable debug logging
 #define CEC_ENABLE_CEC_LOG_WARNING 1 // Set to 0 to disable warning logging
@@ -734,6 +736,88 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
 }
 
 /**
+ * @brief This function will ensure back to back CEC message send is working as expected for sink devices
+ * 
+ * **Test Group ID:** 02@n
+ * **Test Case ID:** 006@n
+ * 
+ * **Test Procedure:**
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
+ */
+void test_hdmicec_hal_l2_back_to_back_send_sink( void )
+{
+    int result=0;
+    int handle = 0;
+    int logicalAddress = 0;
+    int devType = 0;//Trying some dev type
+    unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+
+    CEC_LOG_DEBUG ("\nPlease connect more than one cec device to the network and run back to back send parallel . Please enter any key to continue"); getchar ();
+    
+    int len = 2;
+    //Give vendor id
+    //Assuming sender as 3 and broadcast
+    unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
+
+    /* Positive result */
+    result = HdmiCecOpen (&handle);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+
+    /* Positive result */
+    result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    /* Positive result */
+    result = HdmiCecSetTxCallback(handle, DriverTransmitCallback_hal_l2, (void*)0xDEADBEEF);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    //Set logical address for TV.
+    logicalAddress = 0;
+    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    //Get logical address of the device
+    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    //Get the receiver logical address
+    getReceiverLogicalAddress (handle, logicalAddress, &receiverLogicalAddress);
+
+    buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; CEC_LOG_DEBUG ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
+
+    cec_opcodeExpected_g = CEC_REPORT_POWER_STATUS;
+    cec_isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
+
+    for (int index=0; index < CEC_BACK_TO_BACK_SEND_LIMIT; index++) {
+        /* Positive result */
+        CEC_LOG_INFO ("\nRequests for the power status");
+        result = HdmiCecTxAsync(handle, buf1, len);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    
+        CEC_LOG_INFO ("\nRequests vendor id");
+        buf1[1] = CEC_GIVE_CEC_DEVICE_VENDOR_ID;
+        result = HdmiCecTxAsync(handle, buf1, len);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    }
+
+    //Using NULL callback
+    result = HdmiCecSetRxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    result = HdmiCecSetTxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    /*calling hdmicec_close should pass */
+    result = HdmiCecClose (handle);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+}
+
+
+/**
  * @brief This function will request the version from the connected devices and check if the valid opcode is received within the expected time interval.
  *  In oder to be deterministic opcode should be fixed.
  * 
@@ -1206,9 +1290,85 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 }
 
+/**
+ * @brief This function will ensure back to back CEC message send is working as expected for sink devices
+ * 
+ * **Test Group ID:** 02@n
+ * **Test Case ID:** 012@n
+ * 
+ * **Test Procedure:**
+ * Refer to UT specification documentation [l2_module_test_specification.md](l2_module_test_specification.md)
+ */
+void test_hdmicec_hal_l2_back_to_back_send_source ( void )
+{
+    int result=0;
+    int handle = 0;
+    int logicalAddress = 0;
+    int devType = 0;//Trying some dev type
+    unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+
+    int len = 2;
+    //Give vendor id
+    //Assuming sender as 3 and broadcast
+    unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
+
+    CEC_LOG_DEBUG ("\nPlease connect more than one cec device to the network and run back to back send parallel . Please enter any key to continue"); getchar ();
+
+    /* Positive result */
+    result = HdmiCecOpen (&handle);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+
+    //if init is failed no need to proceed further.
+    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+
+    /* Positive result */
+    result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    /* Positive result */
+    result = HdmiCecSetTxCallback(handle, DriverTransmitCallback_hal_l2, (void*)0xDEADBEEF);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    //Get logical address of the device
+    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    //Get the receiver logical address
+    getReceiverLogicalAddress (handle, logicalAddress, &receiverLogicalAddress);
+
+    buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; CEC_LOG_DEBUG ("\n HDMI CEC buf: 0x%x\n", buf1[0]);
+
+    cec_opcodeExpected_g = CEC_REPORT_POWER_STATUS;
+    cec_isExpectedBufferReceived_g = HDMI_CEC_IO_SENT_FAILED;
+
+    for (int index=0; index < CEC_BACK_TO_BACK_SEND_LIMIT; index++) {
+        /* Positive result */
+        CEC_LOG_INFO ("\nRequests for the power status");
+        result = HdmiCecTxAsync(handle, buf1, len);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    
+        CEC_LOG_INFO ("\nRequests vendor id");
+        buf1[1] = CEC_GIVE_CEC_DEVICE_VENDOR_ID;
+        result = HdmiCecTxAsync(handle, buf1, len);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    }
+
+    //Using NULL callback
+    result = HdmiCecSetRxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    result = HdmiCecSetTxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    /*calling hdmicec_close should pass */
+    result = HdmiCecClose (handle);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+}
 
 static UT_test_suite_t *pSuiteHdmiConnected = NULL;
 static UT_test_suite_t *pSuiteHdmiDisConnected = NULL;
+static UT_test_suite_t *pSuiteHdmiBackToBackSend = NULL;
 
 /**
  * @brief Register the main tests for this module
@@ -1220,8 +1380,9 @@ int test_hdmicec_hal_l2_register( void )
     /* add a suite to the registry */
     pSuiteHdmiConnected = UT_add_suite("[L2 test hdmi connected]", NULL, NULL);
     pSuiteHdmiDisConnected = UT_add_suite("[L2 test hdmi disconnected]", NULL, NULL);
+    pSuiteHdmiBackToBackSend = UT_add_suite("[L2 test hdmi back to back send]", NULL, NULL);
     //#TODO need have two separate suits with one hdmi connected state and another suite for disconnected states.
-    if (NULL == pSuiteHdmiConnected || NULL == pSuiteHdmiDisConnected) 
+    if (NULL == pSuiteHdmiConnected || NULL == pSuiteHdmiDisConnected || NULL == pSuiteHdmiBackToBackSend) 
     {
         return -1;
     }
@@ -1232,12 +1393,14 @@ int test_hdmicec_hal_l2_register( void )
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusSink", test_hdmicec_hal_l2_getPowerStatus_sink);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSink", test_hdmicec_hal_l2_TogglePowerState_sink);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgHdmiVendorIdDisconnectedSink", test_hdmicec_hal_l2_validateHdmiCecConnection_sink);
+    UT_add_test( pSuiteHdmiBackToBackSend, "back_to_back_send", test_hdmicec_hal_l2_back_to_back_send_sink);
 #else
     UT_add_test( pSuiteHdmiConnected, "getCecVersionSource", test_hdmicec_hal_l2_getCecVersion_source);
     UT_add_test( pSuiteHdmiConnected, "getVendorIDSource", test_hdmicec_hal_l2_getVendorID_source);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusSource", test_hdmicec_hal_l2_getPowerStatus_source);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSource", test_hdmicec_hal_l2_TogglePowerState_source);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgVendorIdHdmiDisconnectedSource", test_hdmicec_hal_l2_validateHdmiCecConnection_source);
+    UT_add_test( pSuiteHdmiBackToBackSend, "back_to_back_send", test_hdmicec_hal_l2_back_to_back_send_source);
 #endif
 
     return 0;
