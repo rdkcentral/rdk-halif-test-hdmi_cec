@@ -145,6 +145,11 @@ unsigned char cec_version_g = 0x00;
  * 
  */
 bool cec_isCallbackTriggered_g = false;
+
+/**
+ * @brief Status variable to check if ping is triggered.
+ * 
+ */
 bool cec_isPingTriggered_g = false;
 
 /**
@@ -753,7 +758,7 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
 
     CEC_LOG_DEBUG ("\nPlease connect more than one cec device to the network and run back to back send parallel . Please enter any key to continue"); getchar ();
-    
+
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
@@ -1393,14 +1398,14 @@ int test_hdmicec_hal_l2_register( void )
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusSink", test_hdmicec_hal_l2_getPowerStatus_sink);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSink", test_hdmicec_hal_l2_TogglePowerState_sink);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgHdmiVendorIdDisconnectedSink", test_hdmicec_hal_l2_validateHdmiCecConnection_sink);
-    UT_add_test( pSuiteHdmiBackToBackSend, "back_to_back_send", test_hdmicec_hal_l2_back_to_back_send_sink);
+    UT_add_test( pSuiteHdmiBackToBackSend, "back_to_back_sendSink", test_hdmicec_hal_l2_back_to_back_send_sink);
 #else
     UT_add_test( pSuiteHdmiConnected, "getCecVersionSource", test_hdmicec_hal_l2_getCecVersion_source);
     UT_add_test( pSuiteHdmiConnected, "getVendorIDSource", test_hdmicec_hal_l2_getVendorID_source);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusSource", test_hdmicec_hal_l2_getPowerStatus_source);
     UT_add_test( pSuiteHdmiConnected, "getPowerStatusAndToggleSource", test_hdmicec_hal_l2_TogglePowerState_source);
     UT_add_test( pSuiteHdmiDisConnected, "sendMsgVendorIdHdmiDisconnectedSource", test_hdmicec_hal_l2_validateHdmiCecConnection_source);
-    UT_add_test( pSuiteHdmiBackToBackSend, "back_to_back_send", test_hdmicec_hal_l2_back_to_back_send_source);
+    UT_add_test( pSuiteHdmiBackToBackSend, "back_to_back_sendSource", test_hdmicec_hal_l2_back_to_back_send_source);
 #endif
 
     return 0;
