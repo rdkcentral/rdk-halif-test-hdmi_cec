@@ -508,6 +508,8 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated. | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
  * |08|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ *
+ *#TODO Need to check why this test is not working. Need to check with SKY if this is a valid case.
  */
 void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
 {
