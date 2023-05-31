@@ -490,27 +490,27 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
 }
 
 /**
- * @brief Ensure HdmiCecAddLogicalAddress() returns HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE when tying to add an existing logic address
- *  This test case is only applicable for sink devices
- * 
- * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 005@n
- * 
- * **Pre-Conditions:**@n
- * Device should be connected to another CEC enabled TV
- * 
- * **Dependencies:**None@n
- * **User Interaction:** None
- * 
- * **Test Procedure:**@n
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
- * |08|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- *
- *#TODO Need to check why this test is not working. Need to check with SKY if this is a valid case
- */
+  * @brief Ensure HdmiCecAddLogicalAddress() returns HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE when tying to add an existing logic address
+  *  This test case is only applicable for sink devices
+  * 
+  * **Test Group ID:** Basic: 01@n
+  * **Test Case ID:** 005@n
+  * 
+  * **Pre-Conditions:**@n
+  * Device should be connected to another CEC enabled TV
+  * 
+  * **Dependencies:**None@n
+  * **User Interaction:** None
+  * 
+  * **Test Procedure:**@n
+  * |Variation / Step|Description|Test Data|Expected Result|Notes|
+  * |:--:|---------|----------|--------------|-----|
+  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+  * |03|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
+  * |08|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+  *
+  *#TODO Need to check why this test is not working. Need to check with SKY if this is a valid case. Need to verify with another vendor TV also Sreeni will come back.
+  */
 void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
 {
     int result;
@@ -1003,6 +1003,7 @@ void test_hdmicec_hal_l1_setTxCallback( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  *  HDMI_CEC_IO_SENT_BUT_NOT_ACKD : is verified part of L2. since all the device disconnected tests handled in L2
  *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated
+ * #TODO  Sreeni will come back on how to simulate HDMI_CEC_IO_SENT_FAILED.
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 012@n

@@ -799,6 +799,7 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     for (int index=0; index < CEC_BACK_TO_BACK_SEND_LIMIT; index++) {
         /* Positive result */
         CEC_LOG_INFO ("\nRequests for the power status");
+        buf1[1] = CEC_GIVE_DEVICE_POWER_STATUS;
         result = HdmiCecTxAsync(handle, buf1, len);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     
@@ -1348,6 +1349,7 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
 
     for (int index=0; index < CEC_BACK_TO_BACK_SEND_LIMIT; index++) {
         /* Positive result */
+        buf1[1] = CEC_GIVE_DEVICE_POWER_STATUS;
         CEC_LOG_INFO ("\nRequests for the power status");
         result = HdmiCecTxAsync(handle, buf1, len);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
