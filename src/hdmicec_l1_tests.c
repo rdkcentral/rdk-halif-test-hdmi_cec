@@ -22,8 +22,8 @@
 * @page HDMI_CEC_L1_Tests HDMI CEC Level 1 Tests
 *
 * ## Module's Role
-* This module includes Level 1 functional tests (success and failure scenarios).
-* This is to ensure that the API meets the operational requirements of the HDMI CEC across all vendors.
+* This module includes Level 1 functional tests (success and failure scenarios)
+* This is to ensure that the API meets the operational requirements of the HDMI CEC across all vendors
 *
 * **Pre-Conditions:**  None@n
 * **Dependencies:** None@n
@@ -101,7 +101,7 @@
 
 
 /**
- * @brief Status variable to check if ping is triggered.
+ * @brief Status variable to check if ping is triggered
  * 
  */
 bool cec_isPingTriggeredl1_g = false;
@@ -113,7 +113,7 @@ bool cec_isPingTriggeredl1_g = false;
 sem_t cec_seml1_g;
 
 /**
- * @brief variable to hold the semaphore time out.
+ * @brief variable to hold the semaphore time out
  * 
  */
 struct timespec cec_tsl1_g;
@@ -148,7 +148,7 @@ void DriverReceiveCallback(int handle, void *callbackData, unsigned char *buf, i
  * 
  * @param handle Hdmi device handle
  * @param callbackData callback data passed
- * @param result async send status.
+ * @param result async send status
  */
 void DriverTransmitCallback(int handle, void *callbackData, int result)
 {
@@ -164,19 +164,19 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
  * @brief get the logical address of the receiver
  * @param handle Hdmi device handle
  * @param logicalAddress logical address of the device
- * @param receiverLogicalAddress logical address of the receiver.
+ * @param receiverLogicalAddress logical address of the receiver
  */
 void getReceiverLogicalAddressL1 (int handle, int logicalAddress, unsigned char* receiverLogicalAddress) {
     int ret=0;
     unsigned char buf[] = {0x00};
     cec_isPingTriggeredl1_g = false;
-    //Ping all logical address and determine which device is connected.
+    //Ping all logical address and determine which device is connected
     for(int i=0; i< CEC_BROADCAST_ADDR; i++ ) {
         unsigned char addr = i & 0x0F; 
         if (logicalAddress != addr) {
             buf[0] = ((logicalAddress&0x0F)<<4)|addr;
 	        //No need to check the return status of HdmiCecTx since function will called
-	        //to check the hdmi disconnected conditions also.
+	        //to check the hdmi disconnected conditions also
 	        ret = HDMI_CEC_IO_SUCCESS;
             int result = HdmiCecTx(handle, buf, sizeof (buf), &ret);
 
@@ -202,7 +202,7 @@ void getReceiverLogicalAddressL1 (int handle, int logicalAddress, unsigned char*
  * 2. HdmiCecOpen() will return HDMI_CEC_IO_INVALID_STATE during successive calls
  * 4. Passing invalid handle address will return HDMI_CEC_IO_INVALID_ARGUMENT
  * 3. Once Hdmi Cec module is open, should be able to close the handle with HdmiCecClose()
- * HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ * HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 001@n
@@ -227,7 +227,7 @@ void test_hdmicec_hal_l1_open( void )
     int result;
     int handle = 0;
 
-    //Check Null even before calling the positive case.
+    //Check Null even before calling the positive case
     result = HdmiCecOpen( NULL );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
 
@@ -254,7 +254,7 @@ void test_hdmicec_hal_l1_open( void )
  * 3. HdmiCecClose() will return HDMI_CEC_IO_INVALID_STATE during successive calls
  * 4. Passing invalid handle address will return HDMI_CEC_IO_INVALID_ARGUMENT
  * 5. Once Hdmi Cec module is open. should be able to close the handle with HdmiCecClose()
- * HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ * HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 002@n
@@ -300,14 +300,14 @@ void test_hdmicec_hal_l1_close( void )
  * 
  * This test ensure following conditions:
  * 1. API is not crashing if called without initialising
- * 5. Passing invalid handle to API is not crashing it.
+ * 5. Passing invalid handle to API is not crashing it
  * 6. Once module is closed, API is not crashing
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 003@n
  * 
  * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
+ * Connect at least one CEC enabled device
  * 
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -349,15 +349,15 @@ void test_hdmicec_hal_l1_getPhysicalAddress( void )
 
 
 /**
- * @brief Ensure HdmiCecAddLogicalAddress() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for sink devices.
+ * @brief Ensure HdmiCecAddLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for sink devices
  * 
  * This test ensure following conditions :
  * 1. Module not initialised error is returned if called without initialising
  * 2. Sink device should able to successfully add the logical address once module is initialized
  * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed, return not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 004@n
@@ -377,7 +377,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress( void )
  * |04|Call HdmiCecAddLogicalAddress() - call with invalid logical address | handle, logicalAddress=-1 | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |05|Call HdmiCecAddLogicalAddress() - call with invalid logical address. Only supported value is 0 | handle, logicalAddress=0x03 | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |06|Call HdmiCecAddLogicalAddress() - call with invalid logical address | handle, logicalAddress=0x0F | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |07|Call HdmiCecAddLogicalAddress() - call with valid arguments. API is applicable only for sink devices.  | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass for sink devices |
+ * |07|Call HdmiCecAddLogicalAddress() - call with valid arguments. API is applicable only for sink devices  | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass for sink devices |
  * |08|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |09|Call HdmiCecAddLogicalAddress() - call after module is closed | handle, logicalAddress | HDMI_CEC_IO_INVALID_STATE| Should Pass |
  */
@@ -392,7 +392,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     result = HdmiCecAddLogicalAddress( 0, logicalAddress );
@@ -420,14 +420,14 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice( void )
 }
 
 /**
- * @brief Ensure HdmiCecAddLogicalAddress() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for source devices.
+ * @brief Ensure HdmiCecAddLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for source devices
  * This test ensure following conditions :
  * 1. Module not initialised error is returned if called without initialising
  * 2. Source device shouldn't support this API.
  * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed, return not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 005@n
@@ -462,7 +462,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     result = HdmiCecAddLogicalAddress( 0, logicalAddress );
@@ -490,8 +490,8 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
 }
 
 /**
- * @brief Ensure HdmiCecAddLogicalAddress() returns HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE when tying to add an existing logic address.
- *  This test case is only applicable for sink devices.
+ * @brief Ensure HdmiCecAddLogicalAddress() returns HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE when tying to add an existing logic address
+ *  This test case is only applicable for sink devices
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 005@n
@@ -506,10 +506,10 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated. | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
+ * |03|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
  * |08|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  *
- *#TODO Need to check why this test is not working. Need to check with SKY if this is a valid case.
+ *#TODO Need to check why this test is not working. Need to check with SKY if this is a valid case
  */
 void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
 {
@@ -521,7 +521,7 @@ void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
     
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
@@ -533,17 +533,17 @@ void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
 }
 
 /**
- * @brief Ensure HdmiCecRemoveLogicalAddress() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for sink devices.
+ * @brief Ensure HdmiCecRemoveLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for sink devices
  * 
  * This test ensure following conditions :
  * 1. Module not initialised error is returned if called without initialising
- * 2. Removing the unallocated logical address should give success for sink devices.
+ * 2. Removing the unallocated logical address should give success for sink devices
  * 3. Sink devices should able to successfully remove the logical address once module is initialized
- * 4. Removing logical address twice should give success for sink devices.
+ * 4. Removing logical address twice should give success for sink devices
  * 5. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 6. Once module is closed, API invocation should return not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 006@n
@@ -581,7 +581,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice( void )
     result = HdmiCecOpen(&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     result = HdmiCecRemoveLogicalAddress( 0, logicalAddress );
@@ -602,7 +602,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice( void )
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //TODO if we try to remove it again. Should throw an error. It should return invalid argument. It will be done in next phase.
+    //TODO if we try to remove it again. Should throw an error. It should return invalid argument. It will be done in next phase
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -616,15 +616,15 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice( void )
 
 
 /**
- * @brief Ensure HdmiCecRemoveLogicalAddress() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for source devices.
+ * @brief Ensure HdmiCecRemoveLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for source devices
  * 
  * This test ensure following conditions :
  * 1. Module not initialised error is returned if called without initialising
  * 2. Source devices shouldn't support remove API
  * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed return not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 007@n
@@ -658,7 +658,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sourceDevice( void )
     result = HdmiCecOpen(&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
@@ -686,22 +686,22 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sourceDevice( void )
 
 /**
  * @brief Ensure HdmiCecGetLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
- *  This test case is only applicable for sink devices.
- * TODO: Unused variable devType in HdmiCecGetLogicalAddress. Need to remove.
+ *  This test case is only applicable for sink devices
+ * TODO: Unused variable devType in HdmiCecGetLogicalAddress. Need to remove
  * 
  * This test ensure following conditions:
  * 1. Module not initialised error is returned if called without initialising
  * 2. Sink devices should get the same logical address added by the caller
- * 3. Sink devices should return 0xF logical address after remove api is invoked.
- * 5. Passing invalid handle to API, returns HDMI_CEC_IO_INVALID_ARGUMENT.
+ * 3. Sink devices should return 0xF logical address after remove api is invoked
+ * 5. Passing invalid handle to API, returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 6. Once module is closed, API returns not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 008@n
  * 
  * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
+ * Connect at least one CEC enabled device
  * 
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -725,7 +725,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice( void )
     int handle = 0;
     int logicalAddress = 0;
     int logicalAddressCrossCheck = INT_MIN;
-    int devType = 0;//Trying some dev type.
+    int devType = 0;//Trying some dev type
 
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
@@ -733,7 +733,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     result = HdmiCecGetLogicalAddress(0, devType,  &logicalAddress);
@@ -771,16 +771,16 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice( void )
 }
 
 /**
- * @brief Ensure HdmiCecGetLogicalAddress() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for source devices.
- * TODO: Unused variable devType in HdmiCecGetLogicalAddress. Need to remove.
+ * @brief Ensure HdmiCecGetLogicalAddress() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for source devices
+ * TODO: Unused variable devType in HdmiCecGetLogicalAddress. Need to remove
  * 
  * This test ensure following conditions:
  * 1. Module not initialised error is returned if called without initialising
- * 2. Able to successfully get the logical address once module is initialized. Source devices should return a valid logical address between 0x00 and 0x0F.
- * 3. Passing invalid handle to API, returns HDMI_CEC_IO_INVALID_ARGUMENT.
+ * 2. Able to successfully get the logical address once module is initialized. Source devices should return a valid logical address between 0x00 and 0x0F
+ * 3. Passing invalid handle to API, returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed, API returns not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 009@n
@@ -807,7 +807,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice( void )
     int result;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type.
+    int devType = 3;//Trying some dev type
 
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_STATE);
@@ -815,7 +815,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     result = HdmiCecGetLogicalAddress(0, devType,  &logicalAddress);
@@ -842,19 +842,19 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice( void )
  * @brief Ensure HdmiCecSetRxCallback() returns, correct error codes, during all of this API's invocation scenarios
  * 
  * This test ensure following conditions:
- * 1. Setting RX callback even before module is initialized, Should fail.
- * 2. Able to successfully set the RX callback, after module is initialized.
- * 3. Passing invalid handle to the API, returns HDMI_CEC_IO_INVALID_ARGUMENT.
- * 4. Setting the RX callback after the module is closed should fail.
- * 5. Setting the RX callback with invalid args after the module is closed should fail.
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ * 1. Setting RX callback even before module is initialized, Should fail
+ * 2. Able to successfully set the RX callback, after module is initialized
+ * 3. Passing invalid handle to the API, returns HDMI_CEC_IO_INVALID_ARGUMENT
+ * 4. Setting the RX callback after the module is closed should fail
+ * 5. Setting the RX callback with invalid args after the module is closed should fail
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 010@n
  * 
  * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
- * 
+ * Connect at least one CEC enabled device
+ *
  * **Dependencies:** None@n
  * **User Interaction:** None
  * 
@@ -887,17 +887,17 @@ void test_hdmicec_hal_l1_setRxCallback( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     logicalAddress = DEFAULT_LOGICAL_ADDRESS;
 
-    //Set logical address for TV.
+    //Set logical address for TV
     //logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Get logical address for STB.
+    //Get logical address for STB
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -933,9 +933,9 @@ void test_hdmicec_hal_l1_setRxCallback( void )
  * 1. Setting TX callback even before initialization, should pass
  * 2. Able to successfully set the TX callback after the initialization
  * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
- * 4. Setting the TX callback after module is closed, should fail.
- * 5. Setting the TX callback with invalid args after the module is closed should fail.
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ * 4. Setting the TX callback after module is closed, should fail
+ * 5. Setting the TX callback with invalid args after the module is closed should fail
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 011@n
@@ -969,7 +969,7 @@ void test_hdmicec_hal_l1_setTxCallback( void )
     result = HdmiCecOpen ( &handle );
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     result = HdmiCecSetTxCallback(0, NULL, (void*)0xDEADBEEF);
@@ -992,17 +992,17 @@ void test_hdmicec_hal_l1_setTxCallback( void )
 }
 
 /**
- * @brief Ensure HdmiCecTx() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for sink devices.
+ * @brief Ensure HdmiCecTx() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for sink devices
  * 
  * This test ensure following conditions:
  * 1. Module not initialised error is returned if called without initialising
- * 2. Sink device should able to successfully transmit the cec messages once module is initialized and logical address is added.
+ * 2. Sink device should able to successfully transmit the cec messages once module is initialized and logical address is added
  * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed returns not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  *  HDMI_CEC_IO_SENT_BUT_NOT_ACKD : is verified part of L2. since all the device disconnected tests handled in L2
- *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated.
+ *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 012@n
@@ -1051,7 +1051,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     logicalAddress = DEFAULT_LOGICAL_ADDRESS;
@@ -1059,7 +1059,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
     result = HdmiCecTx(handle, buf, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_FAILED);
 
-    //Set logical address for TV.
+    //Set logical address for TV
     //logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
@@ -1110,17 +1110,17 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
 }
 
 /**
- * @brief Ensure HdmiCecTx() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for source devices.
+ * @brief Ensure HdmiCecTx() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for source devices
  * 
  * This test ensure following conditions:
  * 1. Module not initialised error is returned if called without initialising
  * 2. Source device should able to successfully transmit the cec messages once module is initialized
  * 3. Passing invalid handle returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed returns not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
- *  HDMI_CEC_IO_SENT_BUT_NOT_ACKD : is verified part of disconnected test of L1.
- *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulate
+ *  HDMI_CEC_IO_SENT_BUT_NOT_ACKD : is verified part of disconnected test of L1
+ *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 013@n
@@ -1148,7 +1148,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
 {
-    //#TODO transmit back to back functionality also.
+    //#TODO transmit back to back functionality also
     int result=HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
@@ -1168,7 +1168,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
@@ -1202,7 +1202,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
     UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
 
     buf [1] = CEC_DEVICE_VENDOR_ID;
-    /*Back to back send and ensure send is not failed.*/
+    /*Back to back send and ensure send is not failed*/
     result = HdmiCecTx(handle, buf, len, &ret);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
@@ -1218,14 +1218,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
 
 
 /**
- * @brief This function will try to ping an unavailable logical address and ensure ACK error happens.
+ * @brief This function will try to ping an unavailable logical address and ensure ACK error happens
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 005@n
  *
  *
  * *Pre-Conditions :** @n
- *  All of the device HDMI cable should be disconnected.
+ *  All of the device HDMI cable should be disconnected
  *
  **Dependencies :** N/A @n
  *
@@ -1255,7 +1255,7 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
@@ -1263,7 +1263,7 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     //Set logical address for TV.
-    //#TODO need to find out why add logical address is required for sink devices. Sreeni will come back.
+    //#TODO need to find out why add logical address is required for sink devices. Sreeni will come back
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
@@ -1287,21 +1287,21 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
 
 /**
  * @brief Ensure HdmiCecTxAsync() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for sink devices.
+ *  This test case is only applicable for sink devices
  * 
  * This test ensure following conditions:
  * 1. Module not initialised error is returned if called without initialising
- * 2. Sink device is able to successfully transmit the cec messages once module is initialized and logical address is added.
- * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
+ * 2. Sink device is able to successfully transmit the cec messages once module is initialized and logical address is added
+ * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed returns not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 014@n
 
  * 
  * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
+ * Connect at least one CEC enabled device
  * 
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -1341,14 +1341,14 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
     result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
-    //Set logical address for TV.
+    //Set logical address for TV
     logicalAddress = DEFAULT_LOGICAL_ADDRESS;
 
     result = HdmiCecTxAsync(handle, buf, len);
@@ -1359,7 +1359,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
-    //Get logical address.
+    //Get logical address
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -1382,7 +1382,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     buf [1] = CEC_DEVICE_VENDOR_ID;
-    /*Back to back send and ensure send is not failed.*/
+    /*Back to back send and ensure send is not failed*/
     result = HdmiCecTxAsync(handle, buf, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -1396,22 +1396,22 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
 }
 
 /**
- * @brief Ensure HdmiCecTxAsync() returns correct error codes, during all of this API's invocation scenarios.
- *  This test case is only applicable for source devices.
+ * @brief Ensure HdmiCecTxAsync() returns correct error codes, during all of this API's invocation scenarios
+ *  This test case is only applicable for source devices
  * 
  * This test ensure following conditions:
  * 1. Module not initialised error is returned if called without initialising
  * 2. Source device is able to successfully transmit the cec messages once module is initialized
- * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT.
+ * 3. Passing invalid handle to api returns HDMI_CEC_IO_INVALID_ARGUMENT
  * 4. Once module is closed returns not initialised error
- *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated.
+ *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 015@n
 
  * 
  * **Pre-Conditions:**@n
- * Connect at least one CEC enabled device.
+ * Connect at least one CEC enabled device
  * 
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -1450,7 +1450,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */
@@ -1459,7 +1459,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
-    //Get logical address.
+    //Get logical address
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -1481,7 +1481,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     buf [1] = CEC_DEVICE_VENDOR_ID;
-    /*Back to back send and ensure send is not failed.*/
+    /*Back to back send and ensure send is not failed*/
     result = HdmiCecTxAsync(handle, buf, len);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -1496,14 +1496,14 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
 
 
 /**
- * @brief This function will try to ping an unavailable logical address and ensure ACK error happens.
+ * @brief This function will try to ping an unavailable logical address and ensure ACK error happens
  * 
  * **Test Group ID:** 02@n
  * **Test Case ID:** 005@n
  *
  *
  * *Pre-Conditions :** @n
- *  All of the device HDMI cable should be disconnected.
+ *  All of the device HDMI cable should be disconnected
  *
  **Dependencies :** N/A @n
  *
@@ -1533,7 +1533,7 @@ void test_hdmicec_hal_l1_portDisconnected_source( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //if init is failed no need to proceed further.
+    //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
     /* Positive result */

@@ -127,7 +127,7 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_TogglePowerState_sink () |
-|Description| This function will toggle the current power state of the connected device.|
+|Description| This function will toggle the current power state of the connected device|
 |Test Group|02 (Module)|
 |Test Case ID|004|
 
@@ -157,12 +157,12 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_validateHdmiCecConnection_sink () |
-|Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
+|Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval|
 |Test Group|02 (Module)|
 |Test Case ID|005|
 
 **Pre-Conditions :**
--   All of the device HDMI cable should be disconnected.
+-   All of the device HDMI cable should be disconnected
 
 **Dependencies :** N/A
 
@@ -286,7 +286,7 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_TogglePowerState_source () |
-|Description| This function will toggle the current power state of the connected device.|
+|Description| This function will toggle the current power state of the connected device|
 |Test Group|02 (Module)|
 |Test Case ID|010|
 
@@ -317,12 +317,12 @@ The following functions test module functionality.
 |Title|Details|
 |--|--|
 |Function Name|test_hdmicec_hal_l2_validateHdmiCecConnection_source ()|
-|Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval. |
+|Description| This function will request the vendor ID  when `HDMI` is in disconnected state and will confirm that response is not received within the expected time interval|
 |Test Group|02 (Module)|
 |Test Case ID|011|
 
 **Pre-Conditions :**
--   All of the device HDMI cable should be disconnected.
+-   All of the device HDMI cable should be disconnected
 
 **Dependencies :** N/A
 
