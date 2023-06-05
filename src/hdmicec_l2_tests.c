@@ -229,7 +229,9 @@ void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
 }
 
 /**
- * @brief get the logical address of the receiver
+ * @brief finding the receiver device on the network for the test 
+ * and getting its logical address
+ * 
  * @param handle Hdmi device handle
  * @param logicalAddress logical address of the device
  * @param receiverLogicalAddress logical address of the receiver
@@ -664,6 +666,10 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     }
 
     //Using NULL callback
+    result = HdmiCecSetTxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+
+    //Using NULL callback
     result = HdmiCecSetRxCallback(handle, NULL, 0);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
@@ -756,6 +762,7 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    int ret=0;
 
     CEC_LOG_INFO ("\nPlease connect more than one cec device to the network \
          and run back to back send parallel . Please enter any key to continue"); getchar ();
@@ -799,15 +806,19 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
 
     for (int index=0; index < CEC_BACK_TO_BACK_SEND_LIMIT; index++) {
         /* Positive result */
+        //Use HdmiCecTx. Even if introduce small delay to ensure send failure is
+        //not happening
         CEC_LOG_INFO ("\nRequests for the power status");
         buf1[1] = CEC_GIVE_DEVICE_POWER_STATUS;
-        result = HdmiCecTxAsync(handle, buf1, len);
+        result = HdmiCecTx(handle, buf1, len, &ret);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
     
         CEC_LOG_INFO ("\nRequests vendor id");
         buf1[1] = CEC_GIVE_CEC_DEVICE_VENDOR_ID;
-        result = HdmiCecTxAsync(handle, buf1, len);
+        result = HdmiCecTx(handle, buf1, len, &ret);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
 
     }
 
@@ -1044,6 +1055,9 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     if(HDMI_CEC_IO_SUCCESS != cec_isExpectedBufferReceived_g){
         CEC_LOG_DEBUG ("\nhdmicec %s:%d failed logicalAddress:%d\n", __FUNCTION__, __LINE__, logicalAddress);
     }
+
+    result = HdmiCecSetTxCallback(handle, NULL, 0);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     //Using NULL callback
     result = HdmiCecSetRxCallback(handle, NULL, 0);
@@ -1309,6 +1323,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
 void test_hdmicec_hal_l2_back_to_back_send_source ( void )
 {
     int result=0;
+    int ret=0;
     int handle = 0;
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
@@ -1351,15 +1366,19 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
 
     for (int index=0; index < CEC_BACK_TO_BACK_SEND_LIMIT; index++) {
         /* Positive result */
-        buf1[1] = CEC_GIVE_DEVICE_POWER_STATUS;
+        //Use HdmiCecTx. Even if introduce small delay to ensure send failure is
+        //not happening
         CEC_LOG_INFO ("\nRequests for the power status");
-        result = HdmiCecTxAsync(handle, buf1, len);
+        buf1[1] = CEC_GIVE_DEVICE_POWER_STATUS;
+        result = HdmiCecTx(handle, buf1, len, &ret);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
     
         CEC_LOG_INFO ("\nRequests vendor id");
         buf1[1] = CEC_GIVE_CEC_DEVICE_VENDOR_ID;
-        result = HdmiCecTxAsync(handle, buf1, len);
+        result = HdmiCecTx(handle, buf1, len, &ret);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
 
     }
 

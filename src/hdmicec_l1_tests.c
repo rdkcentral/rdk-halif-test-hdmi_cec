@@ -279,10 +279,10 @@ void test_hdmicec_hal_l1_open_logical_address_unavailable_source ( void )
     CEC_LOG_INFO ("\nPlease connect other 4 cec enabled playback devices to the cec network. \
                   Please enter any key to continue"); getchar ();
     result = HdmiCecOpen( &handle );
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE );
     
     //The above open is failed handle should be null
-    UT_ASSERT_TRUE(handle!=0);
+    UT_ASSERT_TRUE(handle==0);
 
      //Here handle = 0 since open failed and close should fail.
     result = HdmiCecClose( handle );
