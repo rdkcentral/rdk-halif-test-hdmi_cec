@@ -246,6 +246,51 @@ void test_hdmicec_hal_l1_open( void )
 }
 
 /**
+ * @brief Ensure HdmiCecOpen() returns HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE when all
+ * none of the device specific logical address is not available.
+ * 
+ * This test case ensures the following conditions :
+ * 1. HdmiCecOpen() will return HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE, if not able
+ * to allocate it.
+ * 
+ * **Test Group ID:** Basic: 02@n
+ * **Test Case ID:** 001@n
+ * 
+ * **Pre-Conditions:**@n
+ * Connect other four cec enabled playback source devices to the network
+ * and ensure none of the playback device logical address is available 
+ * to allocate for the current device.
+ * 
+ * **Dependencies:** None@n
+ * **User Interaction:** None
+ * 
+ * **Test Procedure:**@n
+ * |Variation / Step|Description|Test Data|Expected Result|Notes|
+ * |:--:|---------|----------|--------------|-----|
+ * |01|Call HdmiCecOpen() - open interface when not all the logical address are in use | handle | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE| Should Pass |
+ * |02|Call HdmiCecClose () - call with invalid handle | handle=0 | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * 
+ */
+void test_hdmicec_hal_l1_open_logical_address_unavailable_source ( void )
+{
+    int result;
+    int handle = 0;
+
+    CEC_LOG_INFO ("\nPlease connect other 4 cec enabled playback devices to the cec network. \
+                  Please enter any key to continue"); getchar ();
+    result = HdmiCecOpen( &handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+    
+    //The above open is failed handle should be null
+    UT_ASSERT_TRUE(handle!=0);
+
+     //Here handle = 0 since open failed and close should fail.
+    result = HdmiCecClose( handle );
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_INVALID_ARGUMENT );
+
+}
+
+/**
  * @brief Ensure HdmiCecClose() returns correct error codes, during all of this API's invocation scenarios
  * 
  * This ensure the following conditions :
@@ -256,7 +301,7 @@ void test_hdmicec_hal_l1_open( void )
  * 5. Once Hdmi Cec module is open. should be able to close the handle with HdmiCecClose()
  * HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
- * **Test Group ID:** Basic: 01@n
+ * **Test Group ID:** Basic: 03@n
  * **Test Case ID:** 002@n
  * 
  * **Pre-Conditions:**@n
@@ -304,7 +349,7 @@ void test_hdmicec_hal_l1_close( void )
  * 6. Once module is closed, API is not crashing
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 003@n
+ * **Test Case ID:** 004@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device
@@ -360,7 +405,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 004@n
+ * **Test Case ID:** 005@n
  * 
  * **Pre-Conditions:**@n
  * None.
@@ -430,7 +475,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 005@n
+ * **Test Case ID:** 006@n
  * 
  * **Pre-Conditions:**@n
  * None.
@@ -494,7 +539,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
   *  This test case is only applicable for sink devices
   * 
   * **Test Group ID:** Basic: 01@n
-  * **Test Case ID:** 005@n
+  * **Test Case ID:** 007@n
   * 
   * **Pre-Conditions:**@n
   * Device should be connected to another CEC enabled TV
@@ -517,7 +562,7 @@ void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
     int handle = 0;
     int logicalAddress = 0;
 
-    CEC_LOG_DEBUG ("\nPlease connect another CEC enabled sink device to the device. Please enter any key to continue"); getchar ();
+    CEC_LOG_INFO ("\nPlease connect another CEC enabled sink device to the device. Please enter any key to continue"); getchar ();
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
@@ -546,7 +591,7 @@ void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 006@n
+ * **Test Case ID:** 008@n
  * 
  * **Pre-Conditions:**@n
  * None.
@@ -627,7 +672,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 007@n
+ * **Test Case ID:** 009@n
  * 
  * **Pre-Conditions:**@n
  * None.
@@ -698,7 +743,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sourceDevice( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 008@n
+ * **Test Case ID:** 010@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device
@@ -783,7 +828,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 009@n
+ * **Test Case ID:** 011@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -850,7 +895,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 010@n
+ * **Test Case ID:** 012@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device
@@ -938,7 +983,7 @@ void test_hdmicec_hal_l1_setRxCallback( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 011@n
+ * **Test Case ID:** 013@n
  * 
  * **Pre-Conditions:**@n
  * None
@@ -1006,7 +1051,7 @@ void test_hdmicec_hal_l1_setTxCallback( void )
  * #TODO  Sreeni will come back on how to simulate HDMI_CEC_IO_SENT_FAILED.
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 012@n
+ * **Test Case ID:** 014@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -1124,7 +1169,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
  *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 013@n
+ * **Test Case ID:** 015@n
  * 
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device.
@@ -1222,7 +1267,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice( void )
  * @brief This function will try to ping an unavailable logical address and ensure ACK error happens
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 005@n
+ * **Test Case ID:** 016@n
  *
  *
  * *Pre-Conditions :** @n
@@ -1250,7 +1295,7 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
     int devType = 0;//Trying some dev type
     unsigned char buf[] = {0x03};
 
-    CEC_LOG_DEBUG ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
+    CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1298,7 +1343,7 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 014@n
+ * **Test Case ID:** 017@n
 
  * 
  * **Pre-Conditions:**@n
@@ -1408,7 +1453,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  * 
  * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 015@n
+ * **Test Case ID:** 018@n
 
  * 
  * **Pre-Conditions:**@n
@@ -1500,7 +1545,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice( void )
  * @brief This function will try to ping an unavailable logical address and ensure ACK error happens
  * 
  * **Test Group ID:** 02@n
- * **Test Case ID:** 005@n
+ * **Test Case ID:** 019@n
  *
  *
  * *Pre-Conditions :** @n
@@ -1528,7 +1573,7 @@ void test_hdmicec_hal_l1_portDisconnected_source( void )
     int devType = 0;//Trying some dev type
     unsigned char buf[] = {0x00};
 
-    CEC_LOG_DEBUG ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
+    CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1598,6 +1643,7 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuite, "getLogicalAddressSource", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice);
     UT_add_test( pSuite, "hdmiCecTxSource", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice);
     UT_add_test( pSuite, "hdmiCecTxAsyncSource", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice);
+    UT_add_test( pSuite, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
     UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
 #endif
 
