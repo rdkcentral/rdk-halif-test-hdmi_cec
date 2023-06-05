@@ -692,7 +692,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
     unsigned char buf1[] = {0x03, CEC_STANDBY };
 
-    CEC_LOG_DEBUG ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
+    CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -757,7 +757,8 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
 
-    CEC_LOG_DEBUG ("\nPlease connect more than one cec device to the network and run back to back send parallel . Please enter any key to continue"); getchar ();
+    CEC_LOG_INFO ("\nPlease connect more than one cec device to the network \
+         and run back to back send parallel . Please enter any key to continue"); getchar ();
 
     int len = 2;
     //Give vendor id
@@ -1079,7 +1080,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
     unsigned char buf4[] = {0x3F, CEC_ACTIVE_SOURCE, 0x00, 0x00 };
     CEC_LOG_DEBUG ("\nCEC_STANDBY opcode is not working for TV time being. This currently under investigation");
-    CEC_LOG_DEBUG ("\nPlease set the connected display to CEC_STANDBY. Please enter any key to continue."); getchar ();
+    CEC_LOG_INFO ("\nPlease set the connected display to CEC_STANDBY. Please enter any key to continue."); getchar ();
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1254,7 +1255,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
 
 
-    CEC_LOG_DEBUG ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
+    CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1318,7 +1319,8 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
     //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
 
-    CEC_LOG_DEBUG ("\nPlease connect more than one cec device to the network and run back to back send parallel . Please enter any key to continue"); getchar ();
+    CEC_LOG_INFO ("\nPlease connect more than one cec device to the network and run \
+      back to back send parallel . Please enter any key to continue"); getchar ();
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
