@@ -44,7 +44,7 @@
 //Set the MACRO for the stb platforms
 //#define __UT_STB__ 1
  
-//#TODO Need to change to 1 second. It must be 1 sec
+//@todo Need to change to 1 second. It must be 1 sec
 #define CEC_RESPONSE_TIMEOUT 10
 #define CEC_GET_CEC_VERSION (0x9F)
 #define CEC_VERSION (0x9E)
@@ -72,7 +72,7 @@
 
 #define CEC_BACK_TO_BACK_SEND_LIMIT 15
 
-//#TODO This section will be replaced with UT_LOG() when the feature is available
+//@todo This section will be replaced with UT_LOG() when the feature is available
 #define CEC_ENABLE_CEC_LOG_DEBUG 1 // Set to 0 to disable debug logging
 #define CEC_ENABLE_CEC_LOG_WARNING 1 // Set to 0 to disable warning logging
 #define CEC_ENABLE_CEC_LOG_INFO 1 // Set to 0 to disable info logging
@@ -180,7 +180,7 @@ void DriverReceiveCallback_hal_l2(int handle, void *callbackData, unsigned char 
     UT_ASSERT_PTR_NULL((bool)(!callbackData));
     UT_ASSERT_PTR_NULL((bool)(!buf));
     //UT_ASSERT_TRUE( (unsigned long long)(callbackData) == (unsigned long long)0xDEADBEEF);
-    //TODO need to identify why callback is not equal
+    //@todo need to identify why callback is not equal
     cec_isPingTriggered_g = true;
     CEC_LOG_DEBUG ("\nCall back data generated is \n");
     for (int index=0; index < len; index++) {
@@ -222,7 +222,7 @@ void DriverTransmitCallback_hal_l2(int handle, void *callbackData, int result)
     UT_ASSERT_TRUE(handle!=0);
     UT_ASSERT_PTR_NULL((bool)(!callbackData));
     //UT_ASSERT_TRUE( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
-    //TODO need to identify why callback is not equal
+    //@todo need to identify why callback is not equal
     CEC_LOG_DEBUG ("\ncallbackData returned: %x result: %d\n",callbackData, result);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
     cec_isExpectedBufferReceived_g = HDMI_CEC_IO_SUCCESS;
@@ -254,7 +254,7 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
             clock_gettime(CLOCK_REALTIME, &cec_ts_g); cec_ts_g.tv_sec += 1;
             sem_timedwait(&cec_sem_g, &cec_ts_g);
             CEC_LOG_DEBUG ("\n buf is : 0x%x ret value is  : 0x%x result is : 0x%x \n", buf[0], ret, result);
-	        //TODO need to check why following condition is not working.
+	        //@todo need to check why following condition is not working.
             if (((HDMI_CEC_IO_SENT_AND_ACKD  == ret)||(HDMI_CEC_IO_SUCCESS==ret))&& (HDMI_CEC_IO_SUCCESS == result) ){
                 *receiverLogicalAddress = addr;
                 CEC_LOG_DEBUG ("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
@@ -293,7 +293,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     result = HdmiCecOpen (&handle);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
 
-    //#TODO ut-core will provide a function to exist the complete suite. Will replace return will it. Once it is ready
+    //@todo ut-core will provide a function to exist the complete suite. Will replace return will it. Once it is ready
     //if init is failed no need to proceed further
     if (HDMI_CEC_IO_SUCCESS != result) { return; }
 
@@ -330,7 +330,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
         CEC_LOG_DEBUG ("Request response time: %.2f milliseconds\n", response_time);
     }
     //Check if expected buffer received
-    //#TODO Add a print to show the response time for future analysis. See if cec buffer data is passed to logging module
+    //@todo Add a print to show the response time for future analysis. See if cec buffer data is passed to logging module
     UT_ASSERT_EQUAL( cec_isExpectedBufferReceived_g, HDMI_CEC_IO_SUCCESS);
 
     if(HDMI_CEC_IO_SUCCESS != cec_isExpectedBufferReceived_g){
@@ -689,7 +689,7 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
  */
 void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
 {
-    //TODO need to check why this function crashes when reciever device is connected
+    //@todo need to check why this function crashes when reciever device is connected
     int result=0;
     int ret=0;
     int handle = 0;
@@ -712,7 +712,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     //Set logical address for TV
-    //#TODO need to find out why add logical address is required for sink devices. Sreeni will come back
+    //@todo need to find out why add logical address is required for sink devices. Sreeni will come back
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
@@ -1088,7 +1088,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
 
 
-    //TODO need to send one broadcast event here. Check image view on can be broadcasted
+    //@todo need to send one broadcast event here. Check image view on can be broadcasted
     //Assuming sender as 3 and broadcast
     //Set the receiver to CEC_STANDBY state
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
@@ -1118,7 +1118,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Get the receiver logical address
     getReceiverLogicalAddress (handle, logicalAddress, &receiverLogicalAddress);
 
-    //TODO need to check why CEC_STANDBY signal is not working in tv panel
+    //@todo need to check why CEC_STANDBY signal is not working in tv panel
     buf1[0] = ((logicalAddress&0xFF)<<4)|receiverLogicalAddress; CEC_LOG_DEBUG ("\n HDMI CEC buf0: 0x%x\n", buf1[0]);
     /* Positive result */
     //Broadcast set power state to CEC_STANDBY here
@@ -1244,8 +1244,8 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 }
 
-//TODO Need to have a scenario to evaluate the multiple CEC Commands getting sent on the network at the same time.  A test case that has two sink devices sending back to back commands for 10 to 15 times in a loop
-//TODO implement a separate case to send 10 -15 back to back commands
+//@todo Need to have a scenario to evaluate the multiple CEC Commands getting sent on the network at the same time.  A test case that has two sink devices sending back to back commands for 10 to 15 times in a loop
+//@todo implement a separate case to send 10 -15 back to back commands
 
 
 /**
@@ -1259,7 +1259,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
  */
 void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
 {
-    //TODO need to check why this function crashes when receiver device is connected
+    //@todo need to check why this function crashes when receiver device is connected
     int result=0;
     int ret=0;
     int handle = 0;
@@ -1409,7 +1409,7 @@ int test_hdmicec_hal_l2_register( void )
     pSuiteHdmiConnected = UT_add_suite("[L2 test hdmi connected]", NULL, NULL);
     pSuiteHdmiDisConnected = UT_add_suite("[L2 test hdmi disconnected]", NULL, NULL);
     pSuiteHdmiBackToBackSend = UT_add_suite("[L2 test hdmi back to back send]", NULL, NULL);
-    //#TODO need have two separate suits with one hdmi connected state and another suite for disconnected states
+    //@todo need have two separate suits with one hdmi connected state and another suite for disconnected states
     if (NULL == pSuiteHdmiConnected || NULL == pSuiteHdmiDisConnected || NULL == pSuiteHdmiBackToBackSend) 
     {
         return -1;
