@@ -29,7 +29,7 @@ DOXYGEN_REPO=$(git remote -vv | head -n1 | awk -F ' ' '{print $2}' | sed 's/hal.
 
 # Check if the common document configuration is present, if not clone it
 if [ -d "./build" ]; then
-    make -C ./build PROJECT_NAME="RDK-V AudioCapture HAL" PROJECT_VERSION=${PROJECT_VERSION}
+    make -C ./build PROJECT_NAME="HDMI CEC HAL" PROJECT_VERSION=${PROJECT_VERSION}
 else
     echo "Cloning Common documentation generation"
     git clone $DOXYGEN_REPO build

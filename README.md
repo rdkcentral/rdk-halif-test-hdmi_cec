@@ -13,7 +13,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the License for the specific language governing permissions and limitations under the License.
 -->
 
-# Unit Testing Suite For RMF Audio Capture HAL
+# Unit Testing Suite For HDMI CEC HAL
 
 The following documents should be references to provide specific information on the tests required for this module.
 

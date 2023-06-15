@@ -1,4 +1,4 @@
-# Snag list / Upgrade for ut-core
+# Snag list / Upgrade for HDMI CEC HAL tests
  
 |Version|Comment|
 |--------|-------|

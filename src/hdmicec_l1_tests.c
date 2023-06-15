@@ -18,6 +18,21 @@
 */
 
 /**
+ * @addtogroup HPK HPK
+ * @{
+ * @addtogroup HDMI_CEC HDMI_CEC
+ * @{
+ *
+ */
+
+/**
+ * @defgroup HDMI_CEC_TESTS HDMI_CEC_TESTS
+ * @{
+ * @par
+ * Unit Testing Suite for HDMI CEC HAL
+ */
+
+/**
 * @file hdmicec_l1_tests.c
 * @page HDMI_CEC_L1_Tests HDMI CEC Level 1 Tests
 *
@@ -1649,3 +1664,7 @@ int test_hdmicec_hal_l1_register( void )
 
     return 0;
 }
+
+/** @} */ // End of HDMI_CEC_TESTS HDMI_CEC_TESTS
+/** @} */ // End of HDMI_CEC HDMI_CEC
+/** @} */ // End of HPK

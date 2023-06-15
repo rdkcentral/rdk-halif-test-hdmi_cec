@@ -1,4 +1,4 @@
-# HDMI `CEC`  Level 2 - Module Testing
+# HDMI CEC Level 2 - Module Testing
 ## History
 
 | Version | Date(YY-MM-DD) |Comments |

@@ -17,6 +17,21 @@
  * limitations under the License.
 */
 
+/**
+ * @addtogroup HPK HPK
+ * @{
+ * @addtogroup HDMI_CEC HDMI_CEC
+ * @{
+ *
+ */
+
+/**
+ * @defgroup HDMI_CEC_TESTS HDMI_CEC_TESTS
+ * @{
+ * @par
+ * Unit Testing Suite for HDMI CEC HAL
+ */
+
 #include <ut.h>
 
 extern int register_hdmicec_hal_l1_tests( void );
@@ -32,3 +47,7 @@ int main(int argc, char** argv)
 
     UT_run_tests();
 }
+
+/** @} */ // End of HDMI_CEC_TESTS HDMI_CEC_TESTS
+/** @} */ // End of HDMI_CEC HDMI_CEC
+/** @} */ // End of HPK
