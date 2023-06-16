@@ -307,11 +307,8 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
-    //@todo ut-core will provide a function to exist the complete suite. Will replace return will it. Once it is ready
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -320,7 +317,8 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     //Set logical address for TV
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //if logical address assignment is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -388,10 +386,8 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -400,7 +396,8 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     //Set logical address for TV
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //if logical address assignment is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -469,10 +466,8 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -485,7 +480,8 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     //Set logical address for TV
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //if logical address assignment is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -557,10 +553,8 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -573,7 +567,8 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     //Set logical address for TV
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //if logical address assignment is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -718,10 +713,8 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -731,7 +724,8 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     //@todo need to find out why add logical address is required for sink devices. Sreeni will come back
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //if logical address assignment is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -790,10 +784,8 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -806,7 +798,8 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     //Set logical address for TV
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    //if logical address assignment is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -829,12 +822,18 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
         result = HdmiCecTx(handle, buf1, len, &ret);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
         UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
+	if (ret != HDMI_CEC_IO_SENT_AND_ACKD) {
+		CEC_LOG_INFO ("\nError code ret during back to back send is: %d", ret);
+	}
     
         CEC_LOG_INFO ("\nRequests vendor id");
         buf1[1] = CEC_GIVE_CEC_DEVICE_VENDOR_ID;
         result = HdmiCecTx(handle, buf1, len, &ret);
         UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
         UT_ASSERT_EQUAL( ret, HDMI_CEC_IO_SENT_AND_ACKD);
+	if (ret != HDMI_CEC_IO_SENT_AND_ACKD) {
+		CEC_LOG_INFO ("\nError code ret during back to back send is: %d", ret);
+	}
 
     }
 
@@ -877,10 +876,8 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -952,10 +949,8 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -1027,10 +1022,8 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -1114,10 +1107,8 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -1289,10 +1280,8 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -1355,10 +1344,8 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
-
     //if init is failed no need to proceed further
-    if (HDMI_CEC_IO_SUCCESS != result) { return; }
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
