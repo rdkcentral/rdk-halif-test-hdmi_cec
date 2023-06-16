@@ -700,7 +700,7 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
  */
 void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
 {
-    //@todo need to check why this function crashes when reciever device is connected
+    //@todo need to check why this function crashes when receiver device is connected
     int result=0;
     int ret=0;
     int handle = 0;
@@ -721,7 +721,6 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     //Set logical address for TV
-    //@todo need to find out why add logical address is required for sink devices. Sreeni will come back
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     //if logical address assignment is failed no need to proceed further

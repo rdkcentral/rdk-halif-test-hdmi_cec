@@ -1299,7 +1299,6 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
 
     //Set logical address for TV.
-    //@todo need to find out why add logical address is required for sink devices. Sreeni will come back
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
