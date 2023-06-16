@@ -564,7 +564,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
   * |03|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
   * |08|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
   *
-  *@todo Need to check why this test is not working. Need to check with SKY if this is a valid case. Need to verify with another vendor TV also Sreeni will come back.
+  *@todo Need to check why this test is not working. Need to check with SKY if this is a valid case. Need to verify with another vendor TV also SKY will come back.
   */
 void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
 {
@@ -1044,7 +1044,7 @@ void test_hdmicec_hal_l1_setTxCallback( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  *  HDMI_CEC_IO_SENT_BUT_NOT_ACKD : is verified part of L2. since all the device disconnected tests handled in L2
  *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated
- * @todo  Sreeni will come back on how to simulate HDMI_CEC_IO_SENT_FAILED.
+ * @todo  SKY will come back on how to simulate HDMI_CEC_IO_SENT_FAILED.
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 014@n
