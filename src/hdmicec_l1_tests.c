@@ -938,7 +938,12 @@ void test_hdmicec_hal_l1_setRxCallback( void )
     //Set logical address for TV
     //logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address for STB
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -1102,7 +1107,12 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice( void )
     //Set logical address for TV
     //logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
@@ -1301,7 +1311,12 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
     //Set logical address for TV.
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -1388,7 +1403,12 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice( void )
     UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SENT_FAILED);
 
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 

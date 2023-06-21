@@ -308,7 +308,8 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS ); //UT_ASSERT_EQUAL
+    
 
     /* Positive result */
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback_hal_l2, (void*)0xDEADBEEF);
@@ -318,11 +319,17 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     //if logical address assignment is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
+    //Do the following implementation if we have to stop execution with a cleanup
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS); //if conditon and do UT_FAIL 
 
     //Get the receiver logical address
     getReceiverLogicalAddress (handle, logicalAddress, &receiverLogicalAddress);
@@ -397,7 +404,12 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     //if logical address assignment is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -481,7 +493,12 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     //if logical address assignment is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -568,7 +585,12 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     //if logical address assignment is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -724,7 +746,12 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     //if logical address assignment is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
@@ -798,7 +825,12 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     logicalAddress = 0;
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     //if logical address assignment is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL ( result, HDMI_CEC_IO_SUCCESS );
+    if (HDMI_CEC_IO_SUCCESS != result) {
+        /*Cleanup before exiting */
+        result = HdmiCecClose (handle);
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS);
+        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+    }
 
     //Get logical address of the device
     result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
