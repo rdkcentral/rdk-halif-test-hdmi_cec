@@ -305,6 +305,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     //Simply assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GET_CEC_VERSION};
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 1);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -365,6 +366,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 1);
 }
 
 /**
@@ -391,6 +393,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     //Simply asuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_CEC_DEVICE_VENDOR_ID};
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 2);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -451,6 +454,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 2);
 }
 
 /**
@@ -476,6 +480,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 3);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -543,6 +548,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 3);
 }
 
 /**
@@ -568,6 +574,7 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
     unsigned char buf4[] = {0x3F, CEC_SET_STREAM_PATH, 0x00, 0x00 };
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 4);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -709,6 +716,7 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 4);
 }
 
 /**
@@ -731,6 +739,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
     unsigned char buf1[] = {0x03, CEC_STANDBY };
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 5);
     CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
@@ -780,6 +789,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 5);
 }
 
 /**
@@ -800,6 +810,7 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     int ret=0;
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 6);
     CEC_LOG_INFO ("\nPlease connect more than one cec device to the network \
          and run back to back send parallel . Please enter any key to continue"); getchar ();
 
@@ -878,6 +889,7 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 6);
 }
 
 
@@ -905,6 +917,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     //Simply assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GET_CEC_VERSION};
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 7);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -952,6 +965,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 7);
 }
 
 /**
@@ -978,6 +992,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     //Simply assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_CEC_DEVICE_VENDOR_ID};
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 8);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1026,6 +1041,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 8);
 }
 
 /**
@@ -1051,6 +1067,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 9);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1106,6 +1123,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 9);
 }
 
 /**
@@ -1133,6 +1151,8 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     //Set the receiver to CEC_STANDBY state
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
     unsigned char buf4[] = {0x3F, CEC_ACTIVE_SOURCE, 0x00, 0x00 };
+
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 10);
     CEC_LOG_DEBUG ("\nCEC_STANDBY opcode is not working for TV time being. This currently under investigation");
     CEC_LOG_INFO ("\nPlease set the connected display to CEC_STANDBY. Please enter any key to continue."); getchar ();
 
@@ -1280,6 +1300,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 10);
 }
 
 //@todo Need to have a scenario to evaluate the multiple CEC Commands getting sent on the network at the same time.  A test case that has two sink devices sending back to back commands for 10 to 15 times in a loop
@@ -1307,6 +1328,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
 
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 11);
     CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
@@ -1345,6 +1367,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 11);
 }
 
 /**
@@ -1370,6 +1393,7 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
     //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
 
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 12);
     CEC_LOG_INFO ("\nPlease connect more than one cec device to the network and run \
       back to back send parallel . Please enter any key to continue"); getchar ();
 
@@ -1426,6 +1450,7 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 12);
 }
 
 static UT_test_suite_t *pSuiteHdmiConnected = NULL;
