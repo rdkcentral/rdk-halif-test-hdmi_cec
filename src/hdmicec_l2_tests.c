@@ -59,7 +59,10 @@
 
 //Set the MACRO for the stb platforms
 //#define __UT_STB__ 1
- 
+
+static int gTestGroup = 2;
+static int gTestID = 1;
+
 //@todo Need to change to 1 second. It must be 1 sec
 #define CEC_RESPONSE_TIMEOUT 10
 #define CEC_GET_CEC_VERSION (0x9F)
@@ -275,6 +278,8 @@ void getReceiverLogicalAddress (int handle, int logicalAddress, unsigned char* r
                 *receiverLogicalAddress = addr;
                 CEC_LOG_DEBUG ("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
                 break;
+            } else {
+                CEC_LOG_DEBUG ("\n failed to receive logical address  ret:0x%x result:0x%x\n", ret, result);
             }
         }
     }
@@ -299,13 +304,14 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    gTestID = 1;
 
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Simply assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GET_CEC_VERSION};
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 1);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -366,7 +372,7 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 1);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -387,13 +393,14 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    gTestID = 2;
 
     int len = 2;
     //Give vendor id
     //Simply asuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_CEC_DEVICE_VENDOR_ID};
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 2);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -454,7 +461,7 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 2);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -474,13 +481,14 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    gTestID = 3;
 
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 3);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -548,7 +556,7 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 3);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -568,13 +576,14 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    gTestID = 4;
 
     //Assuming sender as 3 and broadcast
     //Set the receiver to CEC_STANDBY state
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
     unsigned char buf4[] = {0x3F, CEC_SET_STREAM_PATH, 0x00, 0x00 };
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 4);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -716,7 +725,7 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 4);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -738,8 +747,9 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
     unsigned char buf1[] = {0x03, CEC_STANDBY };
+    gTestID = 5;
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 5);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
@@ -789,7 +799,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 5);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -809,8 +819,9 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     int ret=0;
+    gTestID = 6;
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 6);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     CEC_LOG_INFO ("\nPlease connect more than one cec device to the network \
          and run back to back send parallel . Please enter any key to continue"); getchar ();
 
@@ -889,7 +900,7 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 6);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 
@@ -911,13 +922,14 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
+    gTestID = 7;
 
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Simply assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GET_CEC_VERSION};
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 7);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -965,7 +977,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 7);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -986,13 +998,14 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
+    gTestID = 8;
 
     int len = 2;
     //Give vendor id
     //Simply assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_CEC_DEVICE_VENDOR_ID};
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 8);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1041,7 +1054,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 8);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -1061,13 +1074,14 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     int logicalAddress = 0;
     int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
+    gTestID = 9;
 
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 9);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1123,7 +1137,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 9);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -1144,6 +1158,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     int devType = 3;//Trying some dev type
     unsigned int physicalAddress = 0x00;
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
+    gTestID = 10;
 
 
     //@todo need to send one broadcast event here. Check image view on can be broadcasted
@@ -1152,7 +1167,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
     unsigned char buf4[] = {0x3F, CEC_ACTIVE_SOURCE, 0x00, 0x00 };
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 10);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     CEC_LOG_DEBUG ("\nCEC_STANDBY opcode is not working for TV time being. This currently under investigation");
     CEC_LOG_INFO ("\nPlease set the connected display to CEC_STANDBY. Please enter any key to continue."); getchar ();
 
@@ -1300,7 +1315,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 10);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 //@todo Need to have a scenario to evaluate the multiple CEC Commands getting sent on the network at the same time.  A test case that has two sink devices sending back to back commands for 10 to 15 times in a loop
@@ -1326,9 +1341,10 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
+    gTestID = 11;
 
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 11);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     CEC_LOG_INFO ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
 
     /* Positive result */
@@ -1367,7 +1383,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 11);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 /**
@@ -1387,13 +1403,14 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
     int logicalAddress = 0;
     int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
+    gTestID = 12;
 
     int len = 2;
     //Give vendor id
     //Assuming sender as 3 and broadcast
     unsigned char buf1[] = {0x3F, CEC_GIVE_DEVICE_POWER_STATUS };
 
-    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, 2, 12);
+    CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     CEC_LOG_INFO ("\nPlease connect more than one cec device to the network and run \
       back to back send parallel . Please enter any key to continue"); getchar ();
 
@@ -1450,7 +1467,7 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, 2, 12);
+    CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
 static UT_test_suite_t *pSuiteHdmiConnected = NULL;
