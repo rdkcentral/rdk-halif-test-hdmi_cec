@@ -475,9 +475,6 @@ void test_hdmicec_hal_l1_close_positive( void )
  * **Pre-Conditions:**@n
  * Connect at least one CEC enabled device
  * 
- * @todo : max value is 4.4.4.4 need to check the range against this value. Need to do the range check also. Anooj will take care.
- * @todo : Need to add the range in the header file also. Both min and max. Anooj will take care.
- * 
  * **Dependencies:** None@n
  * **User Interaction:** None
  * 
@@ -488,7 +485,7 @@ void test_hdmicec_hal_l1_close_positive( void )
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecGetPhysicalAddress() - call the API with invalid handle | handle=0, physicalAddress | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |04|Call HdmiCecGetPhysicalAddress() - call API with invalid physical address | handle, physicalAddress=NULL  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |04|Call HdmiCecGetPhysicalAddress() - call API with valid physical address pointer | handle, physicalAddress  | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |04|Call HdmiCecGetPhysicalAddress() - call API with valid physical address pointer and ensure address is in its range | handle, physicalAddress  | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |05|Call HdmiCecClose() - close interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |06|Call HdmiCecGetPhysicalAddress()  - call the API after module is closed | handle, physicalAddress | HDMI_CEC_IO_NOT_OPENED| Should Pass |
  * @note: HdmiCecGetPhysicalAddress() is a void returning function currently. In phase2 the above return
@@ -503,32 +500,36 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
     gTestID = 6;
 
     CEC_LOG_INFO("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    result = HDMI_CEC_IO_SUCCESS; if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); } //@todo need to change to HDMI_CEC_IO_NOT_OPENED after next phase modifications
+    result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
+    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); } //@todo need to change to HDMI_CEC_IO_NOT_OPENED after next phase modifications
 
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL ( result, HDMI_CEC_IO_SUCCESS );
 
-    HdmiCecGetPhysicalAddress(0, &physicalAddress);
-    result = HDMI_CEC_IO_INVALID_ARGUMENT; if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL ("Check failed"); }
+    result = HdmiCecGetPhysicalAddress(0, &physicalAddress);
+    if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL ("Check failed"); }
 
-    HdmiCecGetPhysicalAddress(handle, NULL);
-    result = HDMI_CEC_IO_INVALID_ARGUMENT; if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL ("Check failed"); }
+    result = HdmiCecGetPhysicalAddress(handle, NULL);
+    if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL ("Check failed"); }
 
 
-    HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    result = HDMI_CEC_IO_SUCCESS; if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); }
-    UT_ASSERT_TRUE(physicalAddress==0xffff);
+    result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
+    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); }
+    unsigned int maxVal = (((0x04 &0xF0 ) << 20)|( (0x04 &0x0F ) << 16) |((0x04 & 0xF0) << 4)  | (0x04 & 0x0F));
+    //Max possible physical address is 4.4.4.4
+    if (physicalAddress>maxVal) {
+        UT_FAIL ("Check failed");
+    }
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Calling API after close,
-    HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    result = HDMI_CEC_IO_SUCCESS; if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); } //@todo need to change to HDMI_CEC_IO_NOT_OPENED after next phase modifications
+    result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
+    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); } //@todo need to change to HDMI_CEC_IO_NOT_OPENED after next phase modifications
     CEC_LOG_INFO("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -570,8 +571,8 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL ( result, HDMI_CEC_IO_SUCCESS );
 
-    HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    result = HDMI_CEC_IO_SUCCESS; if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); }
+    result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
+    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("Check failed"); }
     UT_ASSERT_TRUE(physicalAddress==0xffff);
 
     /*calling hdmicec_close should pass */
