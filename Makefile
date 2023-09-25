@@ -23,8 +23,8 @@
 #*   ** @file        : makefile
 #*   ** @date        : 20/05/2022
 #*   **
-#*   ** @brief : Makefile for UT
-#*   ** 
+#*   ** @brief       : Makefile for UT
+#*   **
 #*
 #* ******************************************************************************
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
