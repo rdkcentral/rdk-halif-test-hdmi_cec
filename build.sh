@@ -20,7 +20,7 @@
 # *
 
 # Clone the Unit Test Requirements
-TEST_REPO=$(git remote -vv | head -n1 | awk -F ' ' '{print $2}' | sed 's/hal.*/ut-core.git/g')
+TEST_REPO=git@github.com:rdkcentral/ut-core.git
 
 # Set default UT_PROJECT_VERSION to master
 if [ -z "${UT_PROJECT_VERSION}" ]; then
