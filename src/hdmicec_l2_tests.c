@@ -302,7 +302,6 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     gTestID = 1;
 
@@ -331,11 +330,11 @@ void test_hdmicec_hal_l2_getCecVersion_sink( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); } //if condition and do UT_FAIL 
 
     //Get the receiver logical address
@@ -391,7 +390,6 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     gTestID = 2;
 
@@ -418,11 +416,11 @@ void test_hdmicec_hal_l2_getVendorID_sink( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -479,7 +477,6 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
     int result=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     gTestID = 3;
 
@@ -510,11 +507,11 @@ void test_hdmicec_hal_l2_getPowerStatus_sink( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -574,7 +571,6 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     gTestID = 4;
 
@@ -605,11 +601,11 @@ void test_hdmicec_hal_l2_TogglePowerState_sink( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result ) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -744,7 +740,6 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
     unsigned char buf1[] = {0x03, CEC_STANDBY };
     gTestID = 5;
@@ -769,11 +764,11 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_sink( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -816,7 +811,6 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
     int result=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     int ret=0;
     gTestID = 6;
@@ -851,11 +845,11 @@ void test_hdmicec_hal_l2_back_to_back_send_sink( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -920,7 +914,6 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
     gTestID = 7;
 
@@ -940,7 +933,7 @@ void test_hdmicec_hal_l2_getCecVersion_source( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get logical address for STB
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -996,7 +989,6 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
     gTestID = 8;
 
@@ -1016,7 +1008,7 @@ void test_hdmicec_hal_l2_getVendorID_source( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get logical address.
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -1072,7 +1064,6 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     int result=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
     gTestID = 9;
 
@@ -1096,7 +1087,7 @@ void test_hdmicec_hal_l2_getPowerStatus_source( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get logical address for STB
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -1155,7 +1146,6 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
     unsigned int physicalAddress = 0x00;
     unsigned char receiverLogicalAddress = CEC_TV_ADDR;
     gTestID = 10;
@@ -1185,7 +1175,7 @@ void test_hdmicec_hal_l2_TogglePowerState_source( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -1338,7 +1328,6 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_BROADCAST_ADDR;
     unsigned char buf1[] = {0x3F, CEC_STANDBY };
     gTestID = 11;
@@ -1357,7 +1346,7 @@ void test_hdmicec_hal_l2_validateHdmiCecConnection_source( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address
@@ -1401,7 +1390,6 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 0;//Trying some dev type
     unsigned char receiverLogicalAddress = CEC_TUNER_ADDR;
     gTestID = 12;
 
@@ -1428,7 +1416,7 @@ void test_hdmicec_hal_l2_back_to_back_send_source ( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
     //Get the receiver logical address

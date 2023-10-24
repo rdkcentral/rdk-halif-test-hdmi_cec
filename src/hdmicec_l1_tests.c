@@ -1332,7 +1332,7 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address for STB
@@ -1528,7 +1528,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
@@ -1606,7 +1606,6 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type. This is dummy variable
     gTestID = 24;
 
     int len = 2;
@@ -1631,13 +1630,13 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address
-    result = HdmiCecGetLogicalAddress(handle, devType,  &logicalAddress);
+    result = HdmiCecGetLogicalAddress(handle,  &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
 
 
@@ -1695,7 +1694,6 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
-    int devType = 3;//Trying some dev type. This is dummy variable
     gTestID = 25;
 
     int len = 2;
@@ -1874,7 +1872,7 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address of the device
@@ -1964,7 +1962,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
@@ -2061,7 +2059,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
         if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Check failed"); }
-        UT_FAIL_FATAL ("HdmiCecAddLogicalAddress failed");
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     buf[0] = 0x0F; CEC_LOG_DEBUG ("\n hdmicec buf: 0x%x\n", buf[0]);
