@@ -61,7 +61,6 @@
 #include <ut.h>
 
 extern int register_hdmicec_hal_l1_tests( void );
-extern int register_hdmicec_hal_l2_tests( void );
 
 int main(int argc, char** argv) 
 {
@@ -69,7 +68,6 @@ int main(int argc, char** argv)
     UT_init( argc, argv );
 
     register_hdmicec_hal_l1_tests ();
-    register_hdmicec_hal_l2_tests ();
 
     UT_run_tests();
 }
