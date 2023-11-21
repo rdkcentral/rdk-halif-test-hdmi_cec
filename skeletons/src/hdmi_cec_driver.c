@@ -25,21 +25,18 @@
 
 HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   return (int)0;
 }
 
 HDMI_CEC_STATUS HdmiCecClose(int handle)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   return (int)0;
 }
 
 HDMI_CEC_STATUS HdmiCecSetLogicalAddress(int handle, int* logicalAddresses, int num)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)logicalAddresses;
   (void)num;
@@ -48,7 +45,6 @@ HDMI_CEC_STATUS HdmiCecSetLogicalAddress(int handle, int* logicalAddresses, int 
 
 HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddress)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)physicalAddress;
   return (int)0;
@@ -56,7 +52,6 @@ HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddr
 
 HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)logicalAddresses;
   return (int)0;
@@ -64,7 +59,6 @@ HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 
 HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)logicalAddresses;
   return (int)0;
@@ -72,7 +66,6 @@ HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 
 HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)logicalAddress;
   return (int)0;
@@ -80,7 +73,6 @@ HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 
 HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, void* data)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)cbfunc;
   (void)data;
@@ -89,7 +81,6 @@ HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, voi
 
 HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, void* data)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)cbfunc;
   (void)data;
@@ -98,7 +89,6 @@ HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, voi
 
 HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* result)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)buf;
   (void)len;
@@ -108,7 +98,6 @@ HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* re
 
 HDMI_CEC_STATUS HdmiCecTxAsync(int handle, const unsigned char* buf, int len)
 {
-  /*TODO: Implement Me!*/
   (void)handle;
   (void)buf;
   (void)len;
