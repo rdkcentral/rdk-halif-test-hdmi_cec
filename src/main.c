@@ -18,19 +18,45 @@
 */
 
 /**
- * @addtogroup HPK HPK
- * @{
- * @addtogroup HDMI_CEC HDMI_CEC
+ * @addtogroup HPK Hardware Porting Kit
  * @{
  *
  */
 
 /**
- * @defgroup HDMI_CEC_TESTS HDMI_CEC_TESTS
+ * @addtogroup HDMI_CEC HDMI CEC Module
  * @{
- * @par
- * Unit Testing Suite for HDMI CEC HAL
+ *
  */
+
+/**
+ * @defgroup HDMI_CEC_HALTESTS HDMI CEC HAL Tests
+ * @{
+ *
+ */
+
+/**
+ * @defgroup HDMI_CEC_HALTESTS_Main HDMI CEC HAL Tests Main File
+ * @{
+ * @parblock
+ *
+ * ### Tests for HDMI CEC HAL :
+ *
+ * This is to ensure that the API meets the operational requirements of the module across all vendors.
+ *
+ * **Pre-Conditions:** @n
+ * **Dependencies:** None@n
+ *
+ * Refer to API Definition specification documentation : [hdmi-cec_halSpec.md](../../docs/pages/hdmi-cec_halSpec.md)
+ *
+ * @endparblock
+ *
+ */
+
+/**
+* @file main.c
+*
+*/
 
 #include <ut.h>
 
@@ -48,6 +74,7 @@ int main(int argc, char** argv)
     UT_run_tests();
 }
 
-/** @} */ // End of HDMI_CEC_TESTS HDMI_CEC_TESTS
-/** @} */ // End of HDMI_CEC HDMI_CEC
+/** @} */ // End of HDMI CEC HAL Tests Main File
+/** @} */ // End of HDMI CEC HAL Tests
+/** @} */ // End of HDMI CEC Module
 /** @} */ // End of HPK

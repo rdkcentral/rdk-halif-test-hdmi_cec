@@ -1,24 +1,27 @@
-
-<!--
-If not stated otherwise in this file or this component's LICENSE file the following copyright and licenses apply.
-
-Copyright 2023 RDK Management
-
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-See the License for the specific language governing permissions and limitations under the License.
--->
-
 # Unit Testing Suite For HDMI CEC HAL
 
-The following documents should be references to provide specific information on the tests required for this module.
+## Table of Contents
 
-[Documentation can be found under "docs/pages" in this repository](./docs/pages)
+- [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
+- [Description](#description)
+- [Reference Documents](#reference-documents)
 
-## Index of important Documents
+## Acronyms, Terms and Abbreviations
 
-- [hdmicec_feature_requirements.md](./docs/pages/hdmicec_feature_requirements.md)
+- `L1` - Functional Tests
+- `L2` - Module (Functional) Tests
+- `HAL`- Hardware Abstraction Layer
+
+## Description
+
+This repository contains the Unit Test Suites (L1 and L2) for HDMI CEC `HAL`.
+
+## Reference Documents
+
+<!-- Need to update links to rdkcentral and point to branch main-->
+|SNo|Document Name|Document Description|Document Link|
+|---|-------------|--------------------|-------------|
+|1|`HAL` Specification Document|This document provides specific information on the APIs for which tests are written in this module|[hdmi-cec_halSpec.md](https://github.com/comcast-sky/rdk-components-hal-hdmicec/blob/master/docs/pages/hdmi-cec_halSpec.md "hdmi-cec_halSpec.md")|
+|2|`L2` Test Specification Document|This document provides information on the `L2` tests required for this module|[L2_TestSpecification.md](https://github.com/comcast-sky/rdk-components-haltest-hdmicec/blob/master/docs/pages/l2_module_test_specification_template.md "l2_module_test_specification_template.md")|
+|3|`L1` Tests |`L1` Test Case File for this module |[test_l1_hdmi_cec_driver.c](https://github.com/comcast-sky/rdk-components-haltest-hdmicec/blob/master/src/test_l1_hdmi_cec_driver.c "test_l1_hdmi_cec_driver.c")|
+|4|`L2` Tests |`L2` Test Case File for this module|[test_l2_hdmi_cec_driver.c](https://github.com/comcast-sky/rdk-components-haltest-hdmicec/blob/master/src/test_l2_hdmi_cec_driver.c "test_l2_hdmi_cec_driver.c")|

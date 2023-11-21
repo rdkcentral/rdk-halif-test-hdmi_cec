@@ -18,34 +18,46 @@
 */
 
 /**
- * @addtogroup HPK HPK
- * @{
- * @addtogroup HDMI_CEC HDMI_CEC
+ * @addtogroup HPK Hardware Porting Kit
  * @{
  *
  */
 
 /**
- * @defgroup HDMI_CEC_TESTS HDMI_CEC_TESTS
+ * @addtogroup HDMI_CEC HDMI CEC Module
  * @{
- * @par
- * Unit Testing Suite for HDMI CEC HAL
+ *
  */
 
 /**
-* @file hdmicec_l1_tests.c
-* @page HDMI_CEC_L1_Tests HDMI CEC Level 1 Tests
-*
-* ## Module's Role
-* This module includes Level 1 functional tests (success and failure scenarios)
-* This is to ensure that the API meets the operational requirements of the HDMI CEC across all vendors
-*
-* **Pre-Conditions:**  None@n
-* **Dependencies:** None@n
-*
-* Ref to API Definition specification documentation : [halSpec.md](../../../docs/halSpec.md)
-*/
+ * @defgroup HDMI_CEC_HALTESTS HDMI CEC HAL Tests
+ * @{
+ *
+ */
 
+/**
+ * @defgroup HDMI_CEC_HALTESTS_L1 HDMI CEC HAL Tests L1 File
+ * @{
+ * @parblock
+ *
+ * ### L1 Test Cases for HDMI CEC HAL :
+ *
+ * This module includes Level 1 functional tests (success and failure scenarios).
+ * This is to ensure that the API meets the operational requirements of the module across all vendors.
+ *
+ * **Pre-Conditions:** @n
+ * **Dependencies:** None@n
+ *
+ * Refer to API Definition specification documentation : [hdmi-cec_halSpec.md](../../docs/pages/hdmi-cec_halSpec.md)
+ *
+ * @endparblock
+ *
+ */
+
+/**
+ * @file test_l2_hdmi_cec_driver.c
+ * 
+ */
 
 #include <string.h>
 #include <stdlib.h>
@@ -2374,6 +2386,7 @@ int test_hdmicec_hal_l1_register( void )
     return 0;
 }
 
-/** @} */ // End of HDMI_CEC_TESTS HDMI_CEC_TESTS
-/** @} */ // End of HDMI_CEC HDMI_CEC
+/** @} */ // End of HDMI CEC HAL Tests L1 File
+/** @} */ // End of HDMI CEC HAL Tests
+/** @} */ // End of HDMI CEC Module
 /** @} */ // End of HPK

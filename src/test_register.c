@@ -18,24 +18,47 @@
 */
 
 /**
- * @addtogroup HPK HPK
- * @{
- * @addtogroup HDMI_CEC HDMI_CEC
+ * @addtogroup HPK Hardware Porting Kit
  * @{
  *
  */
 
 /**
- * @defgroup HDMI_CEC_TESTS HDMI_CEC_TESTS
+ * @addtogroup HDMI_CEC HDMI CEC Module
  * @{
- * @par
- * Unit Testing Suite for HDMI CEC HAL
+ *
  */
 
 /**
- * @brief Register test functionality
- * 
+ * @defgroup HDMI_CEC_HALTESTS HDMI CEC HAL Tests
+ * @{
+ *
  */
+
+/**
+ * @defgroup HDMI_CEC_HALTESTS_Register HDMI CEC HAL Tests Register File
+ * @{
+ * @parblock
+ *
+ * ### Registration of tests for HDMI CEC HAL :
+ *
+ * Registration of tests for HDMI CEC HAL.
+ * This is to ensure that the API meets the operational requirements of the module across all vendors.
+ *
+ * **Pre-Conditions:** @n
+ * **Dependencies:** None@n
+ *
+ * Refer to API Definition specification documentation : [hdmi-cec_halSpec.md](../../docs/pages/hdmi-cec_halSpec.md)
+ *
+ * @endparblock
+ *
+ */
+
+/**
+* @file test_register.c
+*
+*/
+
 
 /* L1 Testing Functions */
 extern int test_hdmicec_hal_l1_register( void );
@@ -63,6 +86,7 @@ int register_hdmicec_hal_l2_tests( void )
     return registerFailed;
 }
 
-/** @} */ // End of HDMI_CEC_TESTS HDMI_CEC_TESTS
-/** @} */ // End of HDMI_CEC HDMI_CEC
+/** @} */ // End of HDMI CEC HAL Tests Register File
+/** @} */ // End of HDMI CEC HAL Tests
+/** @} */ // End of HDMI CEC Module
 /** @} */ // End of HPK
