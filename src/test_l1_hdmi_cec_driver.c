@@ -332,7 +332,7 @@ void test_hdmicec_hal_l1_open_logical_address_unavailable_source ( void )
     UT_LOG ("\nPlease connect other 4 cec enabled playback devices to the cec network. \
                   Please enter any key to continue"); getchar ();
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("Check failed"); }
+    if (HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
     
     //The above open is failed handle should be null
     UT_ASSERT_TRUE(handle==0);
@@ -375,7 +375,7 @@ void test_hdmicec_hal_l1_close_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
