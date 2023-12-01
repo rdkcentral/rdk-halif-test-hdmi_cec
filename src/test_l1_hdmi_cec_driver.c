@@ -245,16 +245,16 @@ void test_hdmicec_hal_l1_open_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Check Null even before calling the positive case
     result = HdmiCecOpen( NULL );
-    if (HDMI_CEC_IO_INVALID_HANDLE  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_INVALID_HANDLE  != result) { UT_FAIL ("open failed"); }
 
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("open failed"); }
     
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_ALREADY_OPEN != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -292,10 +292,10 @@ void test_hdmicec_hal_l1_open_positive( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("open failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -332,14 +332,14 @@ void test_hdmicec_hal_l1_open_logical_address_unavailable_source ( void )
     UT_LOG ("\nPlease connect other 4 cec enabled playback devices to the cec network. \
                   Please enter any key to continue"); getchar ();
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE != result) { UT_FAIL ("open failed"); }
     
     //The above open is failed handle should be null
     UT_ASSERT_TRUE(handle==0);
 
      //Here handle = 0 since open failed and close should fail.
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_INVALID_HANDLE  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_INVALID_HANDLE  != result) { UT_FAIL ("close failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -375,19 +375,19 @@ void test_hdmicec_hal_l1_close_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("close failed"); }
 
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("open failed"); }
 
     result = HdmiCecClose( 0 );
     if (HDMI_CEC_IO_INVALID_HANDLE  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }  
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }  
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("close failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -422,16 +422,16 @@ void test_hdmicec_hal_l1_close_positive( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("open failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }  
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }  
 
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("open failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("open failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); } 
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); } 
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -471,7 +471,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    if (HDMI_CEC_IO_SUCCESS  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecGetPhysicalAddress failed"); }
+    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("HdmiCecGetPhysicalAddress failed"); }
 
 
     result = HdmiCecOpen (&handle);
@@ -495,11 +495,11 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
 
     //Calling API after close,
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    if (HDMI_CEC_IO_SUCCESS  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecGetPhysicalAddress failed"); }
+    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL ("HdmiCecGetPhysicalAddress failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -588,7 +588,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -608,10 +608,10 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative( void )
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
 
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -660,7 +660,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
@@ -727,10 +727,10 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("Close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("Close failed"); }
 
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -776,7 +776,7 @@ void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
     if (HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -821,7 +821,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecOpen(&handle);
     //if init is failed no need to proceed further
@@ -852,10 +852,10 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
     if (HDMI_CEC_IO_ALREADY_REMOVED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecClose(handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
 
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -902,7 +902,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecClose(handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
 
 }
 
@@ -942,7 +942,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sourceDevice( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecOpen(&handle);
     //if init is failed no need to proceed further
@@ -963,10 +963,10 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sourceDevice( void )
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecClose(handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("close failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("close failed"); }
 
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("HdmiCecRemoveLogicalAddress failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -1011,7 +1011,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1043,11 +1043,11 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     //Calling API after close, should give invalid argument
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -1098,7 +1098,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -1139,7 +1139,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     result = HdmiCecGetLogicalAddress(handle,  &logicalAddress);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1157,11 +1157,11 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     //Calling API after close, should give invalid argument
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecGetLogicalAddress failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -1205,7 +1205,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 }
 
 /**
@@ -1242,7 +1242,7 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
 
     //Calling API before open, should pass
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback, (void*)0xDEADBEEF);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecSetRxCallback failed"); } 
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecSetRxCallback failed"); } 
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1254,14 +1254,14 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     //Calling API after close, should return success
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback, 0);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecSetRxCallback failed"); } 
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecSetRxCallback failed"); } 
 
     HdmiCecSetRxCallback(0, DriverReceiveCallback, 0);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecSetRxCallback failed"); } 
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecSetRxCallback failed"); } 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -1312,8 +1312,8 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) {
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
-        if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
-        HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed");
+        if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     //Get logical address for STB
@@ -1335,7 +1335,7 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -1382,10 +1382,10 @@ void test_hdmicec_hal_l1_setTxCallback_negative( void )
     if (HDMI_CEC_IO_INVALID_HANDLE != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecSetTxCallback failed"); }
     
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     result = HdmiCecSetTxCallback( handle, DriverTransmitCallback, (void*)0xDEADBEEF );
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecSetTxCallback failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL ("HdmiCecSetTxCallback failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -1431,7 +1431,7 @@ void test_hdmicec_hal_l1_setTxCallback_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecSetTxCallback failed"); }
 
     result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -1489,7 +1489,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Calling API before open, should give invalid argument
     result = HdmiCecTx(handle, buf, len, &ret);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTx failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTx failed"); }
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1507,8 +1507,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
     if (HDMI_CEC_IO_SUCCESS != result) {
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
-        if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
-        HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed");
+        if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     buf[0] = 0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
@@ -1549,11 +1549,11 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     //Calling API after close, should give invalid argument
     result = HdmiCecTx(handle, buf, len, &ret);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTx failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTx failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -1609,8 +1609,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) {
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
-        if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
-        HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed");
+        if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     buf[0] = 0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
@@ -1630,7 +1630,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -1683,7 +1683,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Calling API before open, should give invalid argument
     result = HdmiCecTx(handle, buf, len, &ret);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTx failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTx failed"); }
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1728,11 +1728,11 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     //Calling API after close, should give invalid argument
     result = HdmiCecTx(handle, buf, len, &ret);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTx failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTx failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -1794,7 +1794,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 }
 
 /**
@@ -1865,7 +1865,7 @@ void test_hdmicec_hal_l1_portDisconnected_sink( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -1915,7 +1915,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Calling API before open, should give invalid argument
     result = HdmiCecTxAsync(handle, buf, len); //Code crash here
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTxAsync failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTxAsync failed"); }
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -1971,11 +1971,11 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     //Calling API after close, should give invalid argument
     result = HdmiCecTxAsync(handle, buf, len);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTxAsync failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTxAsync failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -2032,8 +2032,8 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) {
         /*Cleanup before exiting */
         result = HdmiCecClose (handle);
-        if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
-        HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecAddLogicalAddress failed");
+        if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
+        UT_FAIL ("HdmiCecAddLogicalAddress failed");
     }
 
     buf[0] = 0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
@@ -2051,7 +2051,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -2102,7 +2102,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Calling API before open, should give invalid argument
     result = HdmiCecTxAsync(handle, buf, len); //Code crash here
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTxAsync failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTxAsync failed"); }
 
     /* Positive result */
     result = HdmiCecOpen (&handle);
@@ -2143,11 +2143,11 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     //Calling API after close, should give invalid argument
     result = HdmiCecTxAsync(handle, buf, len);
-    if (HDMI_CEC_IO_NOT_OPENED != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecTxAsync failed"); }
+    if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL ("HdmiCecTxAsync failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -2211,7 +2211,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
@@ -2275,7 +2275,7 @@ void test_hdmicec_hal_l1_portDisconnected_source( void )
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("HdmiCecClose failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL ("HdmiCecClose failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
