@@ -2316,10 +2316,10 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteNegative, "addLogicalAddressWithAddressInUseSink", test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice);
     UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSink", test_hdmicec_hal_l1_portDisconnected_sink);
 #else
-    UT_add_test( pSuite, "getLogicalAddressSource", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
-    UT_add_test( pSuite, "hdmiCecTxSource", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative);
-    UT_add_test( pSuite, "hdmiCecTxAsyncSource", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative);
-    UT_add_test( pSuite, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
+    UT_add_test( pSuiteNegative, "getLogicalAddressSource", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
+    UT_add_test( pSuiteNegative, "hdmiCecTxSource", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative);
+    UT_add_test( pSuiteNegative, "hdmiCecTxAsyncSource", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative);
+    UT_add_test( pSuiteNegative, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
     UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
 #endif //end of __UT_STB__
 
