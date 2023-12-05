@@ -146,7 +146,6 @@ void DriverReceiveCallback(int handle, void *callbackData, unsigned char *buf, i
     UT_ASSERT_PTR_NULL((bool)(!callbackData));
     UT_ASSERT_PTR_NULL((bool)(!buf));
     //UT_ASSERT_TRUE( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
-    //@todo need to identify why callback is not equal
     cec_isPingTriggeredl1_g = true;
     UT_LOG ("\nCall back data generated is \n");
     for (int index=0; index < len; index++) {
@@ -166,7 +165,6 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
     UT_ASSERT_TRUE(handle!=0);
     UT_ASSERT_PTR_NULL((bool)(!callbackData));
     //UT_ASSERT_TRUE( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
-    //@todo need to identify why callback is not equal
     UT_LOG ("\ncallbackData returned: %x result: %d\n",callbackData, result);
     if (HDMI_CEC_IO_SUCCESS != result) { HDMICEC_ASSERT_AUTO_TERM(); UT_FAIL ("Check failed"); }
 }
@@ -195,7 +193,6 @@ void getReceiverLogicalAddressL1 (int handle, int logicalAddress, unsigned char*
             clock_gettime(CLOCK_REALTIME, &cec_tsl1_g); cec_tsl1_g.tv_sec += 1;
             sem_timedwait(&cec_seml1_g, &cec_tsl1_g);
             UT_LOG ("\n buf is : 0x%x ret value is  : 0x%x result is : 0x%x \n", buf[0], ret, result);
-	        //@todo need to check why following condition is not working.
             if (((HDMI_CEC_IO_SENT_AND_ACKD  == ret)||(HDMI_CEC_IO_SUCCESS==ret))&& (HDMI_CEC_IO_SUCCESS == result) ){
                 *receiverLogicalAddress = addr;
                 UT_LOG ("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
@@ -577,7 +574,6 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
  * |08|Call HdmiCecAddLogicalAddress() - call after module is closed | handle, logicalAddress | HDMI_CEC_IO_NOT_OPENED| Should Pass |
  * 
  * HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE case is updated in separate L1 case
- * @todo SKY will come back how to simulate HDMI_CEC_IO_SENT_FAILED
  */
 void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative( void )
 {
@@ -640,7 +636,6 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative( void )
  * |03|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * 
  * HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE case is updated in separate L1 case
- * @todo SKY will come back how to simulate HDMI_CEC_IO_SENT_FAILED
  */
 void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive( void )
 {
@@ -757,7 +752,6 @@ void test_hdmicec_hal_l1_addLogicalAddress_sourceDevice( void )
   * |02|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
   * |03|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
   *
-  *@todo Need to check why this test is not working. Need to check with SKY if this is a valid case. Need to verify with another vendor TV also SKY will come back.
   */
 void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
 {
@@ -1444,7 +1438,6 @@ void test_hdmicec_hal_l1_setTxCallback_positive( void )
  *  HDMI_CEC_IO_GENERAL_ERROR : is platform specific and cannot be simulated
  *  HDMI_CEC_IO_SENT_BUT_NOT_ACKD : is verified part of L2. since all the device disconnected tests handled in L2
  *  HDMI_CEC_IO_SENT_FAILED : Underlying bus error. cannot be simulated
- * @todo  SKY will come back on how to simulate HDMI_CEC_IO_SENT_FAILED.
  * 
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 023@n
