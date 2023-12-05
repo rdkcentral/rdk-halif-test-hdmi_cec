@@ -9,12 +9,11 @@
 ## Acronyms, Terms and Abbreviations
 
 - `L1` - Functional Tests
-- `L2` - Module (Functional) Tests
 - `HAL`- Hardware Abstraction Layer
 
 ## Description
 
-This repository contains the Unit Test Suites (L1 and L2) for HDMI CEC `HAL`.
+This repository contains the Unit Test Suites (L1) for HDMI CEC `HAL`.
 
 ## Reference Documents
 
@@ -22,6 +21,4 @@ This repository contains the Unit Test Suites (L1 and L2) for HDMI CEC `HAL`.
 |SNo|Document Name|Document Description|Document Link|
 |---|-------------|--------------------|-------------|
 |1|`HAL` Specification Document|This document provides specific information on the APIs for which tests are written in this module|[hdmi-cec_halSpec.md](https://github.com/comcast-sky/rdk-components-hal-hdmicec/blob/master/docs/pages/hdmi-cec_halSpec.md "hdmi-cec_halSpec.md")|
-|2|`L2` Test Specification Document|This document provides information on the `L2` tests required for this module|[L2_TestSpecification.md](https://github.com/comcast-sky/rdk-components-haltest-hdmicec/blob/master/docs/pages/l2_module_test_specification_template.md "l2_module_test_specification_template.md")|
-|3|`L1` Tests |`L1` Test Case File for this module |[test_l1_hdmi_cec_driver.c](https://github.com/comcast-sky/rdk-components-haltest-hdmicec/blob/master/src/test_l1_hdmi_cec_driver.c "test_l1_hdmi_cec_driver.c")|
-|4|`L2` Tests |`L2` Test Case File for this module|[test_l2_hdmi_cec_driver.c](https://github.com/comcast-sky/rdk-components-haltest-hdmicec/blob/master/src/test_l2_hdmi_cec_driver.c "test_l2_hdmi_cec_driver.c")|
+|2|`L1` Tests |`L1` Test Case File for this module |[test_l1_hdmi_cec_driver.c](https://github.com/comcast-sky/rdk-components-haltest-hdmicec/blob/master/src/test_l1_hdmi_cec_driver.c "test_l1_hdmi_cec_driver.c")|
