@@ -25,6 +25,7 @@
 Consumer Electronics Control (CEC) is a single-wire bidirectional bus within an HDMI system, facilitating communication among interconnected products. HDMI-CEC establishes a protocol enabling high-level control functions between audiovisual devices linked via an HDMI network, facilitating communication and control among them. Communication can occur in either Direct messaging mode or Broadcast mode. Below is a diagram illustrating a basic network setup:
 
  
+![CEC_Network](https://github.com/rdkcentral/rdk-halif-test-hdmi_cec/assets/71806084/133a9c82-0cf8-4184-97c6-021b9e10ec4a)
 
  
 ## HDMI-CEC RDK HAL Functionality
