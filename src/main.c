@@ -21,42 +21,6 @@
  
 extern int register_hal_l2_tests( void );
 
-int handle = 0;
-
-int HdmiCec_PreReq()
-{
-    HDMI_CEC_STATUS status;
-    status = HdmiCecOpen(&handle);
-    if (status == HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG("HdmiCecOpen() returned success and handle value is %d", handle);
-        return 0;
-    }
-    else
-    {
-        UT_LOG("HdmiCecOpen() returned failure");
-        UT_FAIL_FATAL(" Hdmi_cec pre-requisite failed");
-    }
-    return -1;
-}
- 
-int HdmiCec_PostReq()
-{
-    HDMI_CEC_STATUS status;
-    status = HdmiCecClose(handle);
-    if (status == HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG("HdmiCecClose() returned success");
-        return 0;
-    }
-    else
-    {
-        UT_LOG("HdmiCecClose returned failure");
-        UT_FAIL_FATAL("Hdmi_cec post-requisite failed");
-    }
-    return -1;
-}
-
 int main(int argc, char** argv)
 {
     int registerReturn = 0;

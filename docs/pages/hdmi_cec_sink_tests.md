@@ -57,9 +57,9 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |-----|------------------|-----------|--------|--|--|--------------------------|
 | 1 |[Logical address](#logical-address-discovery)|Establish my logical address (through HAL APIs) as valid, then retrieve it to verify correct functionality.|HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress|Y|NA|
 |a| | If the logical address is set to anything other than 0 (Allocated TV address) or 14 (Wild card address), it should result in a failure of a TV device|HdmiCecAddLogicalAddress| Y |NA |
-|b| | Invoke the HAL API to delete my logical address and verify that it is removed successfully.  |HdmiCecRemoveLogicalAddress, HdmiCecGetLogicalAddress| Y | NA|
+|b| | Invoke the HAL API to delete my logical address and verify that it is removed successfully.  |HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecGetLogicalAddress| Y | NA|
 |c| | The attempt to obtain my logical address should fail if more than two TV devices are connected.| HdmiCecAddLogicalAddress |NA | Y | Enable two televisions that can acquire the logical address 0 and 14 before attempting my Tele under test to acquire the logical address. |
-|d| | After deleting my logical address, try to send a broadcast command. Should fail to send during HAL Transmission,  call.|HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
+|d| | After deleting my logical address, try to send a broadcast command. Should fail to send during HAL Transmission,  call.|HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
 
 ### Emulator Requirements
 

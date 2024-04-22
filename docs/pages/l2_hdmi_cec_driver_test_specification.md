@@ -3,8 +3,8 @@
 |Title|Details|
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_AddAndGetLogicalAddress`|
-|Description|Testing the functionality of adding and getting the logical address using `HdmiCecAddLogicalAddress` and `HdmiCecGetLogicalAddress`.|
-|Test Group|Module: 02|
+|Description|Establish my logical address (through HAL APIs) as valid, then retrieve it to verify correct functionality.|
+|Test Group|Module : 02|
 |Test Case ID|001|
 |Priority|High|
 
@@ -18,24 +18,33 @@
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
-| 01 | Establish a logical address using `HdmiCecAddLogicalAddress`. | handle = valid handle , logicalAddresses = 0x00 | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 02 | Retrieve the logical address using `HdmiCecGetLogicalAddress` if the previous call was successful. | handle = valid handle, logicalAddress = address of integer variable | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 01 | Open HDMI CEC HAL using HdmiCecOpen | handle = valid buffer | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | Add a valid Logical Address using HdmiCecAddLogicalAddress | handle = valid handle, logicalAddress = 0x0 | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 03 | Get Logical Address using HdmiCecGetLogicalAddress | handle = valid handle, getLogicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS, getLogicalAddress = logicalAddress | Should be successful |
+| 04 | Close HDMI CEC HAL using HdmiCecClose | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+
 
 ```mermaid
 graph TB
-    Start(Start) --> A{Establish <br> logical address using <br> HdmiCecAddLogicalAddress};
-    A -->|Success| B{Retrieve the <br> logical address using <br> HdmiCecGetLogicalAddress};
-    B -->|Success| End(End);
-    A -->|Fail| FailA[Testcase failed at <br> HdmiCecAddLogicalAddress];
-    B -->|Fail| FailB[Testcase failed at <br> HdmiCecGetLogicalAddress];
+    A[Call HdmiCecOpen] -->|success| B[Call HdmiCecAddLogicalAddress]
+    A -->|fail| E[Test case fail]
+    B -->|success| C[Call HdmiCecGetLogicalAddress]
+    B -->|fail| F[Test case fail]
+    C -->|success| D[Verify logical address]
+    C -->|fail| G[Test case fail]
+    D -->|success| H[Call HdmiCecClose]
+    D -->|fail| I[Test case fail]
+    H -->|success| J[End of test case]
+    H -->|fail| K[Test case fail]
 ```
+
 
 ### Test 2
 
 |Title|Details|
 |--|--|
-|Function Name|`test_l2_hdmi_cec_driver_AddLogicalAddressFailure`|
-|Description|This test checks whether the function `HdmiCecAddLogicalAddress` returns the correct `status` after being invoked with an valid handle. The expected result, as per the function, is a failure, which is confirmed through an assertion in the test.|
+|Function Name|`test_l2_hdmi_cec_driver_ValidateLogicalAddress`|
+|Description|If the logical address is set to anything other than 0 (Allocated TV address) or 14 (Wild card address), it should result in a failure of a TV device.|
 |Test Group|Module : 02|
 |Test Case ID|002|
 |Priority|High|
@@ -50,25 +59,33 @@ graph TB
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
-| 01 | Initializing `handle` variable with value `15` and other variables which would be used in the API invocation. | `handle = 15` | N/A | N/A |
-| 02 | Invoke `HdmiCecAddLogicalAddress` with `handle = 15`. | `handle = 15, &logicalAddress = address of logicalAddress` | `status` of the function will be the returned value. | N/A |
-| 03 | Checking if status returned from `HdmiCecAddLogicalAddress` function is not `HDMI_CEC_IO_SUCCESS`, as `handle` is neither `0` nor `14`. | `handle = 15` | `status` should not be equal to `HDMI_CEC_IO_SUCCESS`. | Should fail |
+| 01 | Open the HDMI CEC driver using HdmiCecOpen | handle = valid buffer | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | Add an invalid logical address to the HDMI CEC driver using HdmiCecAddLogicalAddress | handle = valid handle, logicalAddresses = 0x1 | HDMI_CEC_IO_INVALID_ARGUMENT | Should fail |
+| 03 | Close the HDMI CEC driver using HdmiCecClose | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+
 
 ```mermaid
-graph TB
-    A(Start) --> B{Set Logical Address <br> not equal to 0 or 14}
-    B --> |Not 0 or 14| D{Verify failure <br> of TV device}
-    D --> |Fail gets verified| F[End: Test Case Passed]
-    D --> |Fail is not verified| G[End: Test Case Failed]
-    B --> |else| H[End: Test Case Failed]
+graph TD
+A[HdmiCecOpen] -->|Success| B{Handle Stored?}
+B -->|Yes| C[Invoke HdmiCecAddLogicalAddress with invalid address]
+B -->|No| BF[Test case fail]
+C -->|HDMI_CEC_IO_INVALID_ARGUMENT| D{Is Result As Expected?}
+C -->|Else| CF[Test case fail]
+D -->|Yes| E[HdmiCecClose]
+D -->|No| DF[Test case fail]
+E -->|HDMI_CEC_IO_SUCCESS| F{Is Result As Expected?}
+E -->|Else| EF[Test case fail]
+F -->|Yes| G[Test Case Success]
+F -->|No| FF[Test case fail]
 ```
+
 
 ### Test 3
 
 |Title|Details|
 |--|--|
-|Function Name|`test_l2_hdmi_cec_driver_removeAndGetLogicalAddress`|
-|Description|This test checks the functionality of handle removal and getting a logical address using `HdmiCecRemoveLogicalAddress` and `HdmiCecGetLogicalAddress` respectively.|
+|Function Name|`test_l2_hdmi_cec_driver_checkLogicalAddress`|
+|Description|Invoke the HAL API to delete my logical address and verify that it is removed successfully.|
 |Test Group|Module : 02|
 |Test Case ID|003|
 |Priority|High|
@@ -83,28 +100,40 @@ graph TB
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
-|01| Invoke HdmiCecRemoveLogicalAddress with a valid handle and logical address as 0 | handle = NULL, logicalAddresses = 0  | HDMI_CEC_IO_SUCCESS | Should be successful |
-|02| Post removal, invoke HdmiCecGetLogicalAddress to verify the absence of the logical address | handle = valid handle | logicalAddresses = 0xF, statusGet = HDMI_CEC_IO_SUCCESS | Should be successful |
+| 01 | Open HDMI CEC HAL using HdmiCecOpen | handle = valid buffer | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | Add Logical Address using HdmiCecAddLogicalAddress | handle = valid handle, logicalAddress = 0x0 | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 03 | Remove Logical Address using HdmiCecRemoveLogicalAddress | handle = valid handle, logicalAddress = 0x0 | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 04 | Get Logical Address using HdmiCecGetLogicalAddress | handle = valid handle, logicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS and logicalAddress = 0x0F | Should fail |
+| 05 | Close HDMI CEC HAL using HdmiCecClose | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+
 
 ```mermaid
 graph TB
-    Start(Start) --> A{Invoke <br> HdmiCecRemoveLogicalAddress}
-    A --> |success| B[HdmiCecRemoveLogicalAddress <br> success]
-    A --> |Fail| H(Test failed)
-    B --> D{Invoke <br> HdmiCecGetLogicalAddress}
-    D -->|success| E[HdmiCecGetLogicalAddress success]
-    D --> |Fail| F[HdmiCecGetLogicalAddress failed]
-    E --> G{logical address <br> valid?} 
-    G --> |No| J[success]
-    G --> |Yes| I[failed]
+    A[Invoke HdmiCecOpen] -->|Success| B[Invoke HdmiCecAddLogicalAddress]
+    A -->|Failure| AFail[Test case fail]
+    B -->|Success| C[Verify HdmiCecAddLogicalAddress Success]
+    B -->|Failure| BFail[Test case fail]
+    C -->|Success| D[Invoke HdmiCecRemoveLogicalAddress]
+    C -->|Failure| CFail[Test case fail]
+    D -->|Success| E[Verify HdmiCecRemoveLogicalAddress Success]
+    D -->|Failure| DFail[Test case fail]
+    E -->|Success| F[Invoke HdmiCecGetLogicalAddress]
+    E -->|Failure| EFail[Test case fail]
+    F -->|Success| G[Verify successful execution of HdmiCecRemoveLogicalAddress]
+    F -->|Failure| FFail[Test case fail]
+    G -->|Success| H[Invoke HdmiCecClose]
+    G -->|Failure| GFail[Test case fail]
+    H -->|Success| I[Test case success]
+    H -->|Failure| HFail[Test case fail]
 ```
+
 
 ### Test 4
 
 |Title|Details|
 |--|--|
-|Function Name|`test_l2_hdmi_cec_driver_RemoveAndBroadcastFail`|
-|Description|This test validates that the HDMI CEC driver logic removes logical addresses and verifies that broadcast commands are not sent. This is crucial to prevent potential communication breakdowns across the network.|
+|Function Name|`test_l2_hdmi_cec_driver_ValidateHALTransmissionAfterAddressRemoval`|
+|Description|After deleting the logical address, the test tries to send a broadcast command. It should fail to send during HAL Transmission call.|
 |Test Group|Module : 02|
 |Test Case ID|004|
 |Priority|High|
@@ -113,30 +142,45 @@ graph TB
 
 **Dependencies :** None
 
-**User Interaction :**  If user chose to run the test in interactive mode, then the test case has to be selected via console.
+**User Interaction :**
+If user chose to run the test in interactive mode, then the test case has to be selected via console.
 
 #### Test Procedure :
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
-| 01 | Invoke `HdmiCecRemoveLogicalAddress` method using defined handle and logical address | handle = 1, logicalAddresses = 0 | HDMICECSTATUS_SUCCESS | Should be successful |
-| 02 | If the HdmiCecRemoveLogicalAddress executed successfully, then invoke `HdmiCecTx` method for broadcasting with parameters handle, NULL buffer and length zero | handle = 1, buf = NULL, len = 0, result = NULL | HDMICECSTATUS_FAILED | Should fail, as per test objective Broadcast Command should not be sent |
+| 01 | Open HDMI CEC with HdmiCecOpen | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | Set Rx Callback with HdmiCecSetRxCallback | handle = valid handle, callback = NULL, user_data = NULL | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 03 | Add Logical Address with HdmiCecAddLogicalAddress | handle = valid handle, logicalAddresses = 0x0 | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 04 | Remove Logical Address with HdmiCecRemoveLogicalAddress | handle = valid handle, logicalAddresses = 0x0 | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 05 | Transmit with HdmiCecTx after removing logical address | handle = valid handle, buf = {0x3F, CEC_GET_CEC_VERSION}, len = 1, result = valid result buffer | return status != HDMI_CEC_IO_SUCCESS | Should be successful |
+| 06 | Close HDMI CEC with HdmiCecClose | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+
 
 ```mermaid
-graph TB
-A(Start) --> B{HdmiCecRemoveLogicalAddress}
-B -- Success --> C{HdmiCecTx - <br> Send Broadcast Command}
-B -- Failure --> D[Testcase Fail - <br> Cannot Remove Logical Address]
-C -- Success --> E[Testcase Fail - <br> Broadcast Command Shouldn't be Sent]
-C -- Failure --> F(End - Testcase Pass)
+graph TD
+  A[HdmiCecOpen API Call]
+  A -->|Success| B[HdmiCecSetRxCallback API Call]
+  A -->|Failure| A1[Test case fail]
+  B -->|Success| C[HdmiCecAddLogicalAddress API Call]
+  B -->|Failure| B1[Test case fail]
+  C -->|Success| D[HdmiCecRemoveLogicalAddress API Call]
+  C -->|Failure| C1[Test case fail]
+  D -->|Success| E[HdmiCecTx API Call]
+  D -->|Failure| D1[Test case fail]
+  E -->|Expected Failure| G[Test case pass] 
+  E -->|Unexpected Success| E1[Test case fail]
+  G --> H[HdmiCecClose API Call]
+  E1 --> H 
 ```
+
 
 ### Test 5
 
 |Title|Details|
-|-|-|
-|Function Name| `test_l2_hdmi_cec_driver_GetPhysicalAddress`|
-|Description|The test function is designed to test the functionality of fetching the physical address from HDMI CEC using `HdmiCecGetPhysicalAddress` and validating whether the retrieved physical address is valid or not.|
+|--|--|
+|Function Name|`test_l2_hdmi_cec_driver_VerifyPhysicalAddressAllocation`|
+|Description|Verify the valid physical address allocated through the HAL function.|
 |Test Group|Module : 02|
 |Test Case ID|005|
 |Priority|High|
@@ -151,15 +195,27 @@ C -- Failure --> F(End - Testcase Pass)
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
-| 01 | Initialize a handle which will be used to get the physical address | handle = 1 | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 02 | Invoke `HdmiCecGetPhysicalAddress` API using a valid handle and a pointer to unsigned integer for storing the obtained physical address  | handle = valid, physicalAddress = pointer to an unsigned integer | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 03 | Validate the HDMI CEC IO status success and the obtained physical address shouldn't be zero | physicalAddress != 0 | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 01 | Open the HDMI CEC driver using HdmiCecOpen | handle = valid buffer | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | Get the physical address using HdmiCecGetPhysicalAddress | handle = valid handle, physicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 03 | Check if the physical address is within the valid range | physicalAddress = obtained value | physicalAddress should be between 0 and max_address | Should be successful |
+| 04 | Close the HDMI CEC driver using HdmiCecClose | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+
 
 ```mermaid
 graph TB
-A[Start] --> B{Invoke <br> HdmiCecGetPhysicalAddress}
-B -- Success --> C{Valid <br>physical address?}
-B -- Failure --> D[Test Case Fail]
-C -- yes --> E[Testcase passed]
-C -- No --> F[Testcase failed]
+    Initialise("Call HdmiCecOpen") -->|HDMI_CEC_IO_SUCCESS| CheckHdmiCecOpen("Check return status")
+    CheckHdmiCecOpen -- |HDMI_CEC_IO_SUCCESS| --> CallHdmiCecGetPhysicalAddress("Call HdmiCecGetPhysicalAddress")
+    CheckHdmiCecOpen -- |Failure| --> TestFailOpen("Test case fail: HdmiCecOpen")
+    CallHdmiCecGetPhysicalAddress -->|HDMI_CEC_IO_SUCCESS| CheckHdmiCecGetPhysicalAddress("Check return status")
+    CheckHdmiCecGetPhysicalAddress -- |HDMI_CEC_IO_SUCCESS| --> VerifyPhysicalAddressRange("Verify physical address range")  
+    CheckHdmiCecGetPhysicalAddress -- |Failure| --> TestFailGetPhysicalAddress("Test case fail: HdmiCecGetPhysicalAddress")
+    VerifyPhysicalAddressRange -- |Valid| --> CallHdmiCecClose("Call HdmiCecClose")  
+    VerifyPhysicalAddressRange -- |Invalid| --> TestFailPhysicalAddressRange("Test case fail: PhysicalAddressRange")
+    CallHdmiCecClose -->|HDMI_CEC_IO_SUCCESS| CheckHdmiCecClose("Check return status")
+    CheckHdmiCecClose -- |HDMI_CEC_IO_SUCCESS| --> TestPass("Test case pass")
+    CheckHdmiCecClose -- |Failure| --> TestFailClose("Test case fail: HdmiCecClose")
+    TestFailPhysicalAddressRange --> CallHdmiCecClose
+    TestFailGetPhysicalAddress -->  CallHdmiCecClose
 ```
+
+
