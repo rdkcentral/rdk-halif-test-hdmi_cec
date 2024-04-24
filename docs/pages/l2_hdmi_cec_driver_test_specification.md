@@ -20,7 +20,7 @@
 | -- | --------- | ---------- | -------------- | ----- |
 | 01 | Open HDMI CEC HAL using HdmiCecOpen | handle = valid buffer | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 02 | Add a valid Logical Address using HdmiCecAddLogicalAddress | handle = valid handle, logicalAddress = 0x0 | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 03 | Get Logical Address using HdmiCecGetLogicalAddress | handle = valid handle, getLogicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS, getLogicalAddress = logicalAddress | Should be successful |
+| 03 | Get Logical Address using HdmiCecGetLogicalAddress and verify against added address | handle = valid handle, getLogicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS, getLogicalAddress = logicalAddress | Should be successful |
 | 04 | Close HDMI CEC HAL using HdmiCecClose | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
