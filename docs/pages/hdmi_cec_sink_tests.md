@@ -1,4 +1,5 @@
-# HDMI CEC Test Document
+
+# HDMI CEC High Level Test Specification Document
 
 ## Version History
 
@@ -14,11 +15,12 @@
 
 ## Acronyms, Terms and Abbreviations
 
-- `CEC` - Consumer Electronics Control
-- `HAL` - Hardware Abstraction layer
+- `CEC`  - Consumer Electronics Control
+- `HAL`  - Hardware Abstraction layer
 - `HDMI` - High Definition Multimedia Interface
-- `L2` - Level 2 Testing ()
-- `L3` - Level 3 Testing ()
+- `DUT`  - Device Under Test  
+- `L2`   - Level 2 Testing ()
+- `L3`   - Level 3 Testing ()
 
 ## Scope
 
@@ -51,70 +53,70 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 -----------
 
-## Logical address Discovery
+## Logical Address Discovery
 
-|S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
-|-----|------------------|-----------|--|--|--------------------------|
-| 1 |[Logical address](#logical-address-discovery)|Establish my logical address (through HAL APIs) as valid, then retrieve it to verify correct functionality.|Y|NA|
-|a| | If the logical address is set to anything other than 0 (Allocated TV address) or 14 (Wild card address), it should result in a failure of a TV device| Y |NA |
-|b| | Invoke the HAL API to delete my logical address and verify that it is removed successfully.  |Y| NA|
-|c| | The attempt to obtain my logical address should fail if more than two TV devices are connected.| NA | Y | Enable two televisions that can acquire the logical address 0 and 14 before attempting my Tele under test to acquire the logical address. |
-|d| | After deleting my logical address, try to send a broadcast command. Should fail to send during HAL Transmission call.|Y|NA||
+|S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
+|-----|------------------|-----------|--------|--|--|--------------------------|
+| 1 |[Logical address](#logical-address-discovery)|Set up a legitimate logical address for the `DUT` using HAL APIs, then retrieve it to ensure proper functionality.|HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress|Y|NA|
+|a| | If the logical address is configured to any value except 0 (Allocated TV address), 0x14 (Specific Use), or 0x15 (Unregistered), it should result in a failure for a TV `DUT`|HdmiCecAddLogicalAddress| Y |NA |
+|b| | Invoke the HAL API to delete the `DUT` logical address and verify that it is removed successfully.  |HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecGetLogicalAddress| Y | NA|
+|c| | The attempt to obtain the `DUT` logical address should fail if more than two TV devices are connected.| HdmiCecAddLogicalAddress |NA | Y | Enable two televisions that can acquire the logical address 0 and 14 before attempting `DUT` Tele to acquire the logical address. |
+|d| | After deleting the `DUT` logical address, try to send a broadcast command. Should fail to send during HAL Transmission,  call.|HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
 
 ### Emulator Requirements
 
 - Boot with control configuration with various configurations having a predefined set of nodes:
-  - configuration to support two sinks setup, consuming both 0 & 14 as a logical address.
+  - configuration to support two sinks setup, consuming 0 & 14 as a logical address.
   - configuration to support a sink with 0 allocated
   - configuration to support a sink setup with 14 allocated
 
 ### Control Plane Requirements
 
-- Control plane will allow removing or adding a node to the network.
+- The control plane will allow removing or adding a node to the network.
   - allowing add node sink node logical address 14
   - allowing add node sink node logical address 0
 
 ## Physical Address
 
-|S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
-|-----|------------------|-----------|--|--|--------------------------|
-| 2| [Physical Address](#physical-address)| Verify the valid physical address allocated through the HAL function.   | Y  |NA||
-| | | Verify the physical addresses allocated by connecting two sink devices through an HDMI switch.| NA | Y  | Enable the television connected to my Tele first so that it can declare its physical address first.  |
+|S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
+|-----|------------------|-----------|--------|--|--|--------------------------|
+| 2| [Physical Address](#physical-address)| Verify the valid physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| Y  |NA||
+| | | Verify the physical addresses allocated by connecting two sink devices through an HDMI switch.|NA | NA | Y  | Enable the television connected to `DUT` Tele first so that it can declare its physical address first.  |
 
 ### Emulator Requirements - Physical Address
 
-- Boot control configuration to setup the cec network nodes
+- Boot control configuration to setup the CEC network nodes
   - Two sink devices are connected to the network
 
 ### Control Plane Requirements - Physical Address
 
-- Control plane will allow removing or adding a node to the network.
+- The control plane will allow removing or adding a node to the network.
   - allowing add node sink node
 
-## CEC Transmission
+## CEC Synchronous Transmission
 
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--|--|--------------------------|
 | 3| [CEC Transmission](#cec-transmission)| Verify the correct transmission of all the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly.  | NA | Y  ||
-| | | Broadcast all the supported CEC Commands ((as per 1.4b HDMI CEC spec)) to all the devices connected on the network and receive the response.| NA | Y  ||
-| | | Transmit all the  CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitor the behavior of the connected device accordingly.   | NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
+| | | Broadcast all the supported CEC Commands ((as per 1.4b HDMI CEC spec)) to all the devices connected to the network and receive the response.| NA | Y  ||
+| | | Transmit all the  CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitor the behaviour of the connected device accordingly.   | NA | Y  | Control panel to monitor the behavior of the connected devices.  |
 
 ### Emulator Requirements - CEC Transmission
 
 - Boot configuration
-  - Min case scenio mutliple network nodes
+  - Min case scenario multiple network nodes
   - Max case scenario multiple cec nodes
 
 ### Control Plane Requirements - CEC Transmission
 
-- Control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
+- The control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
 
 ## CEC Async Transmission
 
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--|--|--------------------------|
  4| [CEC Async Transmission](#cec-async-transmission) | Verify the correct transmission of all the CEC commands (as per 1.4b HDMI CEC spec) using the Async Transmission support of the CEC HAL interface.   | NA | Y  ||
-| | | Verify the correct behavior of the connected device when the CEC standby command is sent to it.| NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
+| | | Verify the correct behaviour of the connected device when the CEC standby command is sent to it.| NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
 ||| Broadcast all the CEC Commands ((as per 1.4b HDMI CEC spec)) to all the devices connected in the network and check the behaviour and response. | NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
 
 ### Emulator Requirements - CEC Async Transmission
@@ -129,7 +131,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |-----|------------------|-----------|--|--|--------------------------|
 | 5| [CEC Receive functionality](#cec-receive-functionality)| Transmit a CEC Command that expects a response (Eg. GetCECVersion) to a connected device and see the response is received correctly. | NA |Y| |
 | | | Transmit all the CEC Broadcast Command (as per 1.4b HDMI CEC spec) which expects a response from all the connected devices like `<GetPhysicalAddress>`  | NA | Y  ||
-| | | Transmit Different CEC commands from the connected devices and consider the Acknowledgement and responses are received correctly from the host device (my TV here)| NA | Y  | Control panel to control the third-party devices to Transmit the required commands to my Device (Device under test) |
+| | | Transmit Different CEC commands from the connected devices and consider the Acknowledgement and responses are received correctly from the host device (`DUT` TV here)| NA | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`|
 
 ### Emulator Requirements - CEC Receive functionality
 
@@ -139,7 +141,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--|--|--------------------------|
-| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate an Hotplug event by disconnecting the device connected to the HDMI port of the Sink Platform. Check whether the CEC Transmission works when HDMI port is disconnected. | NA | Y  | Control Panel to control the Hotplug activities |
+| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Sink Platform. Check whether the CEC Transmission works when the HDMI port is disconnected. | NA | Y  | Control Panel to control the Hotplug activities |
 | | | Verify  the behaviour when a device has been removed from the network which is not directly connected to the TV device.  Send a CEC Async Tx command using HAL Interface and check the behaviour. The Tx Command should not fail.   | NA | Y  | Control Panel to control the devices connected on the CEC Network.|
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should fail in this state. | NA | Y  | Control Panel to control the external devices connected.|
 
@@ -168,18 +170,18 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 ### Module Configuration Requirements
 
-The module must be configured during the boot sequence in the case of emulation, as if it was a real hardware device with or without multiple connected HDMI nodes.
+The module must be configured during the boot sequence in the case of emulation as if it were a real hardware device with or without multiple connected HDMI nodes.
 
 ### Test Configuration for Sink Devices
 
-The following information shall be helpful for further running the Automation Rack Test for this specific module and further the configuration will help for the Design and Development of Virtual Device.
+The following information shall be helpful for further running the Automation Rack Test for this specific module and further configuration will help for the Design and Development of Virtual Device.
 
 Configurations:
 
 ```yaml
   Device:
     Type: Source / Sink
-    Platform_Manufacturer: sony/sansung etc.
+    Platform_Manufacturer: sony/Samsung etc.
     Platform_Model:  xyz
     Port: 3, 4
     HDMI Node: 1-3 etc.
