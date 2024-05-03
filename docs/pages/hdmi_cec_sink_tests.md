@@ -57,11 +57,12 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
-| 1 |[Logical address](#logical-address-discovery)|Set up a legitimate logical address for the `DUT` using HAL APIs, then retrieve it to ensure proper functionality.|HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress|Y|NA|
-|a| | If the logical address is configured to any value except 0 (Allocated TV address), 0x14 (Specific Use), or 0x15 (Unregistered), it should result in a failure for a TV `DUT`|HdmiCecAddLogicalAddress| Y |NA |
-|b| | Invoke the HAL API to delete the `DUT` logical address and verify that it is removed successfully.  |HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecGetLogicalAddress| Y | NA|
-|c| | The attempt to obtain the `DUT` logical address should fail if more than two TV devices are connected.| HdmiCecAddLogicalAddress |NA | Y | Enable two televisions that can acquire the logical address 0 and 14 before attempting `DUT` Tele to acquire the logical address. |
-|d| | After deleting the `DUT` logical address, try to send a broadcast command. Should fail to send during HAL Transmission,  call.|HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
+| 1 |[Logical address](#logical-address-discovery)|Get the logical address of the `DUT` without actually adding the Logical Address and the API should return 0x0F as the default logical address.|HdmiCecGetLogicalAddress|Y|NA
+|a| |Set up a legitimate logical address for the `DUT` using HAL APIs, then retrieve it to ensure proper functionality.|HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress| Y | NA |
+|b| | If the logical address is configured to any value except 0 (Allocated TV address), 0x14 (Specific Use), or 0x15 (Unregistered), it should result in a failure for a TV `DUT`|HdmiCecAddLogicalAddress| Y | NA |
+|c| | Invoke the HAL API to delete the `DUT` logical address and verify that it is removed successfully.  |HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecGetLogicalAddress| Y | NA|
+|d| | The attempt to obtain the `DUT` logical address should fail if more than two TV devices are connected.| HdmiCecAddLogicalAddress |NA | Y | Enable two televisions that can acquire the logical address 0 and 14 before attempting `DUT` Tele to acquire the logical address. |
+|e| | After deleting the `DUT` logical address, try to send a broadcast command. Should fail to send during HAL Transmission,  call.|HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
 
 ### Emulator Requirements
 
