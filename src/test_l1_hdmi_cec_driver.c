@@ -245,14 +245,19 @@ void test_hdmicec_hal_l1_open_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Check Null even before calling the positive case
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecOpen( NULL );
     if (HDMI_CEC_IO_INVALID_HANDLE  != result) { UT_FAIL("open failed"); }
-
+#endif
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
     
     result = HdmiCecOpen( &handle );
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_ALREADY_OPEN != result) { UT_FAIL("open failed"); }
+#else
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("open failed"); }
+#endif
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
@@ -377,21 +382,27 @@ void test_hdmicec_hal_l1_close_negative( void )
     gTestID = 4;
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("close failed"); }
-
+#endif
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
 
     result = HdmiCecClose( 0 );
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_INVALID_HANDLE  != result) { UT_FAIL("close failed"); }
+#else
+    if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("close failed"); }
+#endif
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
 
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("close failed"); }
-
+#endif
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -474,16 +485,21 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
     gTestID = 6;
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
-
+#endif
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
 
     result = HdmiCecGetPhysicalAddress(0, &physicalAddress);
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_INVALID_HANDLE  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
+#else
+    if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
+#endif
 
     result = HdmiCecGetPhysicalAddress(handle, NULL);
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
@@ -502,10 +518,11 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
 
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     //Calling API after close,
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
-
+#endif
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -595,8 +612,10 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
+#ifdef EHNCAGED_CHECKS_ENABLED
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
     if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
+#endif
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -604,23 +623,39 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative( void )
 
 
     result = HdmiCecAddLogicalAddress( 0, logicalAddress );
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_INVALID_HANDLE  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    result = HdmiCecAddLogicalAddress( handle, -1 );
+#else
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
+#endif
+    result = HdmiCecAddLogicalAddress( handle, -1 );
+#ifdef ENABLE_ENHANCED_ERROR_CODE
+    if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
+#else
+    if (HDMI_CEC_IO_GENERAL_ERROR  != result) { UT_FAIL ("HdmiCecAddLogicalAddress failed"); }
+#endif
 
     result = HdmiCecAddLogicalAddress( handle, 0x3 );
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
+#else
+    if (HDMI_CEC_IO_GENERAL_ERROR  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
+#endif
 
     result = HdmiCecAddLogicalAddress( handle, 0xF );
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
+#else
+    if (HDMI_CEC_IO_GENERAL_ERROR  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
+#endif
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
 
+#ifdef EHNCAGED_CHECKS_ENABLED
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
     if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
+#endif
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -828,9 +863,10 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
     gTestID = 12;
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
     if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
-
+#endif
     result = HdmiCecOpen(&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
@@ -857,14 +893,19 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_ALREADY_REMOVED != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
+#else
+    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
+#endif
 
     result = HdmiCecClose(handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
 
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress );
     if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
-
+#endif
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -1023,8 +1064,10 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
     gTestID = 15;
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
+#endif
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1064,10 +1107,11 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("HdmiCecClose failed"); }
 
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     //Calling API after close, should give invalid argument
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
-
+#endif
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
 
@@ -1269,10 +1313,11 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     //Calling API before open, should pass
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback, (void*)0xDEADBEEF);
     if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
+#endif
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
@@ -1371,9 +1416,10 @@ void test_hdmicec_hal_l1_setTxCallback_negative( void )
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     result = HdmiCecSetTxCallback( handle, DriverTransmitCallback, (void*)0xDEADBEEF );
     if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("HdmiCecSetTxCallback failed"); }
-
+#endif
     result = HdmiCecOpen ( &handle );
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
@@ -1481,10 +1527,11 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+#ifdef ENABLE_ENHANCED_ERROR_CODE
     //Calling API before open, should give invalid argument
     result = HdmiCecTx(handle, buf, len, &ret);
     if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL("HdmiCecTx failed"); }
-
+#endif
     /* Positive result */
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
