@@ -1381,7 +1381,7 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
     result = HdmiCecSetRxCallback(handle, DriverReceiveCallback, (void*)0xDEADBEEF);
 #ifdef ENABLE_ENHANCED_ERROR_CODE
     if (HDMI_CEC_IO_NOT_OPENED != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-#endif
+#else
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
 #endif
     /* Positive result */
