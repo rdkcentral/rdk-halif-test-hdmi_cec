@@ -12,11 +12,12 @@ When the emulator process is started, emulator_initialize shall be called with Y
 `./run --profile skyglass_sink_5_sources.yml --config xyz.yml`
 ```
 
-A Sample profile config in YAML with a network of devices representing a TV as the root device (Sink), connected with an Audio System connected on the HDMI port 1. The Audio system has a DVR Settop on its HDMI port 1 and a chromecast connected on its port 2.
+Given below is a configuration template which provides all possible fields and it's intended values. The configuration template is intened to serve as a validation schema for the emulated device config.
 
 ```yaml
 ---
 hdmicec:
+  #Device logical types - Hints for emulator to auto allocate logical address
   device_type: &device_type
     - TV
     - STB_1
@@ -28,24 +29,29 @@ hdmicec:
     - GamingConsole_1
     - GamingConsole_2
     - DVDPlayer_1
-    - DVDPlayer_2
+	  - DVDPlayer_2
     - AVR_1
     - AVR_2
     - Switcher_1
     - Switcher_2
     - Camera_1
     - Camera_2
-    - SpecialPurpose_1
-    - SpecialPurpose_2
-    - Unregistered_1
-    - Unregistered_2
-
+    - SpecialPurpose
+    - Unregistered
+ 
+  #Port ID - Integer [1 to 15]
   port_id: &port_id
     !!int
+
+  #Enum specifying port type
+  #All references shown in the configuration templates are intended to provide possible values for the given type.
+  #In practice, the below field would be defined as,
+  # port_type: in
   port_type: &port_type
     - in
     - out
 
+  #Vendor Info - Name and IEEE RAC vendor code
   vendor: &vendor
     - [TOSHIBA, 0x000039]
     - [SAMSUNG, 0x0000F0]
@@ -76,7 +82,8 @@ hdmicec:
     - [HARMAN_KARDON, 0x9C645E]
     - [UNKNOWN, 0]
 
-  cec_version: &cec_version
+  #HDMI CEC Version supported by device
+  cec_version: &cec_version 
     - 0  #Unknown
     - 1  #1.2
     - 2  #1.2A
@@ -85,30 +92,38 @@ hdmicec:
     - 5  #1.4
     - 6  #2.0
 
+  #Power Status of the device
   power_status: &power_status
     - on
     - off
     - standby
 
-  endpoint: &endpoint
-    name: !!str
-    id: *port_id
-    type: *port_type
+	#Endpoint information 
+  endpoint: &endpoint 
+    name: !!str # Name of the Device in the network
+	  id: *port_id # Port number 
+	  type: *port_type # Type of Port from &port_type
 
-  link: &link
-    - *endpoint
-    - *endpoint  
+	#Link represents a connection between 2 endpoints
+	#Physical addresses will be based on links
+	link: &link 
+	  - *endpoint 
+	  - *endpoint
 
-  version: *cec_version
-  type: *device_type
-  active_source: !!bool
-  vendor_info: *vendor
-  pwr_status: *power_status
-  name: !!str
+  # Emulated Device's Information
+  version: *cec_version  #Value from enum &cec_version
+  type: *device_type  #Type of device from device_type list
+  active_source: !!bool	 #Whether the device will start as active source
+  vendor_info: *vendor  #Vendor info value pair from &vendor
+  pwr_status: *power_status #Initial Power status from enum &power_status
+  name: !!str #Name of the device
   number_ports: !!int
-  ports:
+  ports: #Variable sized array of Ports belonging to Emulated device
     - id: *port_id
-      type: *port_type
+    #All references shown in the configuration templates are intended to provide possible values for the given type.
+    #In practice, the below field would be defined as,
+    # port_type: in
+      type: *port_type  # Type of Port from &port_type
       cec_supported: !!bool
       arc_supported: !!bool
     - id: *port_id
@@ -116,8 +131,8 @@ hdmicec:
       cec_supported: !!bool
       arc_supported: !!bool
   number_devices: !!int
-  devices:
-    - type: *device_type
+  devices: # Variable sized array of Connected devices
+    - type: *device_type  #Type of device from device_type list
       version: *cec_version
       active_source: !!bool
       vendor_info: *vendor
@@ -145,9 +160,12 @@ hdmicec:
       pwr_status: *power_status
       name: !!str
 
+  # Variable sized array of links between end points
+  # This represents the network of devices 
   links:
-    type: array
-    items: *link
+    - *link
+    - *link
+    - *link
 
 ```
 
@@ -208,7 +226,7 @@ tyedef enum {
   OFF
 }power_status_t;
 
-typedef struct {
+typedef struct port_info {
   uint8_t id;
   uint16_t physical_address;
   port_type_t type;
@@ -216,7 +234,7 @@ typedef struct {
   bool arc_supported;
 } port_info_t;
 
-typedef struct {
+typedef struct device {
    uint32_t version;
    uint16_t physical_address;
    uint8_t logical_address;
@@ -224,7 +242,7 @@ typedef struct {
    uint32_t vendor_id;
    power_status_t power_status;
    char osd_name[MAX_OSD_NAME_LENGTH];
-} device_t
+}
 
 
 
@@ -355,7 +373,7 @@ hdmicec:
     number_devices: 2
     devices:
       - type: TV
-        version: 4
+	      version: 4
         active_source: false
         vendor_info: [SONY, 0x080046]
         pwr_status: on
@@ -368,18 +386,66 @@ hdmicec:
         name: Chromecast
 
     links:
-      - - name: Sony TV
-         id: 1
-         type: in
-        - name: sky_xione
-         id: 1
-         type: out
-      - - name: Sony TV
-         id: 2
-         type: in
-        - name: Chromecast
-         id: 1
-         type: out
+	   - - name: Sony TV
+	       id: 1
+	       type: in
+         - name: sky_xione
+		     id: 1
+			   type: out
+	   - - name: Sony TV
+		     id: 2
+			   type: in
+		 - name: Chromecast
+			   id: 1
+			   type: out
 ```
 
+
+The above configuration yaml instructs the emulator about the following devices connected.
+
+```mermaid
+mindmap
+  root[Sony TV - 0.0.0.0]
+    id[sky_xione - 1.0.0.0]
+    id[Chromecast - 2.0.0.0]
+```
+
+
+
+
+
 This will trigger a complete reconfiguration of the emulator state machine by deleting and reconstructing its internal data base.
+
+
+## Tasks Breakdown for MVP
+
+```mermaid
+mindmap
+  root((HDMI CEC Emulator))
+    Library
+      Init/Deinit
+      Load values from Profile config
+        KVP
+      Makery - Build/Install
+      ::icon(fa fa-wrench)
+      Setup State machine
+        Local data structures
+        Build device network topology
+        Threading for callbacks
+        Auto allocate logical addresses
+    Process
+      Main driver to start Emulator
+      Makery - Build/Install
+      ::icon(fa fa-wrench)
+      Sample Profile config YAMLs
+      Test Menus - Emulator init and basic CEC
+    User Triggers
+    ::icon(fa fa-user)
+      Initialize control plane with endpoint
+      id)User Commands(
+        Active Source Request
+        Add/Remove devices
+        Catalogue of Commands
+        Dynamic base config change
+```
+
