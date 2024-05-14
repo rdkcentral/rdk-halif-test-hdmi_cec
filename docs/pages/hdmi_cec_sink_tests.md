@@ -1,11 +1,5 @@
 
-# HDMI CEC High Level Test Specification Document
-
-## Version History
-
-| Date(DD/MM/YY) | Comment | Version |
-| -------------- | ------- | ------- |
-| 13/02/24 | First Release | 1.0.0 |
+# HDMI CEC High-Level Test Specification Document
 
 ## Table of Contents
 
@@ -96,19 +90,17 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
-| 3| [CEC Transmission](#cec-transmission)| Verify the correct transmission of all the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly.| HdmiCecTx | NA | Y  ||
-| | | Broadcast all the supported CEC Commands ((as per 1.4b HDMI CEC spec)) to all the devices connected to the network and receive the response.|HdmiCecTx| NA | Y  ||
-| | | Transmit all the  CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitor the behaviour of the connected device accordingly.| HdmiCecTx | NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
-| | | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode for a logical address that doesn't exist.| HdmiCecTx | Y | NA  |   |
+| 3| [CEC Transmission](#cec-transmission)| Verify the correct transmission of the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly.| HdmiCecTx | NA | Y  ||
+| | | Broadcast a supported CEC Command to all the devices connected to the network without any error |HdmiCecTx| NA | Y  ||
+| | | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitor the behaviour of the connected device accordingly.| HdmiCecTx | NA | Y  | Control panel to monitor the behavior of the connected devices.  |
+| | | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for a logical address that doesn't exist.| HdmiCecTx | Y | NA  |   |
 
 ### Emulator Requirements - CEC Transmission
-
 - Boot configuration
   - Min case scenario multiple network nodes
   - Max case scenario multiple cec nodes
 
 ### Control Plane Requirements - CEC Transmission
-
 - The control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
 
 ## CEC Receive functionality
@@ -121,36 +113,40 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 | | | Transmit an OSD CEC command from the connected devices and consider the Acknowledgement and responses are received correctly from the host device (`DUT` TV here). Make the OSD String to max length| HdmiCecSetRxCallback | NA | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`|
 | | | Transmit an OSD CEC command from the connected devices continuously and consider the Acknowledgement and responses are received correctly from the host device (`DUT` TV here). Make the OSD String to max length| HdmiCecSetRxCallback | NA | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`|
 
-
 ### Emulator Requirements - CEC Receive functionality
+1. Emulate the Tx and Rx HAL functionalities with the required responses.
 
 ### Control Plane Requirements - CEC Receive functionality
+1. Control the devices to switch ON and respond to the CEC commands.
 
 ## CEC HotPlug Functionality
 
 |S.No.|Test Functionality|Description| HAL APIs |L2|L3|Control plane requirements|
 |-----|------------------|-----------|----------|--|--|--------------------------|
-| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Sink Platform. Check whether the CEC Transmission works when the HDMI port is disconnected.| HdmiCecTx | NA | Y  | Control Panel to control the Hotplug activities |
+| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Sink Platform. Validating whether the CEC Transmission works when the HDMI port is disconnected should result in ACK not being received while the TX still works as expected. | HdmiCecTx | NA | Y  | Control Panel to control the Hotplug activities |
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should fail in this state.| HdmiCecTx | NA | Y  | Control Panel to control the external devices connected.|
 
 ### Emulator Requirements - CEC HotPlug Functionality
 
 ### Control Plane Requirements - CEC HotPlug Functionality
+1. Controlling the connected devices to create the HotPlug functionality.
 
 -----------
 -----------
 
 ## Hardware Verification Testing Requirements
 
-|S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
-|-----|------------------|-----------|--|--|--------------------------|
-| 7| Introduce fault in the CEC Bus | Absorve the behaviour when the CEC line is pulled high during the CEC Transmission.| NA | Y  |Fault Introduction|
-| 8| Overloading the CEC bus. | Overload the CEC bus with too many messages  (by connecting more devices in the network) and observe the behaviour| NA | Y  |Fault Introduction|
+|S.No.|Test Functionality|Description| HAL APIs |L2|L3|Control plane requirements|
+|-----|------------------|-----------|----------|--|--|--------------------------|
+| 7| Introduce fault in the CEC Bus | Absorve the behaviour when the CEC line is pulled high during the CEC Transmission.| HdmiCecTx | NA | Y  |Fault Introduction|
+| 8| Overloading the CEC bus. | Overload the CEC bus with too many messages  (by connecting more devices in the network) and observe the behaviour| HdmiCecTx | NA | Y  |Fault Introduction|
 
 ### Emulator Requirements
-
+1. Emulator to support the HDMI_CEC_IO_SENT_FAILED during the above scenarios
+   
 ### Control Plane Requirements
-
+1. Control Plane to control the external devices to pull either the CEC line high.
+2. Control Plan to initiate multiple CEC commands from the different devices connected to the network.
 -----------
 -----------
 
