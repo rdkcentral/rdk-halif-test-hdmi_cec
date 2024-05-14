@@ -22,9 +22,7 @@ This document defines the requirements for testing the HDMI CEC device from a le
 
 ## Overview
 
-Consumer Electronics Control (CEC) is a single-wire bidirectional bus within an HDMI system, facilitating communication among interconnected products. HDMI-CEC establishes a protocol enabling high-level control functions between audiovisual devices linked via an HDMI network, facilitating communication and control among them. Communication can occur in either Direct messaging mode or Broadcast mode. Below is a diagram illustrating a basic network setup:
-
-![CEC_Network](https://github.com/rdkcentral/rdk-halif-test-hdmi_cec/assets/71806084/133a9c82-0cf8-4184-97c6-021b9e10ec4a)
+Consumer Electronics Control (CEC) is a single-wire bidirectional bus within an HDMI system, facilitating communication among interconnected products. HDMI-CEC establishes a protocol enabling high-level control functions between audiovisual devices linked via an HDMI network, facilitating communication and control among them. Communication can occur in either Direct messaging mode or Broadcast mode. 
 
 ## HDMI-CEC RDK HAL Functionality
 
@@ -40,10 +38,9 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |-----|------------------|-----------|
 | 1 |[Logical address](#logical-address-discovery)|Facilitating the Discovery of logical addresses, Setting, getting, and removing the logical address of the device (for sink devices) |
 | 2| [Physical Address](#physical-address)| Retrieving the physical address |
-| 3| [CEC Transmission](#cec-transmission)| Transmitting CEC frames and acknowledging them |
-| 4| [CEC Async Transmission](#cec-async-transmission) | Asynchronously transmitting CEC frames without requiring acknowledgment |
-| 5| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
-| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
+| 3| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and acknowledging them |
+| 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
+| 5| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
 
 -----------
 
