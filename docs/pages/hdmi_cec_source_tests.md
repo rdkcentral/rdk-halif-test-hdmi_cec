@@ -19,6 +19,8 @@
 - `HDMI` - High Definition Multimedia Interface
 - `L2` - Level 2 Testing ()
 - `L3` - Level 3 Testing ()
+- `Sink device` - Any piece of equipment or technology that provides an input signal or data to another device or system.
+- `Source Device` - Any piece of equipment or technology that receives an input signal or data from another device or system.
 
 ## Scope
 
@@ -32,6 +34,10 @@ Consumer Electronics Control (CEC) is a single-wire bidirectional bus within an 
 
 The HAL layers within RDK serve as a bridge between the underlying low-level SoC drivers and the higher-level RDK layers that utilize the functionality offered by these HAL functions. Specifically concerning the CEC Module, the HAL layers facilitate the following functionalities:
 
+- Get Logical address
+- Get Physical address
+- Syncronous transmission, and communicating via hotplug connectivity
+
 ## Test scenarios
 
 The HAL CEC layer facilitates the transmission and reception of CEC information on the CEC bus. It does not handle any specific opcode commands, nor does it validate supported HAL CEC opcodes for sending or receiving.
@@ -40,12 +46,32 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description|
 |-----|------------------|-----------|
-| 1| [Physical Address](#physical-address)| Retrieving the physical address |
-| 2| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and acknowledging them |
-| 3| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
-| 4| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
+| 1 |[Logical address](#logical-address-discovery)|Facilitating the Discovery of logical addresses getting, and removing the logical address of the device (for sink devices) |
+| 2| [Physical Address](#physical-address)| Retrieving the physical address |
+| 3| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and acknowledging them |
+| 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
+| 5| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
 
 -----------
+
+## Logical Address Discovery
+
+|S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
+|-----|------------------|-----------|--------|--|--|--------------------------|
+| 1 |[Logical address](#logical-address-discovery)|Get the logical address of the `DUT`. This will add the logical address, as per source functionality. |HdmiCecGetLogicalAddress|Y|NA
+
+### Emulator Requirements
+
+- Boot with control configuration with various configurations having a predefined set of nodes:
+  - configuration to support the discovery of logical addresses. The caller provides the logical address, and HAL checks the availability of this address and feedback the same to the caller. 
+  - Verify for the valid logical address and return the appropriate error code based on the logical address availability.  
+
+### Control Plane Requirements
+
+- The control plane will allow removing or adding a node to the network.
+  - allowing adding/removing node sink node logical address 0
+  - allowing adding/removing source node
+  - Support the CEC commands from the external devices on L3 Test Cases. 
 
 ## Physical Address
 
@@ -62,8 +88,8 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 ### Control Plane Requirements - Physical Address
 
 - Control plane will allow removing or adding a node to the network.
-  - allowing add node sink node
-  - allowing add node source node
+  - allowing adding/removing node sink node
+  - allowing adding/removing node source node
 
 ## CEC Synchronous Transmission
 
@@ -77,7 +103,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 ### Emulator Requirements - CEC Transmission
 - Boot configuration
   - Min case scenario multiple network nodes
-  - Max case scenario multiple cec nodes
+  - Max case scenario multiple network nodes
 
 ### Control Plane Requirements - CEC Transmission
 - The control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
@@ -94,6 +120,8 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 ### Control Plane Requirements - CEC Receive functionality
 
+- The control panel to handle and facilitate communicate with third party devices to receive and send commands.
+
 ## CEC HotPlug Functionality
 
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
@@ -105,6 +133,8 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 ### Emulator Requirements - CEC HotPlug Functionality
 
 ### Control Plane Requirements - CEC HotPlug Functionality
+
+- The control panel to handle and facilitate communicate with third party devices to receive and send commands.
 
 -----------
 -----------
