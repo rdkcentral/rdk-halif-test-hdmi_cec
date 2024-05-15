@@ -15,10 +15,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
- 
+
 #include <ut.h>
-#include "hdmi_cec_driver.h"
- 
+
 extern int register_hal_l2_tests( void );
 
 int main(int argc, char** argv)

@@ -15,16 +15,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
- 
+
 /* L2 Testing Functions */
- 
+
 extern int test_hdmi_cec_driver_l2_register(void);
- 
+
 int register_hal_l2_tests( void )
 {
     int registerFailed=0;
 
     registerFailed |= test_hdmi_cec_driver_l2_register();
- 
+
     return registerFailed;
 }
