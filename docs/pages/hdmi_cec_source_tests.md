@@ -41,10 +41,9 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |S.No.|Test Functionality|Description|
 |-----|------------------|-----------|
 | 1| [Physical Address](#physical-address)| Retrieving the physical address |
-| 2| [CEC Transmission](#cec-transmission)| Transmitting CEC frames and acknowledging them |
-| 3| [CEC Async Transmission](#cec-async-transmission) | Asynchronously transmitting CEC frames without requiring acknowledgment |
-| 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
-| 5| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
+| 2| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and acknowledging them |
+| 3| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
+| 4| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
 
 -----------
 
@@ -66,23 +65,22 @@ It is the responsibility of the caller to manage the opcodes. The current test c
   - allowing add node sink node
   - allowing add node source node
 
-## CEC Transmission
+## CEC Synchronous Transmission
 
-|S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
-|-----|------------------|-----------|--|--|--------------------------|
-| 2| [CEC Transmission](#cec-transmission)| Verify the correct transmission of all the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly.  | NA | Y  ||
-| | | Broadcast all the supported CEC Commands ((as per 1.4b HDMI CEC spec)) to all the devices connected on the network and receive the response.| NA | Y  ||
-| | | Transmit all the  CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitor the behavior of the connected device accordingly.   | NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
+|S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
+|-----|------------------|-----------|--------|--|--|--------------------------|
+| 3| [CEC Transmission](#cec-transmission)| Verify the correct transmission of the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly.| HdmiCecTx | NA | Y  ||
+| | | Broadcast a supported CEC Command to all the devices connected to the network without any error |HdmiCecTx| NA | Y  ||
+| | | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitor the behaviour of the connected device accordingly.| HdmiCecTx | NA | Y  | Control panel to monitor the behavior of the connected devices.  |
+| | | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for a logical address that doesn't exist.| HdmiCecTx | Y | NA  |   |
 
 ### Emulator Requirements - CEC Transmission
-
 - Boot configuration
   - Min case scenario multiple network nodes
   - Max case scenario multiple cec nodes
 
 ### Control Plane Requirements - CEC Transmission
-
-- Control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
+- The control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
 
 ## CEC Receive functionality
 
@@ -101,7 +99,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--|--|--------------------------|
 | 5| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate an Hotplug event by disconnecting the device connected to the HDMI port of the source Platform. Check whether the CEC Transmission works when HDMI port is disconnected. | NA | Y  | Control Panel to control the Hotplug activities |
-| | | Verify  the behaviour when a device has been removed from the network which is not directly connected to the TV device.  Send a CEC Async Tx command using HAL Interface and check the behaviour. The Tx Command should not fail.   | NA | Y  | Control Panel to control the devices connected on the CEC Network.|
+| | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should fail in this state.| HdmiCecTx | NA | Y  | Control Panel to control the external devices connected.|
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should fail in this state. | NA | Y  | Control Panel to control the external devices connected.|
 
 ### Emulator Requirements - CEC HotPlug Functionality
