@@ -73,25 +73,25 @@ It is the responsibility of the caller to manage the opcodes. The current test c
   - allowing adding/removing source node
   - Support the CEC commands from the external devices on L3 Test Cases. 
 
-## Physical Address
+### Physical Address
 
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
 | 1| [Physical Address](#physical-address)| Verify the valid physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| Y  |NA||
 | | | Verify the physical addresses allocated by connecting a source and sink device through an HDMI switch.|NA | NA | Y  | Enable the television connected to my Tele first so that it can declare its physical address first.  |
 
-### Emulator Requirements - Physical Address
+#### Emulator Requirements - Physical Address
 
 - Boot control configuration to setup the cec network nodes
   - A source and sink devices are connected to the network
 
-### Control Plane Requirements - Physical Address
+#### Control Plane Requirements - Physical Address
 
 - Control plane will allow removing or adding a node to the network.
   - allowing adding/removing node sink node
   - allowing adding/removing node source node
 
-## CEC Synchronous Transmission
+### CEC Synchronous Transmission
 
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
@@ -100,15 +100,15 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 | | | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitor the behaviour of the connected device accordingly.| HdmiCecTx | NA | Y  | Control panel to monitor the behavior of the connected devices.  |
 | | | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for a logical address that doesn't exist.| HdmiCecTx | Y | NA  |   |
 
-### Emulator Requirements - CEC Transmission
+#### Emulator Requirements - CEC Transmission
 - Boot configuration
   - Min case scenario multiple network nodes
   - Max case scenario multiple network nodes
 
-### Control Plane Requirements - CEC Transmission
+#### Control Plane Requirements - CEC Transmission
 - The control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
 
-## CEC Receive functionality
+### CEC Receive functionality
 
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--|--|--------------------------|
@@ -116,13 +116,13 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 | | | Transmit all the CEC Broadcast Command (as per 1.4b HDMI CEC spec) which expects a response from all the connected devices like `<GetPhysicalAddress>`  | NA | Y  ||
 | | | Transmit Different CEC commands from the connected devices and consider the Acknowledgement and responses are received correctly from the host device (my TV here)| NA | Y  | Control panel to control the third-party devices to Transmit the required commands to my Device (Device under test) |
 
-### Emulator Requirements - CEC Receive functionality
+#### Emulator Requirements - CEC Receive functionality
 
-### Control Plane Requirements - CEC Receive functionality
+#### Control Plane Requirements - CEC Receive functionality
 
 - The control panel to handle and facilitate communicate with third party devices to receive and send commands.
 
-## CEC HotPlug Functionality
+### CEC HotPlug Functionality
 
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--|--|--------------------------|
@@ -130,9 +130,9 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should fail in this state.| HdmiCecTx | NA | Y  | Control Panel to control the external devices connected.|
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should fail in this state. | NA | Y  | Control Panel to control the external devices connected.|
 
-### Emulator Requirements - CEC HotPlug Functionality
+#### Emulator Requirements - CEC HotPlug Functionality
 
-### Control Plane Requirements - CEC HotPlug Functionality
+#### Control Plane Requirements - CEC HotPlug Functionality
 
 - The control panel to handle and facilitate communicate with third party devices to receive and send commands.
 
