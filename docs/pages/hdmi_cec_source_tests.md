@@ -84,20 +84,6 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 - Control plane will allow putting nodes into standby mode, this will cause a CEC message on the network
 
-## CEC Async Transmission
-
-|S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
-|-----|------------------|-----------|--|--|--------------------------|
- 3| [CEC Async Transmission](#cec-async-transmission) | Verify the correct transmission of all the CEC commands (as per 1.4b HDMI CEC spec) using the Async Transmission support of the CEC HAL interface.   || NA | Y  ||
-| | | Verify the correct behavior of the connected device when the CEC standby command is sent to it.|| NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
-||| Broadcast all the CEC Commands ((as per 1.4b HDMI CEC spec)) to all the devices connected in the network and check the behaviour and response. || NA | Y  | Control panel to monitor the behaviour of the connected devices.  |
-
-### Emulator Requirements - CEC Async Transmission
-
-
-### Control Plane Requirements - CEC Async Transmission
-
-
 ## CEC Receive functionality
 
 |S.No.|Test Functionality|Description|L2|L3|Control plane requirements|
