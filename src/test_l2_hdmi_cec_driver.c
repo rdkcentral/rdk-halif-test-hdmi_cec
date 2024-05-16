@@ -236,7 +236,7 @@ void test_l2_hdmi_cec_driver_TestBroadcastCommandAfterDeletingLogicalAddress(voi
 
     status = HdmiCecTx(handle, buf, len, &result);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SENT_FAILED);
-    //UT_ASSERT_EQUAL(result, SENT_FAILED);
+    UT_ASSERT_EQUAL(result, HDMI_CEC_IO_SENT_FAILED);
     if(status != HDMI_CEC_IO_SENT_FAILED)
     {
         UT_LOG("Invoking HdmiCecTx failed with status: %d", status);
@@ -356,7 +356,7 @@ void test_l2_hdmi_cec_driver_TransmitCECCommand(void)
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
 
     // Step 5: Check the send status
-   //UT_ASSERT_EQUAL(result, SENT_BUT_NOT_ACKD);
+    UT_ASSERT_EQUAL(result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
 
     // Step 6: Call HdmiCecClose
     status = HdmiCecClose(handle);

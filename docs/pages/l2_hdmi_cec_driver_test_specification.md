@@ -206,7 +206,7 @@ If user chose to run the test in interactive mode, then the test case has to be 
 | 01 | Open HDMI CEC using HdmiCecOpen | handle = valid buffer | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 02 | Add logical address using HdmiCecAddLogicalAddress | handle = valid handle, logicalAddresses = random value between 0 and 15 | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 03 | Remove logical address using HdmiCecRemoveLogicalAddress | handle = valid handle, logicalAddresses = previously added logical address | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 04 | Try to send a broadcast command using HdmiCecTx after deleting logical address | handle = valid handle, buf = valid buffer, len = size of buffer, result = valid buffer | status = HDMI_CEC_IO_SENT_FAILED, result = SENT_FAILED | Should fail |
+| 04 | Try to send a broadcast command using HdmiCecTx after deleting logical address | handle = valid handle, buf = valid buffer, len = size of buffer, result = valid buffer | status = HDMI_CEC_IO_SENT_FAILED, result = HDMI_CEC_IO_SENT_FAILED | Should fail |
 | 05 | Close HDMI CEC using HdmiCecClose | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
@@ -295,7 +295,7 @@ If user chose to run the test in interactive mode, then the test case has to be 
 | 02 | Prepare a CEC packet | cecPacket = {0x0F, 0x9E, 0x00}, len = 3 | N/A | N/A |
 | 03 | Call HdmiCecTx to transmit the CEC command | handle = valid handle, cecPacket = valid, len = 3 | HDMI_CEC_IO_SENT_BUT_NOT_ACKD | Should be successful |
 | 04 | Check the return status of HdmiCecTx | status = return value of HdmiCecTx | HDMI_CEC_IO_SENT_BUT_NOT_ACKD | Should be successful |
-| 05 | Check the send status | result = result paramter of HdmiCecTx | SENT_BUT_NOT_ACKD | Should be successful |
+| 05 | Check the send status | result = result paramter of HdmiCecTx | result = HDMI_CEC_IO_SENT_BUT_NOT_ACKD | Should be successful |
 | 06 | Call HdmiCecClose to close the CEC session | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
@@ -307,7 +307,7 @@ B --> C[Call HdmiCecTx]
 B -->|Other| B1[Test case fail]
 C -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| D[Check send status]
 C -->|Other| C1[Test case fail]
-D -->|SENT_BUT_NOT_ACKD| E[Call HdmiCecClose]
+D -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| E[Call HdmiCecClose]
 D -->|Other| D1[Test case fail]
 E -->|HDMI_CEC_IO_SUCCESS| F[Test case success]
 E -->|Other| E1[Test case fail]
