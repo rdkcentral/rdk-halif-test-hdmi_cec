@@ -26,11 +26,15 @@ Consumer Electronics Control (CEC) is a single-wire bidirectional bus within an 
 
 ## HDMI-CEC RDK HAL Functionality
 
-The HAL layers within RDK serve as a bridge between the underlying low-level SoC drivers and the higher-level RDK layers that utilize the functionality offered by these HAL functions. Caller will manage the discovery of logical addresses in sink devices, while HAL needs to facilitate sending and receiving the CEC commands on the network. Specifically concerning the CEC Module, the HAL layers facilitate the following functionalities:
+The HAL layers within RDK serve as a bridge between the underlying low-level SoC drivers and the higher-level RDK layers that utilize the functionality offered by these HAL functions. Caller will manage the discovery of logical addresses in sink devices, while HAL needs to facilitate sending and receiving the CEC commands on the network. Specifically concerning the CEC Module, the HAL layers facilitate the following functionalities on sink devices:
+
+1. Provision to set, get, and remove the logical address
+2. Provision to get the Physical address
+3. Provision to Tx and Rx the CEC data 
 
 ## Test scenarios
 
-The HAL CEC layer facilitates the transmission and reception of CEC information on the CEC bus. It does not handle any specific opcode commands, nor does it validate supported HAL CEC opcodes for sending or receiving.
+The HAL CEC layer facilitates the transmission and reception of CEC messages on the CEC bus. It does not handle any specific opcode commands, nor does it validate supported HAL CEC opcodes for sending or receiving.
 
 It is the responsibility of the caller to manage the opcodes. The current test cases will verify responses from connected devices for a subset of opcodes as part of the testing process.
 
@@ -38,8 +42,8 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |-----|------------------|-----------|
 | 1 |[Logical address](#logical-address-discovery)|Facilitating the Discovery of logical addresses, Setting, getting, and removing the logical address of the device (for sink devices) |
 | 2| [Physical Address](#physical-address)| Retrieving the physical address |
-| 3| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and acknowledging them |
-| 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
+| 3| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC messages and reporting on their acknowledgement|
+| 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC Information from other devices and passing it to the layer above through registered callback function |
 | 5| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
 
 -----------
@@ -51,7 +55,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 | 1 |[Logical address](#logical-address-discovery)|Get the logical address of the `DUT` without actually adding the Logical Address and the API should return 0x0F as the default logical address.|HdmiCecGetLogicalAddress|Y|NA
 |a| |Set up a legitimate logical address (0x00 to 0x0F) for the `DUT` using HAL APIs, then retrieve it to ensure proper functionality.|HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress| Y | NA |
 |b| | Invoke the HAL API to delete the `DUT` logical address and verify that it is removed successfully.  |HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecGetLogicalAddress| Y | NA|
-|c| | After deleting the `DUT` logical address, try to send a broadcast command. Should fail to send during HAL Transmission,  call.|HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
+|c| | After deleting the `DUT` logical address, try to send a broadcast command and confirm transmission is successful.|HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
 
 ### Emulator Requirements
 
