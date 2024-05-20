@@ -77,13 +77,13 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
-| 2| [Physical Address](#physical-address)| Verify the valid physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| Y  |NA||
+| 2| [Physical Address](#physical-address)| Enable the television connected to the DUT first to get the valid physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| Y  |NA||
 | | | Verify the physical addresses allocated by connecting two sink devices through an HDMI switch.| HdmiCecGetPhysicalAddress| NA | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.|
 
 ### Emulator Requirements - Physical Address
 
 - Boot control configuration to setup the CEC network nodes
-- Scenario to have two sink devices on the network
+    - Emulator to provide a valid physical address when requested.
 
 ### Control Plane Requirements - Physical Address
 
