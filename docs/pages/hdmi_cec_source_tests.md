@@ -34,6 +34,7 @@ Consumer Electronics Control (CEC) is a single-wire bidirectional bus within an 
 
 The HAL layers within RDK serve as a bridge between the underlying low-level SoC drivers and the higher-level RDK layers that utilize the functionality offered by these HAL functions. Specifically concerning the CEC Module, the HAL layers facilitate the following functionalities:
 
+- Logical Address discovery 
 - Get Logical address
 - Get Physical address
 - Syncronous transmission, and communicating via hotplug connectivity
@@ -46,10 +47,10 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description|
 |-----|------------------|-----------|
-| 1 |[Logical address](#logical-address-discovery)|Facilitating the Discovery of logical addresses getting, and removing the logical address of the device (for sink devices) |
+| 1 |[Logical address](#logical-address-discovery)|Facilitating the Discovery of logical addresses getting logical address of the device (for source devices) |
 | 2| [Physical Address](#physical-address)| Retrieving the physical address |
-| 3| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and acknowledging them |
-| 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and communicating it to the above layers through registered callback functions |
+| 3| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and reporting on their acknowledgement |
+| 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and passing it to the layer above through a registered callback function |
 | 5| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Managing CEC during Hotplug and HotUnplug events |
 
 -----------
@@ -58,18 +59,17 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
-| 1 |[Logical address](#logical-address-discovery)|Get the logical address of the `DUT`. This will add the logical address, as per source functionality. |HdmiCecGetLogicalAddress|Y|NA
+| 1 |[Logical address](#logical-address-discovery)|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device. This will add the logical address, as per source functionality. |HdmiCecGetLogicalAddress|Y|NA
 
 ### Emulator Requirements
 
 - Boot with control configuration with various configurations having a predefined set of nodes:
-  - configuration to support the discovery of logical addresses. The caller provides the logical address, and HAL checks the availability of this address and feedback the same to the caller. 
+  - configuration to support the discovery of logical addresses. The caller to provide a create a proper logical address during Open and that should be provided when HDMICECGetLogicaladdress is used.
   - Verify for the valid logical address and return the appropriate error code based on the logical address availability.  
 
 ### Control Plane Requirements
 
 - The control plane will allow removing or adding a node to the network.
-  - allowing adding/removing node sink node logical address 0
   - allowing adding/removing source node
   - Support the CEC commands from the external devices on L3 Test Cases. 
 
