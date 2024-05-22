@@ -111,11 +111,11 @@ static bool extendedEnumsSupported=false;
 {\
    if ( extendedEnumsSupported == true )\
    {\
-      UT_ASSERT_EQUALS( enhanced, result );\
+      UT_ASSERT_EQUAL( enhanced, result );\
    }\
    else\
    {\
-       UT_ASSERT_EQUALS( old, result );\
+       UT_ASSERT_EQUAL( old, result );\
    }\
 }
 
