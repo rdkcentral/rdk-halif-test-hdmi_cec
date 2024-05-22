@@ -1,7 +1,7 @@
 /*
 * If not stated otherwise in this file or this component's LICENSE file the
 * following copyright and licenses apply:*
-* Copyright 2023 RDK Management
+* Copyright 2024 RDK Management
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -27,343 +27,358 @@
 * **Pre-Conditions:**  None@n
 * **Dependencies:** None@n
 *
-* Ref to API Definition specification documentation : [halSpec.md](../../../docs/halSpec.md)
+* Ref to API Definition specification documentation : [hdmi-cec_halSpec.md](../../docs/pages/hdmi-cec_halSpec.md)
 */
 
 #include <ut.h>
 #include <ut_log.h>
 #include "hdmi_cec_driver.h"
-#include <stdlib.h>
-#include <time.h>
+
+static int gTestGroup = 2;
+static int gTestID = 1;
 
 /**
-* @brief Test to verify the default logical address of HDMI CEC driver
+* @brief Test for getting the default logical address of the HDMI CEC driver
 *
-* This test verifies that the default logical address returned by the HDMI CEC driver is 0x0F. The test first initializes the HDMI CEC HAL using HdmiCecOpen(), then retrieves the logical address using HdmiCecGetLogicalAddress(), and finally checks that the returned logical address is 0x0F. The HDMI CEC HAL is then uninitialized using HdmiCecClose().
+* This test case validates the functionality of getting the default logical address of the HDMI CEC driver. It first opens a connection to the HDMI CEC driver, then retrieves the logical address, checks if the address is correct, and finally closes the connection. This test is important to ensure that the HDMI CEC driver is correctly assigning the default logical address.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 001@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
 */
 
 void test_l2_hdmi_cec_driver_GetDefaultLogicalAddress(void)
 {
-    UT_LOG("Entering test_l2_hdmi_cec_driver_GetDefaultLogicalAddress...");
-
-    int handle;
-    int logicalAddress;
+    gTestID = 1;
+    int handle = 0;
+    int logicalAddress = 0;
     HDMI_CEC_STATUS status;
 
-    // Step 1: Call the pre-requisite API HdmiCecOpen() to initialize the HDMI CEC HAL.
+    UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+
+    // Step 1: Call the pre-requisite API HdmiCecOpen()
+    UT_LOG_DEBUG("Invoking HdmiCecOpen with valid handle");
     status = HdmiCecOpen(&handle);
-    UT_LOG("Invoking HdmiCecOpen() with valid handle. Return status: %d", status);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
-    // Step 2: Call the API HdmiCecGetLogicalAddress() with the handle obtained from HdmiCecOpen() and a pointer to an integer to store the logical address.
+    // Step 2: Call the API HdmiCecGetLogicalAddress()
+    UT_LOG_DEBUG("Invoking HdmiCecGetLogicalAddress with handle: %d", handle);
     status = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-    UT_LOG("Invoking HdmiCecGetLogicalAddress() with handle from HdmiCecOpen() and valid logicalAddress pointer. Return status: %d, Logical Address: %d", status, logicalAddress);
+    if (status != HDMI_CEC_IO_SUCCESS)
+    {
+        UT_LOG_ERROR("HdmiCecGetLogicalAddress failed with status: %d", status);
+        HdmiCecClose(handle); // Cleanup if test fails
+        return;
+    }
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
 
-    // Step 3: Check that the logical address returned is 0x0F, which is the default logical address for sink devices when no logical address has been added or removed.
+    // Step 3: Check the logical address
+    UT_LOG_DEBUG("Checking logical address: %d", logicalAddress);
     UT_ASSERT_EQUAL(logicalAddress, 0x0F);
 
-    // Step 4: Call the post-requisite API HdmiCecClose() with the handle obtained from HdmiCecOpen() to uninitialize the HDMI CEC HAL.
+    // Step 4: Call the post-requisite API HdmiCecClose()
+    UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
     status = HdmiCecClose(handle);
-    UT_LOG("Invoking HdmiCecClose() with handle from HdmiCecOpen(). Return status: %d", status);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
 
-    UT_LOG("Exiting test_l2_hdmi_cec_driver_GetDefaultLogicalAddress...");
+    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
 /**
-* @brief Test the sequence of operations: HdmiCecOpen, HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress, and HdmiCecClose
+* @brief This test checks the functionality of adding and getting logical addresses in HDMI CEC driver
 *
-* This function tests the sequence of operations: HdmiCecOpen, HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress, and HdmiCecClose. It uses the CUnit framework's assertion macros to check that each operation returns the expected status code. It also checks that the logical address returned by HdmiCecGetLogicalAddress matches the address that was set by HdmiCecAddLogicalAddress.
+* This test case is designed to validate the correct operation of the HdmiCecAddLogicalAddress and HdmiCecGetLogicalAddress APIs. It does this by first opening a handle to the HDMI CEC driver, then adding logical addresses to it, and finally retrieving those addresses to verify they were correctly added. The test ensures that the APIs return the expected status codes and that the retrieved addresses match the ones that were added.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 002@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
 */
-
 void test_l2_hdmi_cec_driver_AddAndGetLogicalAddress(void)
 {
-    UT_LOG("Entering test_l2_hdmi_cec_driver_AddAndGetLogicalAddress...");
+    gTestID = 2;
+    UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
-    int handle = 0;
-    int logicalAddress = 0;
+    int handle;
     HDMI_CEC_STATUS status;
+    int logicalAddress;
 
-    // Step 1: Call HdmiCecOpen
+    // Step 1: Call the pre-requisite API HdmiCecOpen
     status = HdmiCecOpen(&handle);
-    UT_LOG("Invoking HdmiCecOpen(). Status: %d, Handle: %d", status, handle);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    UT_ASSERT_NOT_EQUAL(handle, 0);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_LOG_DEBUG("Invoking HdmiCecOpen with valid handle");
 
-    // Generate a random logical address between 0x00 and 0x0F
-    srand(time(NULL));
-    int randomLogicalAddress = rand() % 16;
+    // Step 2: Call the API HdmiCecAddLogicalAddress and HdmiCecGetLogicalAddress for each logical address
+    for (int i = 0x00; i <= 0x0F; i++)
+    {
+        status = HdmiCecAddLogicalAddress(handle, i);
+        UT_LOG_DEBUG("Invoking HdmiCecAddLogicalAddress with handle: %d and logicalAddress: %d", handle, i);
+        UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
 
-    // Step 2: Call HdmiCecAddLogicalAddress
-    status = HdmiCecAddLogicalAddress(handle, randomLogicalAddress);
-    UT_LOG("Invoking HdmiCecAddLogicalAddress() with handle: %d and logicalAddress: %d. Status: %d", handle, randomLogicalAddress, status);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+        status = HdmiCecGetLogicalAddress(handle, &logicalAddress);
+        UT_LOG_DEBUG("Invoking HdmiCecGetLogicalAddress with handle: %d and logicalAddress: %d", handle, logicalAddress);
+        UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+        UT_ASSERT_EQUAL(logicalAddress, i);
 
-    // Step 3: Call HdmiCecGetLogicalAddress
-    status = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-    UT_LOG("Invoking HdmiCecGetLogicalAddress() with handle: %d. Status: %d, LogicalAddress: %d", handle, status, logicalAddress);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    UT_ASSERT_EQUAL(logicalAddress, randomLogicalAddress);
+    }
 
-    // Step 4: Call HdmiCecClose
+    // Step 4: Call the post-requisite API HdmiCecClose
     status = HdmiCecClose(handle);
-    UT_LOG("Invoking HdmiCecClose() with handle: %d. Status: %d", handle, status);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
 
-    UT_LOG("Exiting test_l2_hdmi_cec_driver_AddAndGetLogicalAddress...");
+    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
 /**
-* @brief This test function tests the removal of a logical address from the HDMI CEC driver
+* @brief Test the removal of a logical address in the HDMI CEC driver
 *
-* This function tests the `HdmiCecRemoveLogicalAddress` API by first initializing the HDMI CEC HAL with `HdmiCecOpen`, adding a logical address with `HdmiCecAddLogicalAddress`, removing the logical address with `HdmiCecRemoveLogicalAddress`, verifying the removal with `HdmiCecGetLogicalAddress`, and finally closing the HDMI CEC HAL with `HdmiCecClose`. The function uses `UT_ASSERT_EQUAL` to assert that the return values of the APIs are as expected. If any assertion fails, the function will immediately return and the remaining steps will not be executed. The function also logs the status and output values of each API call.
+* This function tests the removal of a logical address in the HDMI CEC driver. It first opens the driver, adds a logical address, removes the logical address, checks that the logical address has been removed, and finally closes the driver.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 003@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
 */
+
 void test_l2_hdmi_cec_driver_RemoveLogicalAddress(void)
 {
-    UT_LOG("Entering test_l2_hdmi_cec_driver_RemoveLogicalAddress...");
+    gTestID = 3;
+    UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     int handle;
-    int logicalAddress;
+    int logicalAddress = 0x00; // valid logical address
     HDMI_CEC_STATUS status;
 
-    // Step 1: Call HdmiCecOpen
+    // Call the pre-requisite API HdmiCecOpen
     status = HdmiCecOpen(&handle);
-    UT_LOG("Invoked HdmiCecOpen with output handle. Status: %d, Handle: %d", status, handle);
+    UT_LOG_DEBUG("Invoking HdmiCecOpen with handle: %d", handle);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+
+    // Invoke the API HdmiCecAddLogicalAddress
+    status = HdmiCecAddLogicalAddress(handle, logicalAddress);
+    UT_LOG_DEBUG("Invoking HdmiCecAddLogicalAddress with handle: %d and logicalAddress: %d", handle, logicalAddress);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
 
-    if (status == HDMI_CEC_IO_SUCCESS)
-    {
-        // Generate a random logical address between 0x0 and 0xF
-        srand(time(NULL));
-        logicalAddress = rand() % 16;
+    // Invoke the API HdmiCecRemoveLogicalAddress
+    status = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+    UT_LOG_DEBUG("Invoking HdmiCecRemoveLogicalAddress with handle: %d and logicalAddress: %d", handle, logicalAddress);
+    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
 
-        // Step 2: Call HdmiCecAddLogicalAddress
-        status = HdmiCecAddLogicalAddress(handle, logicalAddress);
-        UT_LOG("Invoked HdmiCecAddLogicalAddress with input handle and logicalAddress. Status: %d, Handle: %d, LogicalAddress: %d", status, handle, logicalAddress);
-        UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    // Invoke the API HdmiCecGetLogicalAddress
+    status = HdmiCecGetLogicalAddress(handle, &logicalAddress);
+    UT_LOG_DEBUG("Invoking HdmiCecGetLogicalAddress with handle: %d", handle);
+    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_EQUAL(logicalAddress, 0x0F);
 
-        if (status == HDMI_CEC_IO_SUCCESS)
-        {
-            // Step 3: Call HdmiCecRemoveLogicalAddress
-            status = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-            UT_LOG("Invoked HdmiCecRemoveLogicalAddress with input handle and logicalAddress. Status: %d, Handle: %d, LogicalAddress: %d", status, handle, logicalAddress);
-            UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    // Call the post-requisite API HdmiCecClose
+    status = HdmiCecClose(handle);
+    UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
 
-            // Step 4: Call HdmiCecGetLogicalAddress
-            status = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-            UT_LOG("Invoked HdmiCecGetLogicalAddress with input handle and output logicalAddress. Status: %d, Handle: %d, LogicalAddress: %d", status, handle, logicalAddress);
-            UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-            UT_ASSERT_EQUAL(logicalAddress, 0x0F);
-        }
-
-        // Step 5: Call HdmiCecClose
-        status = HdmiCecClose(handle);
-        UT_LOG("Invoked HdmiCecClose with input handle. Status: %d, Handle: %d", status, handle);
-        UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    }
-
-    UT_LOG("Exiting test_l2_hdmi_cec_driver_RemoveLogicalAddress...");
+    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
 /**
-* @brief Test the scenario where a broadcast command is sent after deleting a logical address
+* @brief Test for broadcasting HDMI CEC command
 *
-* This function tests the scenario where a broadcast command is sent after deleting a logical address. It uses the CUnit framework's `UT_ASSERT_EQUAL` macro to assert that the return values of the API calls are as expected. If an assertion fails, the function will immediately return and the remaining code will not be executed. The `UT_LOG` function is used for logging.
+* This function tests the HDMI CEC driver's ability to broadcast a HDMI CEC command. It first opens the HDMI CEC HAL, adds a logical address, removes the logical address, sends a broadcast HDMI CEC command, and finally closes the HDMI CEC HAL.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 004@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
 */
-void test_l2_hdmi_cec_driver_TestBroadcastCommandAfterDeletingLogicalAddress(void)
+
+void test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand(void)
 {
-    UT_LOG("Entering test_l2_hdmi_cec_driver_TestBroadcastCommandAfterDeletingLogicalAddress...");
+    gTestID = 4;
+    UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     int handle;
-    int logicalAddresses;
-    int result;
-    unsigned char buf[10] = {0};
+    int logicalAddresses = 0x0; // valid logical address
+    unsigned char buf[] = {0x0F, 0x84, 0x00, 0x00}; // valid CEC message
     int len = sizeof(buf);
-
-    srand(time(NULL));
-    logicalAddresses = rand() % 16; // Random value between 0 and 15
+    int result;
 
     HDMI_CEC_STATUS status = HdmiCecOpen(&handle);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if(status != HDMI_CEC_IO_SUCCESS)
+    if (status != HDMI_CEC_IO_SUCCESS)
     {
-        UT_LOG("Invoking HdmiCecOpen failed with status: %d", status);
+        UT_LOG_ERROR("HdmiCecOpen failed with status: %d\n", status);
         return;
     }
 
     status = HdmiCecAddLogicalAddress(handle, logicalAddresses);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if(status != HDMI_CEC_IO_SUCCESS)
+    if (status != HDMI_CEC_IO_SUCCESS)
     {
-        UT_LOG("Invoking HdmiCecAddLogicalAddress failed with status: %d", status);
+        UT_LOG_ERROR("HdmiCecAddLogicalAddress failed with status: %d\n", status);
         HdmiCecClose(handle);
         return;
     }
 
     status = HdmiCecRemoveLogicalAddress(handle, logicalAddresses);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if(status != HDMI_CEC_IO_SUCCESS)
+    if (status != HDMI_CEC_IO_SUCCESS)
     {
-        UT_LOG("Invoking HdmiCecRemoveLogicalAddress failed with status: %d", status);
+        UT_LOG_ERROR("HdmiCecRemoveLogicalAddress failed with status: %d\n", status);
         HdmiCecClose(handle);
         return;
     }
 
     status = HdmiCecTx(handle, buf, len, &result);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SENT_FAILED);
-    UT_ASSERT_EQUAL(result, HDMI_CEC_IO_SENT_FAILED);
-    if(status != HDMI_CEC_IO_SENT_FAILED)
+    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    if (status != HDMI_CEC_IO_SUCCESS)
     {
-        UT_LOG("Invoking HdmiCecTx failed with status: %d", status);
+        UT_LOG_ERROR("HdmiCecTx failed with status: %d\n", status);
         HdmiCecClose(handle);
         return;
     }
 
-    status = HdmiCecClose(handle);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if(status != HDMI_CEC_IO_SUCCESS)
+    UT_ASSERT_EQUAL(result, HDMI_CEC_IO_SENT_AND_ACKD);
+    if (result != HDMI_CEC_IO_SENT_AND_ACKD)
     {
-        UT_LOG("Invoking HdmiCecClose failed with status: %d", status);
+        UT_LOG_ERROR("HdmiCecTx result: %d\n", result);
     }
 
-    UT_LOG("Exiting test_l2_hdmi_cec_driver_TestBroadcastCommandAfterDeletingLogicalAddress...");
+    status = HdmiCecClose(handle);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    if (status != HDMI_CEC_IO_SUCCESS)
+    {
+        UT_LOG_ERROR("HdmiCecClose failed with status: %d\n", status);
+    }
+
+    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
 /**
-* @brief This test checks the functionality of the HDMI CEC driver's GetPhysicalAddress API
+* @brief Test to verify the physical address of the HDMI CEC driver
 *
-* This test case is designed to validate the functionality of the GetPhysicalAddress API of the HDMI CEC driver. The test involves initializing the HDMI CEC HAL using the HdmiCecOpen() API, obtaining the physical address using the HdmiCecGetPhysicalAddress() API, validating the obtained physical address, and finally closing the HDMI CEC HAL using the HdmiCecClose() API. The test ensures that all the APIs function as expected and the physical address obtained is within the valid range.
+* This test case verifies the physical address of the HDMI CEC driver by calling the HdmiCecGetPhysicalAddress() API.
+* The test ensures that the physical address obtained is less than F.F.F.F. The test also includes error handling and
+* assertions to check the return values of the APIs. The test ensures that the post-requisite API HdmiCecClose() is called
+* in case of any test failure after the successful execution of the pre-requisite API HdmiCecOpen().
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 005@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
 */
 
-void test_l2_hdmi_cec_driver_GetPhysicalAddress(void)
+void test_l2_hdmi_cec_driver_VerifyPhysicalAddress(void)
 {
-    UT_LOG("Entering test_l2_hdmi_cec_driver_GetPhysicalAddress...");
-
+    gTestID = 5;
     int handle;
     unsigned int physicalAddress;
     HDMI_CEC_STATUS status;
 
-    // Step 1: Call the pre-requisite API HdmiCecOpen() to initialize the HDMI CEC HAL.
+    UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+
+    // Step 1: Call the pre-requisite API HdmiCecOpen()
+    UT_LOG_DEBUG("Invoking HdmiCecOpen with valid handle");
     status = HdmiCecOpen(&handle);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if(status != HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG("HdmiCecOpen failed with status: %d", status);
-        return;
-    }
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
 
-    // Step 2: Call the API HdmiCecGetPhysicalAddress() with the handle obtained from HdmiCecOpen() and a pointer to an unsigned integer to store the physical address.
+    // Step 2: Call the API HdmiCecGetPhysicalAddress()
+    UT_LOG_DEBUG("Invoking HdmiCecGetPhysicalAddress with handle: %d", handle);
     status = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    UT_LOG("Invoking HdmiCecGetPhysicalAddress with handle: %d", handle);
 
-    // Step 3: Check the return status of HdmiCecGetPhysicalAddress(). It should return HDMI_CEC_IO_SUCCESS for a valid handle and physical address.
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if(status != HDMI_CEC_IO_SUCCESS)
+    // Step 3: Check the return status of HdmiCecGetPhysicalAddress()
+    if (status != HDMI_CEC_IO_SUCCESS)
     {
-        UT_LOG("HdmiCecGetPhysicalAddress failed with status: %d", status);
-        // Call the post-requisite API HdmiCecClose() with the handle obtained from HdmiCecOpen().
-        HdmiCecClose(handle);
-        return;
+        UT_LOG_ERROR("HdmiCecGetPhysicalAddress failed with status: %d", status);
+        status = HdmiCecClose(handle); // Closing the handle as the test failed
+        UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
     }
 
-    // Step 4: Validate the physical address obtained. It should be in the range of 0 to (((0x04 &0xF0 ) << 20)|( (0x04 &0x0F ) << 16) |((0x04 & 0xF0) << 4)  | (0x04 & 0x0F)).
-    unsigned int maxAddress = (((0x04 &0xF0 ) << 20)|( (0x04 &0x0F ) << 16) |((0x04 & 0xF0) << 4)  | (0x04 & 0x0F));
-    UT_ASSERT_TRUE(physicalAddress >= 0 && physicalAddress <= maxAddress);
-    if(!(physicalAddress >= 0 && physicalAddress <= maxAddress))
-    {
-        UT_LOG("Physical address: %u is out of range", physicalAddress);
-        // Call the post-requisite API HdmiCecClose() with the handle obtained from HdmiCecOpen().
-        HdmiCecClose(handle);
-        return;
-    }
+    // Step 4: Verify that the physical address obtained is less than F.F.F.F
+    UT_LOG_DEBUG("Checking if physical address: %u is less than F.F.F.F", physicalAddress);
+    UT_ASSERT_TRUE(physicalAddress < 0xFFFF);
 
-    // Step 5: Call the post-requisite API HdmiCecClose() with the handle obtained from HdmiCecOpen().
+    // Step 5: Call the post-requisite API HdmiCecClose()
+    UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
     status = HdmiCecClose(handle);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if(status != HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG("HdmiCecClose failed with status: %d", status);
-    }
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
 
-    UT_LOG("Exiting test_l2_hdmi_cec_driver_GetPhysicalAddress...");
+    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
 /**
-* @brief Test the transmission of CEC command in HDMI CEC driver
+* @brief This test function is designed to test the transmission of CEC commands in the HDMI CEC driver.
 *
-* This test case tests the transmission of CEC command in HDMI CEC driver. It checks if the CEC command is transmitted successfully and the correct status is returned. This is important to ensure the HDMI CEC driver is working as expected.
+* This test function tests the transmission of CEC commands in the HDMI CEC driver. It opens a connection, adds a logical address, sends a CEC command, removes the logical address, and then closes the connection. The test asserts that each operation returns the expected status.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 006@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
 */
 
 void test_l2_hdmi_cec_driver_TransmitCECCommand(void)
 {
-    UT_LOG("Entering test_l2_hdmi_cec_driver_TransmitCECCommand...");
+    gTestID = 6;
+    UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     int handle;
-    HDMI_CEC_STATUS status;
-    unsigned char cecPacket[16] = {0x0F, 0x9E, 0x00}; // CEC Version command to non-existent logical address
-    int len = 3;
+    int logicalAddresses = 0x4; // Example logical address
+    unsigned char buf[] = {0x47, 0x9F}; // Example CEC message
+    int len = sizeof(buf);
     int result;
 
-    // Step 1: Call HdmiCecOpen
-    status = HdmiCecOpen(&handle);
-    UT_LOG("Invoking HdmiCecOpen(). Status: %d", status);
+    HDMI_CEC_STATUS status = HdmiCecOpen(&handle);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    if (status != HDMI_CEC_IO_SUCCESS)
+    {
+        UT_LOG_ERROR("HdmiCecOpen failed with status: %d\n", status);
+        return;
+    }
 
-    // Step 2: Prepare a CEC packet is already done
+    status = HdmiCecAddLogicalAddress(handle, logicalAddresses);
+    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    if (status != HDMI_CEC_IO_SUCCESS)
+    {
+        UT_LOG_ERROR("HdmiCecAddLogicalAddress failed with status: %d\n", status);
+        HdmiCecClose(handle);
+        return;
+    }
 
-    // Step 3: Call HdmiCecTx
-    status = HdmiCecTx(handle, cecPacket, len, &result);
-    UT_LOG("Invoking HdmiCecTx() with handle: %d, cecPacket: valid, len: %d. Status: %d, Result: %d", handle, len, status, result);
-
-    // Step 4: Check the return status of HdmiCecTx
+    status = HdmiCecTx(handle, buf, len, &result);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
-
-    // Step 5: Check the send status
     UT_ASSERT_EQUAL(result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
+    if (status != HDMI_CEC_IO_SENT_BUT_NOT_ACKD)
+    {
+        UT_LOG_ERROR("HdmiCecTx failed with status: %d\n", status);
+        HdmiCecRemoveLogicalAddress(handle, logicalAddresses);
+        HdmiCecClose(handle);
+        return;
+    }
 
-    // Step 6: Call HdmiCecClose
-    status = HdmiCecClose(handle);
-    UT_LOG("Invoking HdmiCecClose() with handle: %d. Status: %d", handle, status);
+    status = HdmiCecRemoveLogicalAddress(handle, logicalAddresses);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
+    if (status != HDMI_CEC_IO_SUCCESS)
+    {
+        UT_LOG_ERROR("HdmiCecRemoveLogicalAddress failed with status: %d\n", status);
+        HdmiCecClose(handle);
+        return;
+    }
 
-    UT_LOG("Exiting test_l2_hdmi_cec_driver_TransmitCECCommand...");
+    status = HdmiCecClose(handle);
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    if (status != HDMI_CEC_IO_SUCCESS)
+    {
+        UT_LOG_ERROR("HdmiCecClose failed with status: %d\n", status);
+    }
+
+    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
 static UT_test_suite_t * pSuite = NULL;
@@ -378,7 +393,8 @@ int test_hdmi_cec_driver_l2_register(void)
 {
     // Create the test suite
     pSuite = UT_add_suite("[L2 hdmi_cec_driver]", NULL, NULL);
-    if (pSuite == NULL) {
+    if (pSuite == NULL)
+    {
         return -1;
     }
     // List of test function names and strings
@@ -386,8 +402,8 @@ int test_hdmi_cec_driver_l2_register(void)
     UT_add_test( pSuite, "l2_hdmi_cec_driver_GetDefaultLogicalAddress", test_l2_hdmi_cec_driver_GetDefaultLogicalAddress);
     UT_add_test( pSuite, "l2_hdmi_cec_driver_AddAndGetLogicalAddress", test_l2_hdmi_cec_driver_AddAndGetLogicalAddress);
     UT_add_test( pSuite, "l2_hdmi_cec_driver_RemoveLogicalAddress", test_l2_hdmi_cec_driver_RemoveLogicalAddress);
-    UT_add_test( pSuite, "l2_hdmi_cec_driver_TestBroadcastCommandAfterDeletingLogicalAddress", test_l2_hdmi_cec_driver_TestBroadcastCommandAfterDeletingLogicalAddress);
-    UT_add_test( pSuite, "l2_hdmi_cec_driver_GetPhysicalAddress", test_l2_hdmi_cec_driver_GetPhysicalAddress);
+    UT_add_test( pSuite, "l2_hdmi_cec_driver_BroadcastHdmiCecCommand", test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand);
+    UT_add_test( pSuite, "l2_hdmi_cec_driver_VerifyPhysicalAddress", test_l2_hdmi_cec_driver_VerifyPhysicalAddress);
     UT_add_test( pSuite, "l2_hdmi_cec_driver_TransmitCECCommand", test_l2_hdmi_cec_driver_TransmitCECCommand);
 
     return 0;
