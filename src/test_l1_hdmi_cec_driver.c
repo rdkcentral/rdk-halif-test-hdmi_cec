@@ -2276,7 +2276,7 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuite_stb, "TxAsyncSource_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative);
     //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
     //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
-    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), ""hdmicec/features/extendedEnumsSupported" );
+    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
     return 0;
 }
 
