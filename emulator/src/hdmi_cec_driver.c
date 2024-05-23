@@ -305,12 +305,12 @@ void LoadDevicesInfo (ut_kvp_instance_t* instance, device_info_t* devices, unsig
       char type[16];
       strcpy(tmp, prefix);
       int length = snprintf( NULL, 0, "%d", i );
-      snprintf( tmp + strlen(prefix) + 1, length + 1, "%d", i );
+      snprintf( tmp + strlen(prefix) , length + 1, "%d", i );
 
       strcpy(tmp + strlen(prefix) + length, "/name");
       ut_kvp_getStringField(instance, tmp, devices[i].osd_name, MAX_OSD_NAME_LENGTH);
 
-      strcpy(tmp + strlen(prefix) + length, "/native_source");
+      strcpy(tmp + strlen(prefix) + length, "/active_source");
       devices[i].active_source = ut_kvp_getBoolField(instance, tmp);
 
       strcpy(tmp + strlen(prefix) + length, "/pwr_status");
@@ -320,7 +320,7 @@ void LoadDevicesInfo (ut_kvp_instance_t* instance, device_info_t* devices, unsig
       strcpy(tmp + strlen(prefix) + length, "/version");
       devices[i].version = (cec_version_t) ut_kvp_getUInt32Field(instance, tmp);
 
-      strcpy(tmp + strlen(prefix) + length, "/vendor_info");
+      strcpy(tmp + strlen(prefix) + length, "/vendor");
       ut_kvp_getStringField(instance, tmp, type, sizeof(type));
       devices[i].vendor_id = GetVendorCode(type);
 
@@ -345,9 +345,9 @@ void LoadPortsInfo (ut_kvp_instance_t* instance, hdmi_port_info_t* ports, unsign
       char type[8];
       strcpy(tmp, prefix);
       int length = snprintf( NULL, 0, "%d", i );
-      snprintf( tmp + strlen(prefix) + 1, length + 1, "%d", i );
+      snprintf( tmp + strlen(prefix) , length + 1, "%d", i );
 
-      strcpy(tmp + strlen(prefix) + length, "/id");
+      strcpy( tmp + strlen(prefix) + length  , "/id");
       ports[i].id = ut_kvp_getUInt32Field(instance, tmp);
 
       strcpy(tmp + strlen(prefix) + length, "/type");
@@ -367,7 +367,8 @@ void LoadPortsInfo (ut_kvp_instance_t* instance, hdmi_port_info_t* ports, unsign
 void LoadEmulatedDeviceInfo (ut_kvp_instance_t* instance, device_info_t* device_info)
 {
   ut_kvp_getStringField(instance, "hdmicec/name", device_info->osd_name,MAX_OSD_NAME_LENGTH);
-  device_info->active_source = ut_kvp_getBoolField(instance, "hdmicec/ative_source");
+
+  device_info->active_source = ut_kvp_getBoolField(instance, "hdmicec/active_source");
   char temp[128];
 
   ut_kvp_getStringField(instance, "hdmicec/pwr_status", temp, sizeof(temp));
@@ -375,7 +376,7 @@ void LoadEmulatedDeviceInfo (ut_kvp_instance_t* instance, device_info_t* device_
 
   device_info->version = (cec_version_t) ut_kvp_getUInt32Field(instance, "hdmicec/version");
 
-  ut_kvp_getStringField(instance, "hdmicec/vendor_info", temp, sizeof(temp));
+  ut_kvp_getStringField(instance, "hdmicec/vendor", temp, sizeof(temp));
   device_info->vendor_id = GetVendorCode(temp);
 
   ut_kvp_getStringField(instance, "hdmicec/type", temp, sizeof(temp));
@@ -390,7 +391,7 @@ ut_kvp_instance_t* LoadProfile(const char* path)
   instance = ut_kvp_createInstance();
   if( ut_kvp_open(instance, path) == UT_KVP_STATUS_SUCCESS )
   {
-    EMU_LOG("LoadProfile: Loaded");
+    EMU_LOG("LoadProfile: [%s] Loaded", path);
   }
   else
   {
@@ -411,11 +412,12 @@ void TeardownHal (hdmi_cec_t* hal)
     free (hal->connected_devices);
     hal->callbacks.rx_cb_func = NULL;
     hal->callbacks.tx_cb_func = NULL;
+    hal->state = HAL_STATE_CLOSED;
   }
 }
 
 
-Emulator_t *Emulator_Initialize(const char* pProfilePath, unsigned short pCPPort, const char* pCPUrl)
+Emulator_t *Emulator_Initialize(char* pProfilePath, unsigned short pCPPort, char* pCPUrl)
 {
   cec_emulator_t *result = NULL;
   
@@ -423,18 +425,20 @@ Emulator_t *Emulator_Initialize(const char* pProfilePath, unsigned short pCPPort
   {
     if ( pProfilePath != NULL && pCPPort > 0)
     {
-      cec_emulator_t* emulator = (cec_emulator_t*)malloc(sizeof(cec_emulator_t));
-      if(emulator != NULL)
+      result = (cec_emulator_t*)malloc(sizeof(cec_emulator_t));
+      if(result != NULL)
       {
-        emulator->cp_path = pCPUrl;
-        emulator->cp_port = pCPPort;
+        result->cp_path = pCPUrl;
+        result->cp_port = pCPPort;
 
-        emulator->profile_instance = LoadProfile(pProfilePath);
+        result->profile_instance = LoadProfile(pProfilePath);
+        result->cec_hal = NULL;
 
         //TODO Control Plane init
 
       }
     }
+    else
     {
       EMU_LOG("Emulator_Initialize: Invalid Profile path and/or Control plane Port");
     }
@@ -465,14 +469,17 @@ void Emulator_Deinitialize(Emulator_t *pEmulator)
 HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 {
   HDMI_CEC_STATUS result = HDMI_CEC_IO_NOT_OPENED;
+  EMU_LOG("HdmiCecOpen: \n");
 
   if (gEmulator != NULL && gEmulator->cec_hal == NULL) {
+
+    EMU_LOG("HdmiCecOpen: Loading emulated Device Info\n");
 
     hdmi_cec_t* cec = (hdmi_cec_t*)malloc(sizeof(hdmi_cec_t));
     if(cec != NULL) {
       LoadEmulatedDeviceInfo(gEmulator->profile_instance, &(cec->emulated_device));
       cec->num_ports = ut_kvp_getUInt32Field(gEmulator->profile_instance, "hdmicec/number_ports");
-
+      EMU_LOG("HdmiCecOpen: Loading Ports Info\n");
       hdmi_port_info_t* ports = (hdmi_port_info_t*) malloc(sizeof(hdmi_port_info_t) * cec->num_ports);
       LoadPortsInfo(gEmulator->profile_instance, ports, cec->num_ports);
       cec->ports = ports;
@@ -484,6 +491,7 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
       cec->num_devices = ut_kvp_getUInt32Field(gEmulator->profile_instance, "hdmicec/number_devices");
 
       device_info_t* devices = (device_info_t*) malloc(sizeof(device_info_t) * cec->num_devices);
+      EMU_LOG("HdmiCecOpen: Loading connected Device Info\n");
       LoadDevicesInfo(gEmulator->profile_instance, devices, cec->num_devices);
       cec->connected_devices = devices;
       if(cec->emulated_device.type == DEVICE_TYPE_TV)
@@ -498,7 +506,10 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
         //TODO Auto Allocate Logical addresses
       }
 
-      handle = (int *) cec;
+      *handle = (int) cec;
+      EMU_LOG("HdmiCecOpen: cec[%p], int[%p]", cec, (hdmi_cec_t*)(*handle));
+      gEmulator->cec_hal = cec;
+      cec->state = HAL_STATE_READY;
       result = HDMI_CEC_IO_SUCCESS;
     } 
     else
@@ -515,6 +526,8 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
   {
     EMU_LOG("HdmiCecOpen: Emulator not Initialised");
   }
+
+  EMU_LOG("HdmiCecOpen: result - %d", result);
   return result;
 }
 
@@ -553,9 +566,10 @@ HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddr
 
 HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 {
+   UT_LOG("HdmiCecAddLogicalAddress\n");
   hdmi_cec_t *hal = (hdmi_cec_t*)handle;
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
-
+  UT_LOG("HdmiCecAddLogicalAddress - hal[%p] - g[%p]\n", hal, gEmulator->cec_hal);
   if (hal != NULL)
   {
     if(hal->emulated_device.type != DEVICE_TYPE_TV)
@@ -564,6 +578,7 @@ HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
       status = HDMI_CEC_IO_SUCCESS;
     }
   }
+  UT_LOG("HdmiCecAddLogicalAddress - status %d\n",status);
   return status;
 }
 
@@ -585,6 +600,7 @@ HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 
 HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 {
+  UT_LOG("HdmiCecGetLogicalAddress\n");
   hdmi_cec_t *hal = (hdmi_cec_t*)handle;
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
@@ -593,6 +609,7 @@ HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
     *logicalAddress = hal->emulated_device.logical_address;
     status = HDMI_CEC_IO_SUCCESS;
   }
+  UT_LOG("HdmiCecGetLogicalAddress - status %d\n",status);
   return status;
 }
 

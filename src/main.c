@@ -59,17 +59,64 @@
 */
 
 #include <ut.h>
+#include <string.h>
+#include <getopt.h>
+#include <stdlib.h>
 
 extern int register_hdmicec_hal_l1_tests( void );
+extern int register_emulator_tests ( char* profile, unsigned short cpPort, char* cpPath );
 
 int main(int argc, char** argv) 
 {
+    int opt;
+    char* pProfilePath = NULL;
+    unsigned short cpPort = 8888;
+    char* pUrl = NULL;
+
+    while ((opt = getopt(argc, argv, "p:c:u:")) != -1)
+    {
+        switch(opt)
+        {
+            case 'p':
+                UT_LOG ("Setting Profile path [%s]\n",optarg);
+                pProfilePath = malloc(strlen(optarg) + 1);
+                strcpy(pProfilePath, optarg);
+                pProfilePath[strlen(optarg) + 1] = '\0';
+                break;
+            case 'c':
+                cpPort = atoi(optarg);
+                UT_LOG ("Setting control plane port [%d]\n",cpPort);
+                break;
+
+            case 'u':
+                UT_LOG ("Setting control plane path [%s]\n",optarg);
+                pUrl = malloc(strlen(optarg) + 1);
+                strcpy(pUrl, optarg);
+                pUrl[strlen(optarg) + 1] = '\0';
+                break;
+            case '?':
+            case ':':
+                UT_LOG("unknown option: %c\n", optopt);
+                break;
+        }
+    }
+
+
+
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
 
     register_hdmicec_hal_l1_tests ();
 
+    register_emulator_tests(pProfilePath, cpPort, pUrl);
+
     UT_run_tests();
+
+    if(pProfilePath != NULL)
+        free(pProfilePath);
+
+    if(pUrl != NULL)
+        free(pUrl);
 }
 
 /** @} */ // End of HDMI CEC HAL Tests Main File
