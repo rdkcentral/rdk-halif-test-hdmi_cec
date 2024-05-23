@@ -88,6 +88,7 @@ void start_emulator (void)
         if(emulator != NULL)
         {
           gEmulatorInfo.handle = emulator;
+          UT_LOG("Emulator started\n");
 
         }
     }
@@ -99,6 +100,7 @@ void stop_emulator(void)
     {
         Emulator_Deinitialize(gEmulatorInfo.handle);
         gEmulatorInfo.handle = NULL;
+        UT_LOG("Emulator stopped\n");
     }
 }
 

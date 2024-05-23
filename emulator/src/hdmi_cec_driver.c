@@ -533,7 +533,7 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
 HDMI_CEC_STATUS HdmiCecClose(int handle)
 {
-  if(gEmulator != NULL && gEmulator->cec_hal != NULL)
+  if(gEmulator != NULL && gEmulator->cec_hal != NULL && ((int)gEmulator->cec_hal == handle))
   {
     TeardownHal(gEmulator->cec_hal);
   }
@@ -554,12 +554,11 @@ HDMI_CEC_STATUS HdmiCecSetLogicalAddress(int handle, int* logicalAddresses, int 
 
 HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddress)
 {
-  hdmi_cec_t *hal = (hdmi_cec_t*)handle;
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (hal != NULL)
+  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
   {
-    *physicalAddress = hal->emulated_device.physical_address;
+    *physicalAddress = gEmulator->cec_hal ->emulated_device.physical_address;
   }
   return status;
 }
@@ -567,16 +566,16 @@ HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddr
 HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 {
    UT_LOG("HdmiCecAddLogicalAddress\n");
-  hdmi_cec_t *hal = (hdmi_cec_t*)handle;
+
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
-  UT_LOG("HdmiCecAddLogicalAddress - hal[%p] - g[%p]\n", hal, gEmulator->cec_hal);
-  if (hal != NULL)
+
+  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
   {
-    if(hal->emulated_device.type != DEVICE_TYPE_TV)
+    if(gEmulator->cec_hal->emulated_device.type != DEVICE_TYPE_TV)
     {
       //ADD Logical Address only for source device
-      status = HDMI_CEC_IO_SUCCESS;
     }
+    status = HDMI_CEC_IO_SUCCESS;
   }
   UT_LOG("HdmiCecAddLogicalAddress - status %d\n",status);
   return status;
@@ -584,16 +583,16 @@ HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 
 HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 {
-  hdmi_cec_t *hal = (hdmi_cec_t*)handle;
+
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (hal != NULL)
+  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
   {
-    if(hal->emulated_device.type != DEVICE_TYPE_TV)
+    if(gEmulator->cec_hal->emulated_device.type != DEVICE_TYPE_TV)
     {
       //ADD Logical Address only for source device
-      status = HDMI_CEC_IO_SUCCESS;
     }
+    status = HDMI_CEC_IO_SUCCESS;
   }
   return status;
 }
@@ -601,12 +600,12 @@ HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 {
   UT_LOG("HdmiCecGetLogicalAddress\n");
-  hdmi_cec_t *hal = (hdmi_cec_t*)handle;
+
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (hal != NULL)
+  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
   {
-    *logicalAddress = hal->emulated_device.logical_address;
+    *logicalAddress = gEmulator->cec_hal->emulated_device.logical_address;
     status = HDMI_CEC_IO_SUCCESS;
   }
   UT_LOG("HdmiCecGetLogicalAddress - status %d\n",status);
@@ -615,13 +614,12 @@ HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 
 HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, void* data)
 {
-  hdmi_cec_t *hal = (hdmi_cec_t*)handle;
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (hal != NULL && cbfunc != NULL)
+  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle) && cbfunc != NULL)
   {
-    hal->callbacks.rx_cb_func = cbfunc;
-    hal->callbacks.rx_cb_data = data;
+    gEmulator->cec_hal->callbacks.rx_cb_func = cbfunc;
+    gEmulator->cec_hal->callbacks.rx_cb_data = data;
     status = HDMI_CEC_IO_SUCCESS;
   }
   return status;
@@ -629,13 +627,12 @@ HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, voi
 
 HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, void* data)
 {
-  hdmi_cec_t *hal = (hdmi_cec_t*)handle;
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (hal != NULL && cbfunc != NULL)
+  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle)&& cbfunc != NULL)
   {
-    hal->callbacks.tx_cb_func = cbfunc;
-    hal->callbacks.tx_cb_data = data;
+    gEmulator->cec_hal->callbacks.tx_cb_func = cbfunc;
+    gEmulator->cec_hal->callbacks.tx_cb_data = data;
     status = HDMI_CEC_IO_SUCCESS;
   }
   return status;
@@ -643,14 +640,38 @@ HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, voi
 
 HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* result)
 {
-  EMU_LOG("HdmiCecTx: Tx: ");
+  HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
+  if(handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  {
+    int i = 0;
+	  EMU_LOG(">>>>>>> >>>>> >>>> >> >> >\r\n");
+    EMU_LOG("HdmiCecTx: ");
+    for (i = 0; i < len; i++) {
+    	EMU_LOG("%02X ", buf[i]);
+    }
+	  EMU_LOG("==========================\r\n");
+    status = HDMI_CEC_IO_SUCCESS;
+  }
 
-  return (int)0;
+  return status;
 }
 
 HDMI_CEC_STATUS HdmiCecTxAsync(int handle, const unsigned char* buf, int len)
 {
 
-  return (int)0;
+  HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
+  if(handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  {
+    int i = 0;
+	  EMU_LOG(">>>>>>> >>>>> >>>> >> >> >\r\n");
+    EMU_LOG("HdmiCecTx: ");
+    for (i = 0; i < len; i++) {
+    	EMU_LOG("%02X ", buf[i]);
+    }
+	  EMU_LOG("==========================\r\n");
+    status = HDMI_CEC_IO_SUCCESS;
+  }
+
+  return status;
 }
 
