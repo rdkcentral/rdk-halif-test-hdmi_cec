@@ -1,56 +1,38 @@
-# HDMI CEC DRIVER Level 2 - Module Testing
-
-| Version | Date(YY-MM-DD) | Comments |
-| -------| ----- |  ----- |
-| 1.0.0 | 22/05/24 | Inital Document |
-
+# HDMI CEC DRIVER L2 Low Level Test Specification and Procedure Documentation
+ 
 ## Table of Contents
+            
+- [HDMI CEC DRIVER L2 Low Level Test Specification and Procedure Documentation](#hdmi-cec-driver-l2-low-level-test-specification-and-procedure-documentation)
 
-- [HDMI CEC DRIVER Level 2 - Module Testing](#hdmi-cec-driver-level-2---module-testing)
-  - [History](#history)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
     - [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
     - [Definitions](#definitions)
     - [References](#references)
-  - [Level 2 Test Suite](#level-2-test-suite)
-
+  - [Level 2 Test Procedure](#level-2-test-procedure)
+ 
 ## Overview
 
 This document describes the level 2 testing suite for the HDMI CEC DRIVER module.
-
+ 
 ### Acronyms, Terms and Abbreviations
 
 - `HAL` \- Hardware Abstraction Layer, may include some common components
-- `HAL.h`  \- Abstracted defined API to control the hardware
-- `HAL.c`  \- Implementation wrapper layer created by the `OEM` or `SoC` Vendor.
-- `RDK`  \- Reference Design Kit for All Devices
-- `RDK-B`  \- Reference Design Kit for Broadband Devices
-- `RDK-V`  \- Reference Design Kit for Video Devices
 - `UT`  \- Unit Test(s)
 - `OEM`  \- Original Equipment Manufacture
 - `SoC`  \- System on a Chip
-
+ 
 ### Definitions
 
-- `Soc Vendor` \- Definition to encompass multiple vendors
-- `Unit Tests` \- C Function tests that run on the target hardware
-- `Common Testing Framework` \- Off the shelf 3rd Party Testing Framework, or framework that does not require infrastructure to control it. That's not to say it cannot be controlled via infrastructure if required. Examples of which are.
-  - `GTest` \- Google Test Suit <https://google.github.io/googletest>
-  - `CUnit` \- C Testing Suit <http://cunit.sourceforge.net/>
-  - `Unity` \- C Embedded Testing Suit <http://www.throwtheswitch.org/unity>
-  - `ut-core` \- Common Testing Framework <https://github.com/rdkcentral/ut-core>, which wraps a open-source framework that can be expanded to the requirements for future framework.
-
+- `ut-core` \- Common Testing Framework <https://github.com/rdkcentral/ut-core>, which wraps a open-source framework that can be expanded to the requirements for future framework.
+ 
 ### References
-
-- `Feedback Loops` \- <https://www.softwaretestingnews.co.uk/4-methods-to-improve-your-feedback-loops-and-supercharge-your-testing-process/>
-- `Doxygen` \- SourceCode documentation tool - <https://www.doxygen.nl/index.html>
-- `Black Box Testing` \- <https://en.wikipedia.org/wiki/Black-box_testing>
-
-## Level 2 Test Suite
+- `High Level Test Specification` - [hdmi_cec_sink_tests.md](hdmi_cec_sink_tests.md)
+ 
+## Level 2 Test Procedure
 
 The following functions are expecting to test the module operates correctly.
-
+ 
 ### Test 1
 
 |Title|Details|
@@ -64,10 +46,10 @@ The following functions are expecting to test the module operates correctly.
 **Pre-Conditions :**
 None
 
-**Dependencies :**
+**Dependencies :** 
 None
 
-**User Interaction :**
+**User Interaction :** 
 If user chose to run the test in interactive mode, then the test case has to be selected via console.
 
 #### Test Procedure :
@@ -106,10 +88,10 @@ D -->|Failure| D1[Test case fail]
 **Pre-Conditions :**
 None
 
-**Dependencies :**
+**Dependencies :** 
 None
 
-**User Interaction :**
+**User Interaction :** 
 If user chose to run the test in interactive mode, then the test case has to be selected via console.
 
 #### Test Procedure :
@@ -119,7 +101,8 @@ If user chose to run the test in interactive mode, then the test case has to be 
 | 01 | Open the HDMI CEC driver using HdmiCecOpen API | handle = valid pointer | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 02 | Add each logical address from 0x00 to 0x0F using HdmiCecAddLogicalAddress API | handle = valid handle, logicalAddress = 0x00 to 0x0F | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 03 | Get each logical address from 0x00 to 0x0F using HdmiCecGetLogicalAddress API | handle = valid handle | HDMI_CEC_IO_SUCCESS , logical address = current logical address | Should be successful |
-| 04 | Close the HDMI CEC driver using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 04 | Remove each logical address from 0x00 to 0x0F using HdmiCecRemoveLogicalAddress API | handle = valid handle, logicalAddress = 0x00 to 0x0F | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 05 | Close the HDMI CEC driver using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
 ```mermaid
@@ -128,10 +111,12 @@ A[HdmiCecOpen] -- "HDMI_CEC_IO_SUCCESS" --> B{Call HdmiCecAddLogicalAddress <br>
 A -- "Not HDMI_CEC_IO_SUCCESS" --> A1[Test case fail]
 B -- "HDMI_CEC_IO_SUCCESS" --> C{Call HdmiCecGetLogicalAddress <br> from 0x00 to 0x0F}
 B -- "Not HDMI_CEC_IO_SUCCESS" --> B1[Test case fail]
-C -- "HDMI_CEC_IO_SUCCESS or <br> logical address matches current logical address" --> D[HdmiCecClose]
-C -- "Not HDMI_CEC_IO_SUCCESS or <br> logical address does not match current logical address" --> C1[Test case fail]
-D -- "HDMI_CEC_IO_SUCCESS" --> E[Test case success]
-D -- "Not HDMI_CEC_IO_SUCCESS" --> D1[Test case fail]
+C -- "HDMI_CEC_IO_SUCCESS or <br> logical address matches current logical address" --> D{Call HdmiCecRemoveLogicalAddress <br> from 0x00 to 0x0F}
+C -- "Not HDMI_CEC_IO_SUCCESS"  --> C1[Test case fail]
+D -- "HDMI_CEC_IO_SUCCESS" --> E[HdmiCecClose]
+D -- "Not HDMI_CEC_IO_SUCCESS"  --> D1[Test case fail]
+E -- "HDMI_CEC_IO_SUCCESS" --> F[Test case success]
+E -- "Not HDMI_CEC_IO_SUCCESS" --> E1[Test case fail]
 ```
 
 
@@ -148,10 +133,10 @@ D -- "Not HDMI_CEC_IO_SUCCESS" --> D1[Test case fail]
 **Pre-Conditions :**
 None
 
-**Dependencies :**
+**Dependencies :** 
 None
 
-**User Interaction :**
+**User Interaction :** 
 If user chose to run the test in interactive mode, then the test case has to be selected via console.
 
 #### Test Procedure :
@@ -160,24 +145,28 @@ If user chose to run the test in interactive mode, then the test case has to be 
 | -- | --------- | ---------- | -------------- | ----- |
 | 01 | Open the HDMI CEC driver using HdmiCecOpen API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 02 | Add a logical address using HdmiCecAddLogicalAddress API | handle = valid handle, logicalAddress = 0x00 | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 03 | Remove the logical address using HdmiCecRemoveLogicalAddress API | handle = valid handle, logicalAddress = 0x00 | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 04 | Get the logical address using HdmiCecGetLogicalAddress API | handle = valid handle, logicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS , logicalAddress = 0x0F | Should be successful |
-| 05 | Close the HDMI CEC driver using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 03 | Get the logical address using HdmiCecGetLogicalAddress API | handle = valid handle, logicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS , logicalAddress = 0x00 | Should be successful |
+| 04 | Remove the logical address using HdmiCecRemoveLogicalAddress API | handle = valid handle, logicalAddress = 0x00 | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 05 | Get the logical address using HdmiCecGetLogicalAddress API | handle = valid handle, logicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS , logicalAddress = 0x0F | Should be successful |
+| 06 | Close the HDMI CEC driver using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
 ```mermaid
 graph TB
 A[HdmiCecOpen] -- "HDMI_CEC_IO_SUCCESS" --> B[HdmiCecAddLogicalAddress]
 A -- "Failure" --> A1[Test case fail]
-B -- "HDMI_CEC_IO_SUCCESS" --> C[HdmiCecRemoveLogicalAddress]
+B -- "HDMI_CEC_IO_SUCCESS" --> C[HdmiCecGetLogicalAddress]
 B -- "Failure" --> B1[Test case fail]
-C -- "HDMI_CEC_IO_SUCCESS" --> D[HdmiCecGetLogicalAddress]
+C -- "HDMI_CEC_IO_SUCCESS & Logical Address = current logical address" --> D[HdmiCecRemoveLogicalAddress]
 C -- "Failure" --> C1[Test case fail]
-D -- "HDMI_CEC_IO_SUCCESS & Logical Address = 0x0F" --> E[HdmiCecClose]
+D --"HDMI_CEC_IO_SUCCESS" -->E[HdmiCecGetLogicalAddress]
 D -- "Failure" --> D1[Test case fail]
-E -- "HDMI_CEC_IO_SUCCESS" --> F[Test case pass]
+E -- "HDMI_CEC_IO_SUCCESS & Logical Address = 0x0F" --> F[HdmiCecClose]
 E -- "Failure" --> E1[Test case fail]
+F -- "HDMI_CEC_IO_SUCCESS" --> G[Test case pass]
+F -- "Failure" --> F1[Test case fail]
 ```
+
 
 
 ### Test 4
@@ -185,7 +174,7 @@ E -- "Failure" --> E1[Test case fail]
 |Title|Details|
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand`|
-|Description|After deleting the `DUT` logical address, try to send a broadcast HDMI CEC Command (as per 1.4b HDMI CEC spec) and confirm transmission is successful.|
+|Description|After deleting the `DUT` logical address, try to send a broadcast CEC Command (as per 1.4b HDMI CEC spec) and confirm transmission is successful.|
 |Test Group|Module : 02|
 |Test Case ID|004|
 |Priority|High|
@@ -193,10 +182,10 @@ E -- "Failure" --> E1[Test case fail]
 **Pre-Conditions :**
 None
 
-**Dependencies :**
+**Dependencies :** 
 None
 
-**User Interaction :**
+**User Interaction :** 
 If user chose to run the test in interactive mode, then the test case has to be selected via console.
 
 #### Test Procedure :
@@ -226,6 +215,7 @@ E -- "Failure" --> E1[Test case fail]
 F -- "HDMI_CEC_IO_SUCCESS" --> G[Test case success]
 F -- "Failure" --> F1[Test case fail]
 ```
+
 
 
 ### Test 5
@@ -276,7 +266,7 @@ A -->|Failure| A1[Test case fail]
 |Title|Details|
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_TransmitCECCommand`|
-|Description|Transmit a HDMI CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version of a device that doesn't exist.|
+|Description|DUT transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC version of device that doesn't exist.|
 |Test Group|Module : 02|
 |Test Case ID|006|
 |Priority|High|
@@ -284,10 +274,10 @@ A -->|Failure| A1[Test case fail]
 **Pre-Conditions :**
 None
 
-**Dependencies :**
+**Dependencies :** 
 None
 
-**User Interaction :**
+**User Interaction :** 
 If user chose to run the test in interactive mode, then the test case has to be selected via console.
 
 #### Test Procedure :
