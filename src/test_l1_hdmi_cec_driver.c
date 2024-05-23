@@ -68,6 +68,7 @@
 
 #include <ut.h>
 #include "ut_log.h"
+#include "ut_kvp_profile.h"
 #include "hdmi_cec_driver.h"
 
 /**
