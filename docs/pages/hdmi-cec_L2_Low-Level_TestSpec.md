@@ -123,14 +123,18 @@ graph TD
     style F fill:#bbf,stroke:#333,stroke-width:2px
     style G fill:#f9f,stroke:#333,stroke-width:2px
     style H fill:#bff,stroke:#333,stroke-width:2px
+    style I fill:#f00,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecOpen: \n handle = valid pointer}
     B -->|HDMI_CEC_IO_SUCCESS| C[Manage Logical Addresses]
     C -->|Each step successful| D[Add Logical Address]
-    D -->|HDMI_CEC_IO_SUCCESS| E[Validate Added Logical Address]
-    E -->|Matched| F[Remove Logical Address]
+    D -->|HDMI_CEC_IO_SUCCESS| E[Validate Added Logical Address]    
+    E -->|Matched| F[Remove Logical Address]    
     F -->|HDMI_CEC_IO_SUCCESS| G[All Addresses processed?]
     G -->|No| C
+    D <-->|NOT SUCCESS| I[Test Fail]
+    E <-->|NOT SUCCESS| I[Test Fail]
+    F <-->|NOT SUCCESS| I[Test Fail]
     G -->|Yes| H[Close HDMI CEC Driver]
 ```
 
@@ -176,13 +180,21 @@ graph TD
     style F fill:#bbf,stroke:#333,stroke-width:2px
     style G fill:#bff,stroke:#333,stroke-width:2px
     style H fill:#bbf,stroke:#333,stroke-width:2px
+	  style I fill:#f00,stroke:#333,stroke-width:2px
+	  style J fill:#bbf,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecOpen:\n handle = valid handle}
     B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address]
+	  C -->|NOT SUCCESS| I[Test Fail]
+	  I -->G
     C -->|HDMI_CEC_IO_SUCCESS| D[Get Logical Address]
+	  D -->|NOT SUCCESS| J[Remove Logical Address] --> I
     D -->|HDMI_CEC_IO_SUCCESS| E[Remove Logical Address]
+	  E -->|NOT SUCCESS| I
     E -->|HDMI_CEC_IO_SUCCESS| F[Get Logical Address]
+	  F -->|NOT SUCCESS| I
     F -->|HDMI_CEC_IO_SUCCESS| H[Compare Logical Address 0x0F]
+	  H -->|NOT SUCCESS| I
     H -->|HDMI_CEC_IO_SUCCESS| G[Close HDMI CEC Driver]
 ```
 
@@ -228,12 +240,17 @@ graph TD
     style E fill:#bbf,stroke:#333,stroke-width:2px
     style F fill:#bbf,stroke:#333,stroke-width:2px
     style G fill:#bff,stroke:#333,stroke-width:2px
+	  style I fill:#f00,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecOpen:\n handle = valid buffer}
-    B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address]
+    B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address] 
+	  C -->|NOT SUCCESS| I[Test Fail]--> G
     C -->|HDMI_CEC_IO_SUCCESS| D[Remove Logical Address]
+	  D -->|NOT SUCCESS| I[Test Fail]
     D -->|HDMI_CEC_IO_SUCCESS| E[Broadcast CEC Message]
+	  E -->|NOT SUCCESS| I[Test Fail]
     E -->|HDMI_CEC_IO_SUCCESS| F[Check Transmission Result]
+	  F -->|NOT SUCCESS| I[Test Fail]
     F -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| G[Close HDMI CEC Driver]
 ```
 
@@ -275,10 +292,12 @@ graph TD
     style B fill:#bbf,stroke:#333,stroke-width:2px
     style C fill:#bbf,stroke:#333,stroke-width:2px
     style D fill:#bff,stroke:#333,stroke-width:2px
+	  style E fill:#f00,stroke:#333,stroke-width:2px
     
     A[Open HDMI CEC Driver] --> B{HdmiCecGetPhysicalAddress}
-    B -->|Not HDMI_CEC_IO_SUCCESS | D
+    B -->|Not SUCCESS | E[Test Fail] --> D
     B -->|HDMI_CEC_IO_SUCCESS| C[Verify physical address < 0xFFFF]
+	  C -->|Not SUCCESS | E
     C -->D[Close HDMI CEC Driver]
 ```
 
@@ -319,10 +338,16 @@ graph TD
     style B fill:#bbf,stroke:#333,stroke-width:2px
     style C fill:#bbf,stroke:#333,stroke-width:2px
     style D fill:#bbf,stroke:#333,stroke-width:2px
-    style E fill:#bff,stroke:#333,stroke-width:2px
+	  style D fill:#bbf,stroke:#333,stroke-width:2px
+    style F fill:#bff,stroke:#333,stroke-width:2px
+	  style I fill:#f00,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecAddLogicalAddress}
+	  B --> |NOT SUCCESS| I[TEST FAIL] --> F
     B -->|HDMI_CEC_IO_SUCCESS| C[Transmit CEC Command for \n a device not in the network]
-    C -->|HDMI_CEC_IO_SUCCESS| D[Check Result]
-    D -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| E[Close HDMI CEC Driver]
+	  C -->|NOT SUCCESS| E[Remove Logical Address]-->I
+    C -->|HDMI_CEC_IO_SUCCESS| D[Check Tx Ack]
+	  D -->|NOT SUCCESS| E[Remove Logical Address]
+	  D -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| G[Remove Logical Address]
+	  G -->F[Close HDMI CEC]
 ```
