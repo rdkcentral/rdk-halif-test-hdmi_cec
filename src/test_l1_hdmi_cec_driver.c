@@ -67,8 +67,8 @@
 #include <time.h>
 
 #include <ut.h>
-#include "ut_log.h"
-#include "ut_kvp_profile.h"
+#include <ut_log.h>
+#include <ut_kvp_profile.h>
 #include "hdmi_cec_driver.h"
 
 /**
@@ -606,11 +606,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-#ifdef EHNCAGED_CHECKS_ENABLED
-    if (HDMI_CEC_IO_NOT_OPENED  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-#else
-    if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-#endif
+    CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_NOT_OPENED,HDMI_CEC_IO_INVALID_ARGUMENT)
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
