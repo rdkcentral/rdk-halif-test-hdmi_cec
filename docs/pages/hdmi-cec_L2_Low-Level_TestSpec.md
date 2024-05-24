@@ -103,8 +103,6 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
-| 01 | Open the HDMI CEC driver using HdmiCecOpen API | handle = valid pointer | HDMI_CEC_IO_SUCCESS | Should be successful |
---- | --- | --- | --- | --- | ---
 01 | Open HDMI CEC Driver | Open the HDMI CEC driver using `HdmiCecOpen` API | `handle = valid pointer` | `HDMI_CEC_IO_SUCCESS` | Should be successful
 02 | Manage Logical Addresses | For each logical address from 0x00 to 0x0F, add, validate, and remove the address sequentially | `handle = valid handle`, `logicalAddress = 0x00 to 0x0F` | `HDMI_CEC_IO_SUCCESS` | Each step should be successful
 02a | Add Logical Address | Add the logical address using `HdmiCecAddLogicalAddress` API | `handle = valid handle`, `logicalAddress = current address` | `HDMI_CEC_IO_SUCCESS` | Should be successful
