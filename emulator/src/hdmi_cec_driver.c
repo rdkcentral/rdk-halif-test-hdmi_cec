@@ -24,7 +24,8 @@
 #include "hdmi_cec_driver.h"
 #include "emulator.h"
 #include "ut_log.h"
-#include "ut_kvp.h"
+#include "ut_kvp_profile.h"
+#include <assert.h>
 
 //Todo Decouple this from UT
 #define EMU_LOG(format, ...)  UT_logPrefix(__FILE__, __LINE__, UT_LOG_ASCII_YELLOW"EMU   "UT_LOG_ASCII_NC, format, ## __VA_ARGS__)
@@ -33,8 +34,6 @@
 /**HDMI CEC HAL Data structures */
 
 #define MAX_OSD_NAME_LENGTH 16
-
-
 
 typedef enum {
   DEVICE_TYPE_TV = 0,
@@ -113,7 +112,6 @@ typedef struct {
 } hotplug_event_t;
 
 typedef enum{
-
   CEC_ACTIVE_SOURCE = 0x82,
   CEC_IMAGE_VIEW_ON = 0x04,
   CEC_TEXT_VIEW_ON = 0x0D,
@@ -121,7 +119,6 @@ typedef enum{
   CEC_REQUEST_ACTIVE_SOURCE = 0x85,
   CEC_STANDBY = 0x36,
   CEC_UNKNOWN = 0
-
 } cec_command_t;
 
 
@@ -140,12 +137,11 @@ typedef struct {
   };
 } cec_event_t;
 
-
 typedef struct {
    device_type_t type;
    cec_version_t version;
    unsigned int physical_address;
-   unsigned char logical_address;
+   unsigned int logical_address;
    bool active_source;
    unsigned int vendor_id;
    device_power_status_t power_status;
@@ -159,10 +155,8 @@ typedef struct {
   void* tx_cb_data;
 } cec_callbacks_t;
 
-
 typedef struct {
   cec_hal_state_t state;
-
   device_info_t emulated_device;
   int num_ports;
   hdmi_port_info_t *ports;
@@ -173,57 +167,34 @@ typedef struct {
   //TODO
   // Eventing Queue, Thread for callback
 
-  //TODO
-  //Handle of Profile config KVP
 } hdmi_cec_t;
 
 
 /**Emulator Data types*/
-
 typedef struct {
   unsigned short cp_port;
   char* cp_path;
   hdmi_cec_t * cec_hal;
-  ut_kvp_instance_t *profile_instance;
 } cec_emulator_t;
 
 static cec_emulator_t* gEmulator = NULL;
 
+const static struct  {
+  device_type_t val;
+  char* str_type;
+} gDIMap [] = {
+  { DEVICE_TYPE_TV, "TV" },
+  { DEVICE_TYPE_PLAYBACK, "PlaybackDevice" },
+  { DEVICE_TYPE_AUDIO_SYSTEM, "AudioSystem" },
+  { DEVICE_TYPE_RECORDER, "RecordingDevice" },
+  { DEVICE_TYPE_TUNER, "Tuner" },
+  { DEVICE_TYPE_RESERVED, "Reserved" }
+};
 
-
-static device_type_t GetDeviceType(char *type)
-{
-  const static struct  {
-    device_type_t val;
-    const char* str_type;
-  } dimap [] = {
-    { DEVICE_TYPE_TV, "TV" },
-    { DEVICE_TYPE_PLAYBACK, "PlaybackDevice" },
-    { DEVICE_TYPE_AUDIO_SYSTEM, "AudioSystem" },
-    { DEVICE_TYPE_RECORDER, "RecordingDevice" },
-    { DEVICE_TYPE_TUNER, "Tuner" },
-    { DEVICE_TYPE_RESERVED, "Reserved" }
-  };
-
-  device_type_t result = DEVICE_TYPE_TV;
-
-  for (int i = 0;  i < sizeof (dimap) / sizeof (dimap[0]);  ++i)
-  {
-    if (!strcmp (type, dimap[i].str_type))
-    {
-        result = dimap[i].val;    
-    }
-  }
-
-  return result;
-}
-
-static unsigned int GetVendorCode(const char *name)
-{
-  const static struct  {
-    const char* name;
+const static struct  {
+    char* name;
     unsigned int code;
-  } vcmap [] = {
+  } gVCMap [] = {
     {"TOSHIBA", 0x000039},
     {"SAMSUNG", 0x0000F0},
     {"DENON", 0x0005CD},
@@ -254,32 +225,109 @@ static unsigned int GetVendorCode(const char *name)
     {"UNKNOWN", 0},
   };
 
-  unsigned int result = 0;
+const static struct  {
+  device_power_status_t status;
+  char* str;
+} gPSMap [] = {
+  { DEVICE_POWER_STATUS_ON, "on" },
+  { DEVICE_POWER_STATUS_OFF, "off" },
+  { DEVICE_POWER_STATUS_STANDBY, "standby" }
+};
 
-  for (int i = 0;  i < sizeof (vcmap) / sizeof (vcmap[0]);  ++i)
+static char* GetDeviceTypeStr(device_type_t type)
+{
+  char* result = NULL;
+  for (int i = 0;  i < sizeof (gDIMap) / sizeof (gDIMap[0]);  ++i)
   {
-    if (!strcmp (name, vcmap[i].name))
+    if (type == gDIMap[i].val)
     {
-        result = vcmap[i].code;    
+        result = gDIMap[i].str_type;
+        break;
+    }
+  }
+  return result;
+}
+
+static device_type_t GetDeviceType(char *type)
+{
+
+  device_type_t result = DEVICE_TYPE_TV;
+
+  for (int i = 0;  i < sizeof (gDIMap) / sizeof (gDIMap[0]);  ++i)
+  {
+    if (!strcmp (type, gDIMap[i].str_type))
+    {
+        result = gDIMap[i].val;   
+        break; 
     }
   }
 
   return result;
 }
 
-static device_power_status_t GetDevicePowerStatus(char *status)
+static char* GetVendorName(int code)
 {
-  device_power_status_t result = DEVICE_POWER_STATUS_OFF;
-  if(!strncmp(status, "on", sizeof("on")))
+  char* result = NULL;
+
+  for (int i = 0;  i < sizeof (gVCMap) / sizeof (gVCMap[0]);  ++i)
   {
-    result = DEVICE_POWER_STATUS_ON;
+    if (code == gVCMap[i].code)
+    {
+        result = gVCMap[i].name;   
+        break; 
+    }
   }
-  else if (!strncmp(status, "standby", sizeof("standby")))
+
+  return result;
+}
+
+static unsigned int GetVendorCode(char *name)
+{
+  unsigned int result = 0;
+
+  for (int i = 0;  i < sizeof (gVCMap) / sizeof (gVCMap[0]);  ++i)
   {
-    result = DEVICE_POWER_STATUS_STANDBY;
+    if (!strcmp (name, gVCMap[i].name))
+    {
+        result = gVCMap[i].code;   
+        break; 
+    }
+  }
+
+  return result;
+}
+
+static char* GetDevicePowerStatusStr(device_power_status_t status)
+{
+  char* result = NULL;
+
+  for (int i = 0;  i < sizeof (gPSMap) / sizeof (gPSMap[0]);  ++i)
+  {
+    if (status == gPSMap[i].status)
+    {
+        result = gPSMap[i].str;
+        break; 
+    }
   }
   return result;
 }
+
+static device_power_status_t GetDevicePowerStatus(char *name)
+{
+  device_power_status_t result = DEVICE_POWER_STATUS_OFF;
+
+  for (int i = 0;  i < sizeof (gPSMap) / sizeof (gPSMap[0]);  ++i)
+  {
+    if (!strcmp (name, gPSMap[i].str))
+    {
+        result = gPSMap[i].status;
+        break; 
+    }
+  }
+
+  return result;
+}
+
 
 static hdmi_port_type_t GetPortType(char *type)
 {
@@ -332,7 +380,6 @@ void LoadDevicesInfo (ut_kvp_instance_t* instance, device_info_t* devices, unsig
   }
 }
 
-
 void LoadPortsInfo (ut_kvp_instance_t* instance, hdmi_port_info_t* ports, unsigned int nPorts)
 {
   if (ports != NULL && nPorts > 0)
@@ -384,23 +431,6 @@ void LoadEmulatedDeviceInfo (ut_kvp_instance_t* instance, device_info_t* device_
 
 }
 
-
-ut_kvp_instance_t* LoadProfile(const char* path)
-{
-  ut_kvp_instance_t* instance = NULL;
-  instance = ut_kvp_createInstance();
-  if( ut_kvp_open(instance, path) == UT_KVP_STATUS_SUCCESS )
-  {
-    EMU_LOG("LoadProfile: [%s] Loaded", path);
-  }
-  else
-  {
-    ut_kvp_destroyInstance(instance);
-    instance = NULL;
-  }
-  return instance;
-}
-
 void TeardownHal (hdmi_cec_t* hal)
 {
   if(hal != NULL)
@@ -408,11 +438,17 @@ void TeardownHal (hdmi_cec_t* hal)
     //Stop all events
     //Exit Eventing
 
-
-    free (hal->connected_devices);
+    if(hal->connected_devices)
+    {
+      free (hal->connected_devices);
+    }
+    if(hal->ports)
+    {
+      free (hal->ports);
+    }
     hal->callbacks.rx_cb_func = NULL;
     hal->callbacks.tx_cb_func = NULL;
-    hal->state = HAL_STATE_CLOSED;
+    free(hal);
   }
 }
 
@@ -420,6 +456,7 @@ void TeardownHal (hdmi_cec_t* hal)
 Emulator_t *Emulator_Initialize(char* pProfilePath, unsigned short pCPPort, char* pCPUrl)
 {
   cec_emulator_t *result = NULL;
+  ut_kvp_status_t status;
   
   if(gEmulator == NULL)
   {
@@ -430,12 +467,12 @@ Emulator_t *Emulator_Initialize(char* pProfilePath, unsigned short pCPPort, char
       {
         result->cp_path = pCPUrl;
         result->cp_port = pCPPort;
-
-        result->profile_instance = LoadProfile(pProfilePath);
+        status = ut_kvp_profile_open(pProfilePath);
+        EMU_LOG("ut_kvp_profile_open: status: %d", status);
+        assert(status == UT_KVP_STATUS_SUCCESS);
         result->cec_hal = NULL;
 
         //TODO Control Plane init
-
       }
     }
     else
@@ -458,9 +495,23 @@ Emulator_t *Emulator_Initialize(char* pProfilePath, unsigned short pCPPort, char
 
 void Emulator_Deinitialize(Emulator_t *pEmulator)
 {
-  if(pEmulator != NULL)
+  cec_emulator_t* emulator = (cec_emulator_t*)pEmulator;
+  assert(emulator != gEmulator);
+
+  if(emulator != NULL)
   {
-     
+    if(emulator->cec_hal != NULL && emulator->cec_hal->state != HAL_STATE_CLOSED)
+    {
+      HdmiCecClose((int)emulator->cec_hal);
+    }
+    ut_kvp_profile_close();
+    free(emulator);
+    gEmulator = NULL;
+    EMU_LOG("Emulator_Deinitialize: Success");
+  }
+  else
+  {
+    EMU_LOG("Emulator_Deinitialize: already deinitialized");
   }
 }
 
@@ -469,36 +520,38 @@ void Emulator_Deinitialize(Emulator_t *pEmulator)
 HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 {
   HDMI_CEC_STATUS result = HDMI_CEC_IO_NOT_OPENED;
-  EMU_LOG("HdmiCecOpen: \n");
+  if(handle == NULL)
+  {
+    result = HDMI_CEC_IO_INVALID_HANDLE;
+  }
+  else if (gEmulator != NULL && gEmulator->cec_hal == NULL) {
 
-  if (gEmulator != NULL && gEmulator->cec_hal == NULL) {
-
-    EMU_LOG("HdmiCecOpen: Loading emulated Device Info\n");
-
+    EMU_LOG("HdmiCecOpen: Loading emulated Device Info");
+    ut_kvp_instance_t *profile_instance = ut_kvp_profile_getInstance();
     hdmi_cec_t* cec = (hdmi_cec_t*)malloc(sizeof(hdmi_cec_t));
     if(cec != NULL) {
-      LoadEmulatedDeviceInfo(gEmulator->profile_instance, &(cec->emulated_device));
-      cec->num_ports = ut_kvp_getUInt32Field(gEmulator->profile_instance, "hdmicec/number_ports");
-      EMU_LOG("HdmiCecOpen: Loading Ports Info\n");
+      LoadEmulatedDeviceInfo(profile_instance, &(cec->emulated_device));
+      cec->num_ports = ut_kvp_getUInt32Field(profile_instance, "hdmicec/number_ports");
+      EMU_LOG("HdmiCecOpen: Loading Ports Info");
       hdmi_port_info_t* ports = (hdmi_port_info_t*) malloc(sizeof(hdmi_port_info_t) * cec->num_ports);
-      LoadPortsInfo(gEmulator->profile_instance, ports, cec->num_ports);
+      LoadPortsInfo(profile_instance, ports, cec->num_ports);
       cec->ports = ports;
 
       //Setup Eventing and callback
 
 
       //Device Discovery and Network Topology
-      cec->num_devices = ut_kvp_getUInt32Field(gEmulator->profile_instance, "hdmicec/number_devices");
+      cec->num_devices = ut_kvp_getUInt32Field(profile_instance, "hdmicec/number_devices");
 
       device_info_t* devices = (device_info_t*) malloc(sizeof(device_info_t) * cec->num_devices);
-      EMU_LOG("HdmiCecOpen: Loading connected Device Info\n");
-      LoadDevicesInfo(gEmulator->profile_instance, devices, cec->num_devices);
+      EMU_LOG("HdmiCecOpen: Loading connected Device Info");
+      LoadDevicesInfo(profile_instance, devices, cec->num_devices);
       cec->connected_devices = devices;
       if(cec->emulated_device.type == DEVICE_TYPE_TV)
       { 
         EMU_LOG("HdmiCecOpen: Emulating a TV");
         cec->emulated_device.physical_address = 0;
-        cec->emulated_device.logical_address = 0;
+        cec->emulated_device.logical_address = 0x0F;
       }
       else
       {
@@ -506,8 +559,15 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
         //TODO Auto Allocate Logical addresses
       }
 
+      EMU_LOG(">>>>>>> >>>>> >>>> >> >> >");
+      EMU_LOG("Emulated Device               : %s", cec->emulated_device.osd_name);
+      EMU_LOG("Type                          : %s", GetDeviceTypeStr(cec->emulated_device.type));
+      EMU_LOG("Pwr Status                    : %s", GetDevicePowerStatusStr(cec->emulated_device.power_status));
+      EMU_LOG("Number of Ports               : %d", cec->num_ports);
+      EMU_LOG("Number of discovered devices  : %d", cec->num_devices);
+      EMU_LOG("==========================\r\n");
+
       *handle = (int) cec;
-      EMU_LOG("HdmiCecOpen: cec[%p], int[%p]", cec, (hdmi_cec_t*)(*handle));
       gEmulator->cec_hal = cec;
       cec->state = HAL_STATE_READY;
       result = HDMI_CEC_IO_SUCCESS;
@@ -533,51 +593,69 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
 HDMI_CEC_STATUS HdmiCecClose(int handle)
 {
-  if(gEmulator != NULL && gEmulator->cec_hal != NULL && ((int)gEmulator->cec_hal == handle))
+  HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
+
+  if (handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
-    TeardownHal(gEmulator->cec_hal);
+      TeardownHal(gEmulator->cec_hal);
+      gEmulator->cec_hal = NULL;
+      status = HDMI_CEC_IO_SUCCESS;
   }
-  return (int)0;
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecClose - status %d",status);
+  return status;
 }
 
-/*
-HDMI_CEC_STATUS HdmiCecSetLogicalAddress(int handle, int* logicalAddresses, int num)
-{
-  hdmi_cec_t *hal = (hdmi_cec_t*)handle;
-  if (hal != NULL && hal == gEmulator->cec_hal)
-  {
-    //TODO: Is more than 1 logical address expected?
-    hal->emulated_device.logical_address = logicalAddresses[0];
-  }
-  return (int)0;
-}*/
 
 HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddress)
 {
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  if (handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
-    *physicalAddress = gEmulator->cec_hal ->emulated_device.physical_address;
+    if(physicalAddress != NULL)
+    {
+      *physicalAddress = gEmulator->cec_hal->emulated_device.physical_address;
+      status = HDMI_CEC_IO_SUCCESS;
+    }
+    else
+    {
+      status = HDMI_CEC_IO_INVALID_ARGUMENT;
+    }
   }
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecGetPhysicalAddress - status %d",status);
   return status;
 }
 
 HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 {
-   UT_LOG("HdmiCecAddLogicalAddress\n");
-
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  if (handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
-    if(gEmulator->cec_hal->emulated_device.type != DEVICE_TYPE_TV)
+    if(gEmulator->cec_hal->emulated_device.type == DEVICE_TYPE_TV && logicalAddresses == 0)
     {
-      //ADD Logical Address only for source device
+      //ADD Logical Address only for Sink device
+      gEmulator->cec_hal->emulated_device.logical_address = logicalAddresses;
+      status = HDMI_CEC_IO_SUCCESS;
     }
-    status = HDMI_CEC_IO_SUCCESS;
+    else
+    {
+      status = HDMI_CEC_IO_INVALID_ARGUMENT;
+    }
   }
-  UT_LOG("HdmiCecAddLogicalAddress - status %d\n",status);
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecAddLogicalAddress - status %d",status);
   return status;
 }
 
@@ -586,29 +664,58 @@ HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  if (handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
-    if(gEmulator->cec_hal->emulated_device.type != DEVICE_TYPE_TV)
+    //Remove Logical Address only for Sink device
+    if(gEmulator->cec_hal->emulated_device.type == DEVICE_TYPE_TV && logicalAddresses == 0)
     {
-      //ADD Logical Address only for source device
+      if(gEmulator->cec_hal->emulated_device.logical_address == 0x0F)
+      {
+        //Looks like logical address is already removed. 
+        status = HDMI_CEC_IO_NOT_ADDED;
+      }
+      else
+      {
+        //Reset back to 0x0F
+        gEmulator->cec_hal->emulated_device.logical_address = 0x0F;
+        status = HDMI_CEC_IO_SUCCESS;
+      }
     }
-    status = HDMI_CEC_IO_SUCCESS;
+    else
+    {
+      //Return Invalid argument for source devices or if logical adddress removed is other than 0
+      status = HDMI_CEC_IO_INVALID_ARGUMENT;
+    }
+  }
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
   }
   return status;
 }
 
 HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 {
-  UT_LOG("HdmiCecGetLogicalAddress\n");
+  EMU_LOG("HdmiCecGetLogicalAddress handle[%d]", handle);
 
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  if (handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
-    *logicalAddress = gEmulator->cec_hal->emulated_device.logical_address;
-    status = HDMI_CEC_IO_SUCCESS;
+    if(logicalAddress != NULL)
+    {
+      *logicalAddress = gEmulator->cec_hal->emulated_device.logical_address;
+      status = HDMI_CEC_IO_SUCCESS;
+    }
+    else{
+      status = HDMI_CEC_IO_INVALID_ARGUMENT;
+    }
   }
-  UT_LOG("HdmiCecGetLogicalAddress - status %d\n",status);
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecGetLogicalAddress - status %d",status);
   return status;
 }
 
@@ -616,12 +723,17 @@ HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, voi
 {
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle) && cbfunc != NULL)
+  if (handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
     gEmulator->cec_hal->callbacks.rx_cb_func = cbfunc;
     gEmulator->cec_hal->callbacks.rx_cb_data = data;
     status = HDMI_CEC_IO_SUCCESS;
   }
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecSetRxCallback - status %d",status);
   return status;
 }
 
@@ -629,30 +741,52 @@ HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, voi
 {
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
 
-  if (handle > 0 &&  ((int)gEmulator->cec_hal == handle)&& cbfunc != NULL)
+  if (handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
     gEmulator->cec_hal->callbacks.tx_cb_func = cbfunc;
     gEmulator->cec_hal->callbacks.tx_cb_data = data;
     status = HDMI_CEC_IO_SUCCESS;
   }
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecSetTxCallback - status %d",status);
   return status;
 }
 
 HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* result)
 {
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
-  if(handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  if(handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
-    int i = 0;
-	  EMU_LOG(">>>>>>> >>>>> >>>> >> >> >\r\n");
-    EMU_LOG("HdmiCecTx: ");
-    for (i = 0; i < len; i++) {
-    	EMU_LOG("%02X ", buf[i]);
+    if(gEmulator->cec_hal->emulated_device.type == DEVICE_TYPE_TV && gEmulator->cec_hal->emulated_device.logical_address == 0x0F)
+    {
+      //If Logical Address is not set for a sink device, we cannot transmit
+      status = HDMI_CEC_IO_SENT_FAILED;
     }
-	  EMU_LOG("==========================\r\n");
-    status = HDMI_CEC_IO_SUCCESS;
+    else if(buf != NULL && len > 0 && result != NULL)
+    {
+      int i = 0;
+      EMU_LOG(">>>>>>> >>>>> >>>> >> >> >");
+      EMU_LOG("HdmiCecTx: ");
+      for (i = 0; i < len; i++) {
+        EMU_LOG("%02X ", buf[i]);
+      }
+      EMU_LOG("==========================");
+      *result = HDMI_CEC_IO_SENT_BUT_NOT_ACKD;
+      status = HDMI_CEC_IO_SUCCESS;
+    }
+    else
+    {
+      status = HDMI_CEC_IO_INVALID_ARGUMENT;
+    }
   }
-
+  else if(gEmulator == NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecTx - status %d",status);
   return status;
 }
 
@@ -660,18 +794,35 @@ HDMI_CEC_STATUS HdmiCecTxAsync(int handle, const unsigned char* buf, int len)
 {
 
   HDMI_CEC_STATUS status = HDMI_CEC_IO_INVALID_HANDLE;
-  if(handle > 0 &&  ((int)gEmulator->cec_hal == handle))
+  if(handle != 0 && gEmulator != NULL && gEmulator->cec_hal != NULL)
   {
-    int i = 0;
-	  EMU_LOG(">>>>>>> >>>>> >>>> >> >> >\r\n");
-    EMU_LOG("HdmiCecTx: ");
-    for (i = 0; i < len; i++) {
-    	EMU_LOG("%02X ", buf[i]);
+    if((gEmulator->cec_hal->emulated_device.type == DEVICE_TYPE_TV
+        && gEmulator->cec_hal->emulated_device.logical_address == 0x0F)
+        || gEmulator->cec_hal->callbacks.tx_cb_func == NULL)
+    {
+      status = HDMI_CEC_IO_SENT_FAILED;
     }
-	  EMU_LOG("==========================\r\n");
-    status = HDMI_CEC_IO_SUCCESS;
+    else if(buf != NULL && len > 0)
+    {
+      int i = 0;
+      EMU_LOG(">>>>>>> >>>>> >>>> >> >> >");
+      EMU_LOG("HdmiCecTxAsync: ");
+      for (i = 0; i < len; i++) {
+        EMU_LOG("%02X ", buf[i]);
+      }
+      EMU_LOG("==========================");
+      status = HDMI_CEC_IO_SUCCESS;
+    }
+    else
+    {
+      status = HDMI_CEC_IO_INVALID_ARGUMENT;
+    }
   }
-
+  else if( gEmulator==NULL || gEmulator->cec_hal == NULL)
+  {
+    status = HDMI_CEC_IO_NOT_OPENED;
+  }
+  EMU_LOG("HdmiCecTxAsync - status %d",status);
   return status;
 }
 
