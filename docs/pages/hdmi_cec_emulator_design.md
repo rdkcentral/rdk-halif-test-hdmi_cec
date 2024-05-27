@@ -20,25 +20,13 @@ hdmicec:
   #Device logical types - Hints for emulator to auto allocate logical address
   device_type: &device_type
     - TV
-    - STB_1
-    - STB_2 
-    - DVR_1
-    - DVR_2
-    - Chromecast
-    - HomeTheatre
-    - GamingConsole_1
-    - GamingConsole_2
-    - DVDPlayer_1
-	  - DVDPlayer_2
-    - AVR_1
-    - AVR_2
-    - Switcher_1
-    - Switcher_2
-    - Camera_1
-    - Camera_2
-    - SpecialPurpose
-    - Unregistered
- 
+    - PlaybackDevice
+    - AudioSystem
+    - RecordingDevice
+    - Tuner
+    - Reserved
+    - Unregistered 
+  
   #Port ID - Integer [1 to 15]
   port_id: &port_id
     !!int
@@ -51,36 +39,37 @@ hdmicec:
     - in
     - out
 
-  #Vendor Info - Name and IEEE RAC vendor code
+  #Vendor Info - Name. 
   vendor: &vendor
-    - [TOSHIBA, 0x000039]
-    - [SAMSUNG, 0x0000F0]
-    - [DENON, 0x0005CD]
-    - [MARANTZ, 0x000678]
-    - [LOEWE, 0x000982]
-    - [ONKYO, 0x0009B0]
-    - [MEDION, 0x000CB8]
-    - [TOSHIBA2, 0x000CE7]
-    - [APPLE, 0x0010FA]
-    - [HARMAN_KARDON2, 0x001950]
-    - [GOOGLE, 0x001A11]
-    - [AKAI, 0x0020C7]
-    - [AOC, 0x002467]
-    - [PANASONIC, 0x008045]
-    - [PHILIPS, 0x00903E]
-    - [DAEWOO, 0x009053]
-    - [YAMAHA, 0x00A0DE]
-    - [GRUNDIG, 0x00D0D5]
-    - [PIONEER, 0x00E036]
-    - [LG, 0x00E091]
-    - [SHARP, 0x08001F]
-    - [SONY, 0x080046]
-    - [BROADCOM, 0x18C086]
-    - [SHARP2, 0x534850]
-    - [VIZIO, 0x6B746D]
-    - [BENQ, 0x8065E9]
-    - [HARMAN_KARDON, 0x9C645E]
-    - [UNKNOWN, 0]
+    - TOSHIBA
+    - SAMSUNG
+    - DENON
+    - MARANTZ
+    - LOEWE
+    - ONKYO
+    - MEDION
+    - TOSHIBA2
+    - APPLE
+    - HARMAN_KARDON2
+    - GOOGLE
+    - AKAI
+    - AOC
+    - PANASONIC
+    - PHILIPS
+    - DAEWOO
+    - YAMAHA
+    - GRUNDIG
+    - PIONEER
+    - LG
+    - SHARP
+    - SONY
+    - BROADCOM
+    - SHARP2
+    - VIZIO
+    - BENQ
+    - HARMAN_KARDON
+    - SKY
+    - UNKNOWN
 
   #HDMI CEC Version supported by device
   cec_version: &cec_version 
@@ -114,7 +103,7 @@ hdmicec:
   version: *cec_version  #Value from enum &cec_version
   type: *device_type  #Type of device from device_type list
   active_source: !!bool	 #Whether the device will start as active source
-  vendor_info: *vendor  #Vendor info value pair from &vendor
+  vendor: *vendor  #Vendor info value from &vendor
   pwr_status: *power_status #Initial Power status from enum &power_status
   name: !!str #Name of the device
   number_ports: !!int
@@ -135,28 +124,28 @@ hdmicec:
     - type: *device_type  #Type of device from device_type list
       version: *cec_version
       active_source: !!bool
-      vendor_info: *vendor
+      vendor: *vendor
       pwr_status: *power_status
       name: !!str
 
     - type: *device_type
       version: *cec_version
       active_source: !!bool
-      vendor_info: *vendor
+      vendor: *vendor
       pwr_status: *power_status
       name: !!str
 
     - type: *device_type
       version: *cec_version
       active_source: !!bool
-      vendor_info: *vendor
+      vendor: *vendor
       pwr_status: *power_status
       name: !!str
 
     - type: *device_type
       version: *cec_version
       active_source: !!bool
-      vendor_info: *vendor
+      vendor: *vendor
       pwr_status: *power_status
       name: !!str
 
@@ -169,45 +158,29 @@ hdmicec:
 
 ```
 
-A sample configuration file for the control plane
-
-```yaml
----
-controlplane: 
-    ws:
-        port: 8091
-        url: /hdmicec
-
-```
-
 The Emulator will have a common interface that needs to be implemented along with the HAL driver interface functions.
 
 `emulator.h`
 
 ```
-int emulator_initialise(const char* profile, const char* config);
+Emulator_t *Emulator_Initialize( char* pProfilePath, unsigned short cpPort, char* pCPUrl );
 
-int emulator_deinitialise(void)
+void Emulator_Deinitialize( Emulator_t *pEmulator );
 ```
 
-emulator_initialise will use the YAML decoding functionality via the Key-Value Pair (KVP) module available currently as part of the ut_core to read the profile parameters and create the initial state machine with number of HDMI Ports and the network of devices attached on the CEC bus. In addition, emulator will also intialise the control plane with the websocket parameters passed via '--config'.
+emulator_initialise will use the YAML decoding functionality via the Key-Value Pair (KVP) module available currently as part of the ut_core to read the profile parameters and create the initial state machine with number of HDMI Ports and the network of devices attached on the CEC bus. In addition, emulator will also intialise the control plane with the websocket parameters passed via "-c" and "-u" parameters.
 
 The control plane inititialise function may look like this. This will setup the websocket server.
 
 ```
-ut_kvp_instance_t conf_instance = ut_kvp_createInstance();
-ut_kvp_status_t status = ut_kvp_read(&conf_instance, config);
-uint16_t port = ut_kvp_getUInt32Field(&conf_instance, "controlplane.ws.port");
-char* url = ut_kvp_getStringField(&conf_instance, "controlplane.ws.url");
-
-controlPlane_initialise(port, url);
+ut_controlPlane_instance_t* instance = UT_ControlPlane_Init(cpPort);
 
 ```
 
 The emulator will also register with the control plane to receive callbacks when there is a command trigger from the Test user. These are YAML messages over Websocket. The register mechanism shall look like below,
 
 ```
-controlPlane_register_callbackOnMessage("hdmicec.command", &myCallback);
+UT_ControlPlane_RegisterCallbackOnMessage("hdmicec.command", &myCallback);
 ```
 
 The state machine of the Hdmi CEC hal is setup by populating its data structures by retreiving from the profile config. Below is an example of information about HDMI ports populated. The info on devices connected to the CEC bus is populated in a similar way to set up the initial state machine.
@@ -256,7 +229,7 @@ port_info_t *ports = (port_info_t*)malloc(size(port_info_t) * num_ports);
 char prefix_name[] = "hdmicec.ports.";
 for(int i = 0; i < ports; i++)
 {
-      
+      ...
 }
 ---
 
@@ -359,10 +332,10 @@ Command to trigger a re-configuration of the initial state. The following config
 hdmicec:
   config:
     version: 4 
-    type: STB_1
+    type: PlaybackDevice
     active_source: true
-    vendor: [SAMSUNG, 0x0000F0]
-    power_status: on
+    vendor: SAMSUNG
+    pwr_status: on
     name: sky_xione
     number_ports: 1
     ports:
@@ -375,14 +348,14 @@ hdmicec:
       - type: TV
 	      version: 4
         active_source: false
-        vendor_info: [SONY, 0x080046]
+        vendor: SONY
         pwr_status: on
         name: Sony TV
       - type: Chromecast
         version: 4
         active_source: false
-        vendor_info: [GOOGLE, 0x001A11]
-        power_status: on
+        vendor: GOOGLE
+        pwr_status: on
         name: Chromecast
 
     links:

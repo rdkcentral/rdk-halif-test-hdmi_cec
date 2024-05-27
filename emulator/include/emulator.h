@@ -27,14 +27,14 @@ typedef void Emulator_t;
  * @brief Intitialize the Emulator and the co:qntrol plane
  * This will setup the initial state machine of the emulator
  * @param[in] pProfilePath - File path containing the profile config YAML for the HAL driver
- * @param[in] pCPPort - Control plane listening port. 
+ * @param[in] cpPort - Control plane listening port. 
  * @param[in] pCPUrl - Control plane Path URL e.g, "/hdmicec". Passing NULL is valid.
  * 
- *  The control plane url will look like "http://<ip>:<pCPPort>/pCPUrl"
+ *  The control plane url will look like "http://<ip>:<cpPort>/pCPUrl"
  * 
  * @return Emulator_t* - Pointer to the Emulator.
  */
-Emulator_t *Emulator_Initialize( char* pProfilePath, unsigned short pCPPort, char* pCPUrl );
+Emulator_t *Emulator_Initialize( char* pProfilePath, unsigned short cpPort, char* pCPUrl );
 
 
 /**

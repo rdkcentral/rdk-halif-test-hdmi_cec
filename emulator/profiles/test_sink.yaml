@@ -3,7 +3,7 @@ hdmicec:
     version: 4 
     type: TV
     active_source: false
-    vendor: SKY
+    vendor: SKY_UK
     pwr_status: on
     name: Sky Glass
     number_ports: 3
