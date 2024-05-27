@@ -46,7 +46,7 @@ static int gTestID = 1;
 * **Test Case ID:** 001@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [hdmi_cec_driver_L2_Low-Level_TestSpecification.md](../../docs/pages/hdmi_cec_driver_L2_Low-Level_TestSpecification.md)
 */
 
 void test_l2_hdmi_cec_driver_GetDefaultLogicalAddress(void)
@@ -96,7 +96,7 @@ void test_l2_hdmi_cec_driver_GetDefaultLogicalAddress(void)
 * **Test Case ID:** 002@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [hdmi_cec_driver_L2_Low-Level_TestSpecification.md](../../docs/pages/hdmi_cec_driver_L2_Low-Level_TestSpecification.md)
 */
 void test_l2_hdmi_cec_driver_AddAndGetLogicalAddress(void)
 {
@@ -146,7 +146,7 @@ void test_l2_hdmi_cec_driver_AddAndGetLogicalAddress(void)
 * **Test Case ID:** 003@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [hdmi_cec_driver_L2_Low-Level_TestSpecification.md](../../docs/pages/hdmi_cec_driver_L2_Low-Level_TestSpecification.md)
 */
 
 void test_l2_hdmi_cec_driver_RemoveLogicalAddress(void)
@@ -203,7 +203,7 @@ void test_l2_hdmi_cec_driver_RemoveLogicalAddress(void)
 * **Test Case ID:** 004@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [hdmi_cec_driver_L2_Low-Level_TestSpecification.md](../../docs/pages/hdmi_cec_driver_L2_Low-Level_TestSpecification.md)
 */
 
 void test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand(void)
@@ -282,7 +282,7 @@ void test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand(void)
 * **Test Case ID:** 005@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [hdmi_cec_driver_L2_Low-Level_TestSpecification.md](../../docs/pages/hdmi_cec_driver_L2_Low-Level_TestSpecification.md)
 */
 
 void test_l2_hdmi_cec_driver_VerifyPhysicalAddress(void)
@@ -332,7 +332,7 @@ void test_l2_hdmi_cec_driver_VerifyPhysicalAddress(void)
 * **Test Case ID:** 006@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [l2_hdmi_cec_driver_test_specification.md](../../docs/pages/l2_hdmi_cec_driver_test_specification.md)
+* Refer to UT specification documentation [hdmi_cec_driver_L2_Low-Level_TestSpecification.md](../../docs/pages/hdmi_cec_driver_L2_Low-Level_TestSpecification.md)
 */
 
 void test_l2_hdmi_cec_driver_TransmitCECCommand(void)

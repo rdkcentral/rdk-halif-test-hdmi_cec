@@ -53,7 +53,7 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
 | 1 |[Logical address](#logical-address-discovery)|Get the logical address of the `DUT` without actually adding the Logical Address and the API should return 0x0F as the default logical address.|HdmiCecGetLogicalAddress|Y|NA
-|a| |Setup all valid logical addresses b/w 0x00 to 0x0F for the `DUT` using HAL APIs, then retrieve it to ensure proper functionality.|HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress, HdmiCecRemoveLogicalAddress| Y | NA |
+|a| |Setup all valid logical addresses b/w 0x00 to 0x0F for the `DUT` and retrieve each to ensure proper functionality, using HAL APIs.|HdmiCecAddLogicalAddress, HdmiCecGetLogicalAddress, HdmiCecRemoveLogicalAddress| Y | NA |
 |b| | Invoke the HAL API to delete the `DUT` logical address and verify that it is removed successfully.  |HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecGetLogicalAddress| Y | NA|
 |c| | After deleting the `DUT` logical address, try to send a broadcast CEC Command (as per 1.4b HDMI CEC spec) and confirm transmission is successful.|HdmiCecAddLogicalAddress, HdmiCecRemoveLogicalAddress, HdmiCecTx | Y|NA||
 
