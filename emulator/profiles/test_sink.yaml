@@ -20,7 +20,7 @@ hdmicec:
         type: in
         cec_supported: true
         arc_supported: false
-    number_devices: 2
+    number_devices: 3
     devices:
       - type: AudioSystem
         version: 4
@@ -34,7 +34,14 @@ hdmicec:
         vendor: GOOGLE
         pwr_status: on
         name: Chromecast
+      - type: PlaybackDevice
+        version: 4
+        active_source: false
+        vendor: SKY
+        pwr_status: on
+        name: SKY xione
 
+    number_links: 3
     links:
       - - name: Sony
           id: 1
@@ -46,5 +53,11 @@ hdmicec:
           id: 2
           type: in
         - name: Chromecast
+          id: 1
+          type: out
+      - - name: Sky Glass
+          id: 3
+          type: in
+        - name: SKY xione
           id: 1
           type: out

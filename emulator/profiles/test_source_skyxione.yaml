@@ -27,6 +27,7 @@ hdmicec:
         pwr_status: on
         name: Chromecast
 
+    number_links: 2
     links:
       - - name: Sony TV
           id: 1
