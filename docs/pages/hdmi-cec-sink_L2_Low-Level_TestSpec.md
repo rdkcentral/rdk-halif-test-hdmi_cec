@@ -85,7 +85,7 @@ graph TD
 |Title|Details|
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_AddAndGetLogicalAddress`|
-|Description|Setup all valid logical addresses b/w 0x00 to 0x0F for the `DUT` using HAL APIs, then retrieve it to ensure proper functionality.|
+|Description|Setup all valid logical addresses b/w 0x00 to 0x0F for the `DUT` and retrieve each to ensure proper functionality, using HAL APIs.|
 |Test Group|Module : 02|
 |Test Case ID|002|
 |Priority|High|
@@ -103,12 +103,12 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
-01 | Open HDMI CEC Driver | Open the HDMI CEC driver using `HdmiCecOpen` API | `handle = valid pointer` | `HDMI_CEC_IO_SUCCESS` | Should be successful
-02 | Manage Logical Addresses | For each logical address from 0x00 to 0x0F, add, validate, and remove the address sequentially | `handle = valid handle`, `logicalAddress = 0x00 to 0x0F` | `HDMI_CEC_IO_SUCCESS` | Each step should be successful
-02a | Add Logical Address | Add the logical address using `HdmiCecAddLogicalAddress` API | `handle = valid handle`, `logicalAddress = current address` | `HDMI_CEC_IO_SUCCESS` | Should be successful
-02b | Validate Added Logical Address | Get the previously added logical address using `HdmiCecGetLogicalAddress` API and validate it | `handle = valid handle` | `HDMI_CEC_IO_SUCCESS`, `logical address = current address` | Should match the added logical address
-02c | Remove Logical Address | Remove the logical address using `HdmiCecRemoveLogicalAddress` API | `handle = valid handle`, `logicalAddress = current address` | `HDMI_CEC_IO_SUCCESS` | Should be successful
-03 | Close HDMI CEC Driver | Close the HDMI CEC driver using `HdmiCecClose` API | `handle = valid handle` | `HDMI_CEC_IO_SUCCESS` | Should be successful
+| 01 | Open HDMI CEC driver using HdmiCecOpen API | handle = valid pointer | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | Loop over the range of valid logical addresses (0x00 to 0x0F) | i = 0 to 0x0F | N/A | N/A |
+| 03 | Add logical address using HdmiCecAddLogicalAddress API | handle = valid handle, logicalAddress = i | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 04 | Retrieve logical address using HdmiCecGetLogicalAddress API | handle = valid handle, logicalAddress = valid pointer | HDMI_CEC_IO_SUCCESS, logicalAddress = i | Should be successful |
+| 05 | Remove logical address using HdmiCecRemoveLogicalAddress API | handle = valid handle, logicalAddress = i | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 06 | Close HDMI CEC driver using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
 ```mermaid
@@ -121,18 +121,14 @@ graph TD
     style F fill:#bbf,stroke:#333,stroke-width:2px
     style G fill:#f9f,stroke:#333,stroke-width:2px
     style H fill:#bff,stroke:#333,stroke-width:2px
-    style I fill:#f00,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecOpen: \n handle = valid pointer}
     B -->|HDMI_CEC_IO_SUCCESS| C[Manage Logical Addresses]
     C -->|Each step successful| D[Add Logical Address]
-    D -->|HDMI_CEC_IO_SUCCESS| E[Validate Added Logical Address]    
-    E -->|Matched| F[Remove Logical Address]    
+    D -->|HDMI_CEC_IO_SUCCESS| E[Validate Added Logical Address]
+    E -->|Matched| F[Remove Logical Address]
     F -->|HDMI_CEC_IO_SUCCESS| G[All Addresses processed?]
     G -->|No| C
-    D <-->|NOT SUCCESS| I[Test Fail]
-    E <-->|NOT SUCCESS| I[Test Fail]
-    F <-->|NOT SUCCESS| I[Test Fail]
     G -->|Yes| H[Close HDMI CEC Driver]
 ```
 
@@ -178,21 +174,13 @@ graph TD
     style F fill:#bbf,stroke:#333,stroke-width:2px
     style G fill:#bff,stroke:#333,stroke-width:2px
     style H fill:#bbf,stroke:#333,stroke-width:2px
-	  style I fill:#f00,stroke:#333,stroke-width:2px
-	  style J fill:#bbf,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecOpen:\n handle = valid handle}
     B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address]
-	  C -->|NOT SUCCESS| I[Test Fail]
-	  I -->G
     C -->|HDMI_CEC_IO_SUCCESS| D[Get Logical Address]
-	  D -->|NOT SUCCESS| J[Remove Logical Address] --> I
     D -->|HDMI_CEC_IO_SUCCESS| E[Remove Logical Address]
-	  E -->|NOT SUCCESS| I
     E -->|HDMI_CEC_IO_SUCCESS| F[Get Logical Address]
-	  F -->|NOT SUCCESS| I
     F -->|HDMI_CEC_IO_SUCCESS| H[Compare Logical Address 0x0F]
-	  H -->|NOT SUCCESS| I
     H -->|HDMI_CEC_IO_SUCCESS| G[Close HDMI CEC Driver]
 ```
 
@@ -238,17 +226,12 @@ graph TD
     style E fill:#bbf,stroke:#333,stroke-width:2px
     style F fill:#bbf,stroke:#333,stroke-width:2px
     style G fill:#bff,stroke:#333,stroke-width:2px
-	  style I fill:#f00,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecOpen:\n handle = valid buffer}
-    B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address] 
-	  C -->|NOT SUCCESS| I[Test Fail]--> G
+    B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address]
     C -->|HDMI_CEC_IO_SUCCESS| D[Remove Logical Address]
-	  D -->|NOT SUCCESS| I[Test Fail]
     D -->|HDMI_CEC_IO_SUCCESS| E[Broadcast CEC Message]
-	  E -->|NOT SUCCESS| I[Test Fail]
     E -->|HDMI_CEC_IO_SUCCESS| F[Check Transmission Result]
-	  F -->|NOT SUCCESS| I[Test Fail]
     F -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| G[Close HDMI CEC Driver]
 ```
 
@@ -290,12 +273,10 @@ graph TD
     style B fill:#bbf,stroke:#333,stroke-width:2px
     style C fill:#bbf,stroke:#333,stroke-width:2px
     style D fill:#bff,stroke:#333,stroke-width:2px
-	  style E fill:#f00,stroke:#333,stroke-width:2px
     
     A[Open HDMI CEC Driver] --> B{HdmiCecGetPhysicalAddress}
-    B -->|Not SUCCESS | E[Test Fail] --> D
+    B -->|Not HDMI_CEC_IO_SUCCESS | D
     B -->|HDMI_CEC_IO_SUCCESS| C[Verify physical address < 0xFFFF]
-	  C -->|Not SUCCESS | E
     C -->D[Close HDMI CEC Driver]
 ```
 
@@ -336,16 +317,10 @@ graph TD
     style B fill:#bbf,stroke:#333,stroke-width:2px
     style C fill:#bbf,stroke:#333,stroke-width:2px
     style D fill:#bbf,stroke:#333,stroke-width:2px
-	  style D fill:#bbf,stroke:#333,stroke-width:2px
-    style F fill:#bff,stroke:#333,stroke-width:2px
-	  style I fill:#f00,stroke:#333,stroke-width:2px
+    style E fill:#bff,stroke:#333,stroke-width:2px
 
     A[Open HDMI CEC Driver] --> B{HdmiCecAddLogicalAddress}
-	  B --> |NOT SUCCESS| I[TEST FAIL] --> F
     B -->|HDMI_CEC_IO_SUCCESS| C[Transmit CEC Command for \n a device not in the network]
-	  C -->|NOT SUCCESS| E[Remove Logical Address]-->I
-    C -->|HDMI_CEC_IO_SUCCESS| D[Check Tx Ack]
-	  D -->|NOT SUCCESS| E[Remove Logical Address]
-	  D -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| G[Remove Logical Address]
-	  G -->F[Close HDMI CEC]
+    C -->|HDMI_CEC_IO_SUCCESS| D[Check Result]
+    D -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| E[Close HDMI CEC Driver]
 ```
