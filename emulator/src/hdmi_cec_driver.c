@@ -139,18 +139,17 @@ typedef struct {
 
 typedef struct {
   char name[MAX_OSD_NAME_LENGTH];
-  hdmi_port_type_t type;
   unsigned int portId;
 } endpoint_t;
 
 typedef struct {
-  endpoint_t ep1;
-  endpoint_t ep2;
+  endpoint_t in;
+  endpoint_t out;
 } link_t;
 
 struct device_info_t {
-  struct device_info_t* next;
-  struct device_info_t* prev;
+  struct device_info_t* parent;  //Single Parent
+  struct device_info_t* children; //Array of Children
   device_type_t type;
   cec_version_t version;
   unsigned int physical_address;
@@ -173,7 +172,7 @@ typedef struct {
   int num_ports;
   hdmi_port_info_t *ports;
   int num_devices;
-  struct device_info_t* devices;
+  struct device_info_t* device_map;
   struct device_info_t* emulated_device;
   int num_links;
   link_t* network;
@@ -354,6 +353,50 @@ static hdmi_port_type_t GetPortType(char *type)
   return result;
 }
 
+unsigned int GetAvailableLogicalAddressForDeviceType(device_type_t type)
+{
+
+}
+
+void AutoAllocateAddresses (hdmi_cec_t* cec)
+{
+  //Lets check if emulated device is root device (TV). If so, lets start with that.
+  //We will only set the physical address to start with. We expect the logical address to be set through HdmiCecAddLogicalAddress.
+  //Head of the list is always the emulated device.
+  if(cec != NULL)
+  {
+    struct device_info_t* list = cec->devices;
+    while (list != NULL)
+    {
+      if(list->type == DEVICE_TYPE_TV)
+      {
+        //Root Device
+        list->physical_address = 0;
+        //Lets check its connections
+        for(int i=0; i < cec->num_links; i++)
+        {
+          if(!strcmp(list->osd_name, cec->network[i].in.name))
+          {
+            //We have a source device connected
+            struct device_info_t* source = GetDeviceByName(cec->network[i].out.name);
+            if(source != NULL)
+            {
+              source->physical_address = (((cec->network[i].in.portId & 0xF0 ) << 20)|( (0x04 &0x0F ) << 16) |((0x04 & 0xF0) << 4)  | (0x04 & 0x0F));
+              source->logical_address = GetAvailableLogicalAddressForDeviceType(source->type);
+            }
+          }
+        }
+      }
+      else
+      {
+
+      }
+
+    }
+  }
+}
+
+
 struct device_info_t* NewDevice(void)
 {
   struct device_info_t* device = (struct device_info_t*)malloc(sizeof(struct device_info_t));
@@ -362,94 +405,34 @@ struct device_info_t* NewDevice(void)
     device->active_source = false;
     device->logical_address = 0x0F;
     device->physical_address = 0x0F;
-    device->next = NULL;
-    device->prev = NULL;
+    device->parent = NULL;
+    device->children = NULL;
     device->vendor_id = 0;
   }
   return device;
 }
 
 
-void AddDevice(struct device_info_t** head, struct device_info_t* node)
+void AddChildDevice(struct device_info_t* parent, struct device_info_t* child)
 {
-  if(node != NULL)
-  {
-    if(*head == NULL)
-    {
-      *head = node;
-      node->next = NULL;
-      node->prev = NULL;
-    }
-    else
-    {
-      struct device_info_t* list = *head;
-      while (list != NULL)
-      {
-        if(list->next == NULL)
-        {
-          list->next = node;
-          node->prev = list;
-          break;
-        }
-        else
-        {
-          list = list->next;
-        }
-      }
-    }
-  }
 
 }
 
-void RemoveDevice(struct device_info_t* head, char* name)
+void RemoveDevice(struct device_info_t* parent, char* name)
 {
-  struct device_info_t* list = head;
-  while (list != NULL)
-  {
-    if(!strcmp(list->osd_name, name))
-    {
-      struct device_info_t* item = list;
-      if(list->prev != NULL)
-      {
-        list->prev->next = list->next;
-        if(list->next != NULL)
-        {
-          list->next->prev = list->prev;
-        }
-      }
-      free(item);
-      break;
-    }
-    list = list->next;
-  }
+ 
 }
 
-void RemoveAllDevices(struct device_info_t* head)
+void RemoveAllDevices(struct device_info_t* parent)
 {
-  struct device_info_t* list = head;
-  assert(list != NULL);
-  while (list != NULL)
-  {
-    struct device_info_t* item = list;
-    list = list->next;
-    free(item);
-  }
+  
 }
 
-struct device_info_t* GetDeviceByName (struct device_info_t* head, char* name)
+struct device_info_t* GetDeviceByName (struct device_info_t* parent, char* name)
 {
-  struct device_info_t* list = head;
+  struct device_info_t* list = parent;
   struct device_info_t* result = NULL;
-  while (list != NULL)
-  {
-    if(!strcmp(list->osd_name, name))
-    {
-      result = list;
-      break;
-    }
-    list = list->next;
-  }
-  return result;
+
 }
 
 void PrintDevices(struct device_info_t* head)
@@ -467,48 +450,44 @@ void PrintDevices(struct device_info_t* head)
   EMU_LOG("==========================\r\n");
 }
 
-void LoadDevicesInfo (ut_kvp_instance_t* instance, struct device_info_t* head, unsigned int nDevices)
+/* Load the device info into the passed in device_info_t*
+* prefix can be 
+*   "hdmicec/device_map/0"
+*   "hdmicec/device_map/0/children/0"
+*   "hdmicec/device_map/0/children/1"
+*   "hdmicec/device_map/0/children/1/children/0"
+*/
+void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct device_info_t* device)
 {
-  //We expect atleast one device (the emulated device in the list)
-  if (head != NULL && nDevices > 0)
+  if (device != NULL && instance != NULL && prefix != NULL)
   {
-    char *prefix = "hdmicec/devices/";
-    char tmp[256];
+    char tmp[strlen(prefix) + 64];
+    char type[32];
 
-    for (int i = 0; i < nDevices; ++i)
-    {
-      char type[16];
-      struct device_info_t* device = NewDevice();
-      assert(device != NULL);
-      
-      strcpy(tmp, prefix);
-      int length = snprintf( NULL, 0, "%d", i );
-      snprintf( tmp + strlen(prefix) , length + 1, "%d", i );
+    strcpy(tmp, prefix);
 
-      strcpy(tmp + strlen(prefix) + length, "/name");
-      ut_kvp_getStringField(instance, tmp, device->osd_name, MAX_OSD_NAME_LENGTH);
+    strcpy(tmp + strlen(prefix), "/name");
+    ut_kvp_getStringField(instance, tmp, device->osd_name, MAX_OSD_NAME_LENGTH);
 
-      strcpy(tmp + strlen(prefix) + length, "/active_source");
-      device->active_source = ut_kvp_getBoolField(instance, tmp);
+    strcpy(tmp + strlen(prefix), "/active_source");
+    device->active_source = ut_kvp_getBoolField(instance, tmp);
 
-      strcpy(tmp + strlen(prefix) + length, "/pwr_status");
-      ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-      device->power_status = GetDevicePowerStatus(type);
+    strcpy(tmp + strlen(prefix), "/pwr_status");
+    ut_kvp_getStringField(instance, tmp, type, sizeof(type));
+    device->power_status = GetDevicePowerStatus(type);
 
-      strcpy(tmp + strlen(prefix) + length, "/version");
-      device->version = (cec_version_t) ut_kvp_getUInt32Field(instance, tmp);
+    strcpy(tmp + strlen(prefix), "/version");
+    device->version = (cec_version_t) ut_kvp_getUInt32Field(instance, tmp);
 
-      strcpy(tmp + strlen(prefix) + length, "/vendor");
-      ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-      device->vendor_id = GetVendorCode(type);
+    strcpy(tmp + strlen(prefix), "/vendor");
+    ut_kvp_getStringField(instance, tmp, type, sizeof(type));
+    device->vendor_id = GetVendorCode(type);
 
-      strcpy(tmp + strlen(prefix) + length, "/type");
-      ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-      device->vendor_id = GetDeviceType(type);
+    strcpy(tmp + strlen(prefix), "/type");
+    ut_kvp_getStringField(instance, tmp, type, sizeof(type));
+    device->vendor_id = GetDeviceType(type);
 
-      AddDevice(&head, device);
-    }
-  }      
+  }
 }
 
 void LoadPortsInfo (ut_kvp_instance_t* instance, hdmi_port_info_t* ports, unsigned int nPorts)
@@ -556,26 +535,17 @@ void LoadNetwork (ut_kvp_instance_t* instance, link_t* network, unsigned int nli
       int length = snprintf( NULL, 0, "%d", i );
       snprintf( tmp + strlen(prefix) , length + 1, "%d", i );
 
-      strcpy(tmp + strlen(prefix) + length, "/0/type");
-      ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-      network[i].ep1.type = GetPortType(type);
-
       strcpy(tmp + strlen(prefix) + length, "/0/name");
-      ut_kvp_getStringField(instance, tmp, network[i].ep1.name, MAX_OSD_NAME_LENGTH);
+      ut_kvp_getStringField(instance, tmp, network[i].in.name, MAX_OSD_NAME_LENGTH);
 
       strcpy( tmp + strlen(prefix) + length  , "/0/id");
-      network[i].ep1.portId = ut_kvp_getUInt32Field(instance, tmp);
-
-      strcpy(tmp + strlen(prefix) + length, "/1/type");
-      ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-      network[i].ep2.type = GetPortType(type);
+      network[i].in.portId = ut_kvp_getUInt32Field(instance, tmp);
 
       strcpy(tmp + strlen(prefix) + length, "/1/name");
-      ut_kvp_getStringField(instance, tmp, network[i].ep2.name, MAX_OSD_NAME_LENGTH);
+      ut_kvp_getStringField(instance, tmp, network[i].out.name, MAX_OSD_NAME_LENGTH);
 
       strcpy( tmp + strlen(prefix) + length  , "/1/id");
-      network[i].ep2.portId = ut_kvp_getUInt32Field(instance, tmp);
-
+      network[i].out.portId = ut_kvp_getUInt32Field(instance, tmp);
     }
   }
 }

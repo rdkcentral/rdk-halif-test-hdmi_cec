@@ -43,21 +43,15 @@ hdmicec:
 
     number_links: 3
     links:
-      - - name: Sony
+      - - name: Sky Glass
           id: 1
-          type: out
-        - name: Sky Glass
+        - name: Sony
           id: 1
-          type: in
       - - name: Sky Glass
           id: 2
-          type: in
         - name: Chromecast
           id: 1
-          type: out
       - - name: Sky Glass
           id: 3
-          type: in
         - name: SKY xione
           id: 1
-          type: out
