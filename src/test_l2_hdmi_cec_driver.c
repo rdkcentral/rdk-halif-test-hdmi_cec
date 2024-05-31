@@ -464,7 +464,7 @@ static UT_test_suite_t * pSuite = NULL;
 int test_hdmicec_hal_l2_register(void)
 {
     // Create the test suite
-    pSuite = UT_add_suite("[L2 hdmi_cec_driver]", NULL, NULL);
+    pSuite = UT_add_suite("[L2 HDMICEC PANEL TestCase] ", NULL, NULL);
     if (pSuite == NULL)
     {
         return -1;
