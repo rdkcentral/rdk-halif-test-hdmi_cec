@@ -59,16 +59,15 @@
 */
 
 
+extern int test_hdmicec_hal_l1_register(void);
+extern int test_hdmicec_hal_l2_register(void);
 
-extern int test_hdmi_cec_driver_l1_register(void);
-extern int test_hdmi_cec_driver_l2_register(void);
-
-int register_hal_l2_tests( void )
+int register_hal_tests( void )
 {
     int registerFailed=0;
 
-    registerFailed |= test_hdmi_cec_driver_l1_register();
-    registerFailed |= test_hdmi_cec_driver_l2_register();
+    registerFailed |= test_hdmicec_hal_l1_register();
+    registerFailed |= test_hdmicec_hal_l2_register();
 
     return registerFailed;
 }
