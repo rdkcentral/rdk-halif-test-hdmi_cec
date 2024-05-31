@@ -67,13 +67,13 @@ void test_l2_hdmi_cec_driver_GetDefaultLogicalAddress(void)
     // Step 2: Call the API HdmiCecGetLogicalAddress()
     UT_LOG_DEBUG("Invoking HdmiCecGetLogicalAddress with handle: %d", handle);
     status = HdmiCecGetLogicalAddress(handle, &logicalAddress);
+    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
     if (status != HDMI_CEC_IO_SUCCESS)
     {
         UT_LOG_ERROR("HdmiCecGetLogicalAddress failed with status: %d", status);
         HdmiCecClose(handle); // Cleanup if test fails
         return;
     }
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
 
     // Step 3: Check the logical address
     UT_LOG_DEBUG("Checking logical address: %d", logicalAddress);
@@ -131,7 +131,6 @@ void test_l2_hdmi_cec_driver_AddAndGetLogicalAddress(void)
         if ((status != HDMI_CEC_IO_SUCCESS) || (logicalAddress != i))
         {
             UT_LOG_ERROR("HdmiCecGetLogicalAddress failed with status: %d logical address : %d\n", status, logicalAddress );
-            continue;
         }
 
         status = HdmiCecRemoveLogicalAddress(handle, i);
@@ -197,8 +196,6 @@ void test_l2_hdmi_cec_driver_RemoveLogicalAddress(void)
     if ((status != HDMI_CEC_IO_SUCCESS) || (getLogicaladdress != logicalAddress))
     {
         UT_LOG_ERROR("HdmiCecGetLogicalAddress failed with status: %d logical address : %d\n", status, getLogicaladdress );
-        HdmiCecClose(handle);
-        return;
     }
 
     // Invoke the API HdmiCecRemoveLogicalAddress
@@ -257,12 +254,7 @@ void test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand(void)
 
     HDMI_CEC_STATUS status = HdmiCecOpen(&handle);
     UT_LOG_DEBUG("Invoking HdmiCecOpen with handle: %d", handle);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    if (status != HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG_ERROR("HdmiCecOpen failed with status: %d\n", status);
-        return;
-    }
+    UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
 
     status = HdmiCecAddLogicalAddress(handle, logicalAddresses);
     UT_LOG_DEBUG("Invoking HdmiCecAddLogicalAddress with handle: %d and logicalAddress: %d", handle, logicalAddresses);
@@ -303,10 +295,6 @@ void test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand(void)
     status = HdmiCecClose(handle);
     UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
-    if (status != HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG_ERROR("HdmiCecClose failed with status: %d\n", status);
-    }
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -400,9 +388,9 @@ void test_l2_hdmi_cec_driver_TransmitCECCommand(void)
 
     status = HdmiCecTx(handle, buf, len, &result);
     UT_LOG_DEBUG("Invoking HdmiCecTx with handle: %d", handle);
-    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
+    UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
     UT_ASSERT_EQUAL(result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
-    if (status != HDMI_CEC_IO_SENT_BUT_NOT_ACKD)
+    if (status != HDMI_CEC_IO_SUCCESS)
     {
         UT_LOG_ERROR("HdmiCecTx failed with status: %d\n", status);
         HdmiCecRemoveLogicalAddress(handle, logicalAddresses);
