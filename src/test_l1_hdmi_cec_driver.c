@@ -295,7 +295,7 @@ void test_hdmicec_hal_l1_open_positive( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_LOG("open failed %d", result); UT_FAIL_FATAL("open failed"); }
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }

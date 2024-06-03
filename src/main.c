@@ -64,7 +64,7 @@
 #include <stdlib.h>
 
 extern int register_hdmicec_hal_l1_tests( void );
-extern int register_emulator_tests ( char* profile, unsigned short cpPort, char* cpPath );
+extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
 
 int main(int argc, char** argv) 
 {
@@ -108,15 +108,19 @@ int main(int argc, char** argv)
 
     register_hdmicec_hal_l1_tests ();
 
-    register_emulator_tests(pProfilePath, cpPort, pUrl);
+    register_vcomponent_tests(pProfilePath, cpPort, pUrl);
 
     UT_run_tests();
 
     if(pProfilePath != NULL)
+    {
         free(pProfilePath);
+    }
 
     if(pUrl != NULL)
+    {
         free(pUrl);
+    }
 }
 
 /** @} */ // End of HDMI CEC HAL Tests Main File

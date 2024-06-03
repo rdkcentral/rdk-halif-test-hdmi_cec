@@ -36,11 +36,11 @@
  */
 
 /**
- * @defgroup HDMI_CEC_HAL_EMULATORTESTS HDMI CEC HAL Emulator Tests File
+ * @defgroup HDMI_CEC_HAL_EMULATORTESTS HDMI CEC HAL Virtual Component Tests File
  * @{
  * @parblock
  *
- * ### L1 Test Cases for HDMI CEC HAL Emulator:
+ * ### L1 Test Cases for HDMI CEC HAL Virtual Component:
  *
  * This module includes Level 1 functional tests (success and failure scenarios).
  * This is to ensure that the API meets the operational requirements of the module across all vendors.
@@ -55,7 +55,7 @@
  */
 
 /**
- * @file test_emulator.c
+ * @file test_vcomponent.c
  * 
  */
 
@@ -63,45 +63,60 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include <ut.h>
 #include <ut_cunit.h>
 #include "ut_log.h"
 #include "hdmi_cec_driver.h"
-#include "emulator.h"
+#include "vcomponent_hdmi_cec.h"
 
 
 struct emulator_info {
   char *pProfilePath;
   unsigned short cpPort;
   char* pCpPath;
-  Emulator_t* handle;
-} gEmulatorInfo = {NULL, 8888, NULL};
+  vComponent_HdmiCec_t* handle;
+};
 
+struct emulator_info gVCInfo = {NULL, 8888, NULL};
 
-
-void start_emulator (void)
+void start_virtual_component (void)
 {
-    if(gEmulatorInfo.pProfilePath != NULL)
+    vComponent_HdmiCec_Status status;
+    
+    if(gVCInfo.pProfilePath == NULL)
     {
-        Emulator_t* emulator = Emulator_Initialize(gEmulatorInfo.pProfilePath, gEmulatorInfo.cpPort, gEmulatorInfo.pCpPath);
-        if(emulator != NULL)
-        {
-          gEmulatorInfo.handle = emulator;
-          UT_LOG("Emulator started\n");
-
-        }
+        assert(gVCInfo.pProfilePath != NULL);
+        return;
     }
+
+    status = vComponent_HdmiCec_Initialize(gVCInfo.pProfilePath, gVCInfo.cpPort, gVCInfo.pCpPath, &gVCInfo.handle);
+    if(status != VC_HDMICEC_STATUS_SUCCESS)
+    {
+        UT_LOG("Error starting Virtual Component [%d]\n", status);
+    }
+
+        UT_LOG("Virtual Component started\n");
+
 }
 
-void stop_emulator(void)
+void stop_virtual_component(void)
 {
-    if(gEmulatorInfo.handle != NULL)
+    vComponent_HdmiCec_Status status;
+    if(gVCInfo.handle == NULL)
     {
-        Emulator_Deinitialize(gEmulatorInfo.handle);
-        gEmulatorInfo.handle = NULL;
-        UT_LOG("Emulator stopped\n");
+        assert(gVCInfo.handle != NULL);
+        return;
     }
+    status = vComponent_HdmiCec_Deinitialize(gVCInfo.handle);
+    if(status != VC_HDMICEC_STATUS_SUCCESS)
+    {
+        UT_LOG("Error stopping Virtual Component [%d]\n", status);
+    }
+    gVCInfo.handle = NULL;
+    UT_LOG("Virtual Component stopped\n");
+    
 }
 
 static UT_test_suite_t * pSuite = NULL;
@@ -111,33 +126,31 @@ static UT_test_suite_t * pSuite = NULL;
  *
  * @return int - 0 on success, otherwise failure
  */
-int register_emulator_tests ( char* profile, unsigned short cpPort, char* cpPath )
+int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath )
 {
-    if(profile != NULL)
+    if(profile == NULL) 
     {
-        gEmulatorInfo.pProfilePath = profile;
+        return -1;
     }
-    gEmulatorInfo.cpPort = cpPort;
-    if(cpPath != NULL)
-    {
-        gEmulatorInfo.pCpPath = cpPath;
-    }
+    gVCInfo.pProfilePath = profile;
+    gVCInfo.cpPort = cpPort;
+    gVCInfo.pCpPath = cpPath;
 
     /* add a suite to the registry */
-    pSuite = UT_add_suite( "[HDMI CEC Emulator Lifecycle control]", NULL, NULL );
+    pSuite = UT_add_suite( "[HDMI CEC Virtual Component Lifecycle control]", NULL, NULL );
     if ( NULL == pSuite )
     {
         return -1;
     }
 
-    UT_add_test( pSuite, "start_emulator" , start_emulator );
-    UT_add_test( pSuite, "stop_emulator" , stop_emulator );
+    UT_add_test( pSuite, "start_virtual_component" , start_virtual_component );
+    UT_add_test( pSuite, "stop_virtual_component" , stop_virtual_component );
 
     return 0;
 
 }
 
-/** @} */ // End of HDMI CEC HAL Emulator Tests File
+/** @} */ // End of HDMI CEC HAL Virtual Component Tests File
 /** @} */ // End of HDMI CEC HAL Tests
 /** @} */ // End of HDMI CEC Module
 /** @} */ // End of HPK

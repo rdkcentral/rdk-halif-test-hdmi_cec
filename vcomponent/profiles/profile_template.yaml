@@ -13,7 +13,7 @@ hdmicec:
   #Port ID - Integer [1 to 15]
   port_id: &port_id 
     !!int
-	
+
   #Enum specifying port type
   #All references shown in the configuration templates are intended to provide possible values for the given type.
   #In practice, the below field would be defined as,
@@ -21,7 +21,7 @@ hdmicec:
   port_type: &port_type
     - in
     - out
-	
+
   #Vendor Info - Name and IEEE RAC vendor code
   vendor: &vendor
     - TOSHIBA
@@ -52,7 +52,7 @@ hdmicec:
     - BENQ
     - HARMAN_KARDON
     - UNKNOWN
-	
+
   #HDMI CEC Version supported by device
   cec_version: &cec_version 
     - 0  #Unknown
@@ -68,30 +68,13 @@ hdmicec:
     - on
     - off
     - standby
-	
-	#Endpoint information 
-  endpoint: &endpoint 
-    name: !!str # Name of the Device in the network
-	  id: *port_id # Port number 
-	  type: *port_type # Type of Port from &port_type
-	  
-	#Link represents a connection between 2 endpoints
-	#Physical addresses will be based on links
-	link: &link 
-	  - *endpoint 
-	  - *endpoint
-	  
+
   # Emulated Device's Information
-  version: *cec_version  #Value from enum &cec_version
-  type: *device_type  #Type of device from device_type list
-  active_source: !!bool	 #Whether the device will start as active source
-  vendor_info: *vendor  #Vendor info value pair from &vendor
-  pwr_status: *power_status #Initial Power status from enum &power_status
-  name: !!str #Name of the device
+  emulated_device: !!str # e.g, Sky Glass 
   number_ports: !!int
   ports: #Variable sized array of Ports belonging to Emulated device
     - id: *port_id
-	#All references shown in the configuration templates are intended to provide possible values for the given type.
+  #All references shown in the configuration templates are intended to provide possible values for the given type.
   #In practice, the below field would be defined as,
   # port_type: in
       type: *port_type  # Type of Port from &port_type
@@ -101,39 +84,41 @@ hdmicec:
       type: *port_type
       cec_supported: !!bool
       arc_supported: !!bool
-  number_devices: !!int
-  devices: # Variable sized array of Connected devices
-    - type: *device_type  #Type of device from device_type list
+
+  number_devices: !!int # Total number of devices in the network
+  device_map: # Map of devices starting from the Root Device (A TV) and multiple levels of children
+    - name: !!str  #Unique name identifying the device.
+      type: *device_type  #Type of device from device_type list. The top parent must be a root device (TV)
       version: *cec_version
       active_source: !!bool
       vendor_info: *vendor
       pwr_status: *power_status
-      name: !!str
+      port_id: !!int  #Port id of the parent to which this device is connected. For root device, this will be 0.
+      number_children: !!int  #Number of children connected to this device
+      children:   #Array of devices that are connected to this parent
+      - name: !!str
+        type: *device_type
+        version: *cec_version
+        active_source: !!bool
+        vendor_info: *vendor
+        pwr_status: *power_status
+        port_id: !!int  #Port id of the parent to which this device is connected
+        number_children: !!int # 0, If no devices are connected. This parameter must be present for all devices
 
-    - type: *device_type
-      version: *cec_version
-      active_source: !!bool
-      vendor_info: *vendor
-      pwr_status: *power_status
-      name: !!str
-
-    - type: *device_type
-      version: *cec_version
-      active_source: !!bool
-      vendor_info: *vendor
-      pwr_status: *power_status
-      name: !!str
-
-    - type: *device_type
-      version: *cec_version
-      active_source: !!bool
-      vendor_info: *vendor
-      pwr_status: *power_status
-      name: !!str
-
-  # Variable sized array of links between end points
-  # This represents the network of devices 
-  links:
-    - *link
-    - *link
-    - *link
+      - name: !!str
+        type: *device_type
+        version: *cec_version
+        active_source: !!bool
+        vendor_info: *vendor
+        pwr_status: *power_status
+        port_id: !!int  #Port id of the parent to which this device is connected
+        number_children: !!int # 0, If no devices are connected.
+        children:
+          - name: !!str
+            type: *device_type
+            version: *cec_version
+            active_source: !!bool
+            vendor_info: *vendor
+            pwr_status: *power_status
+            port_id: !!int  #Port id of the parent to which this device is connected
+            number_children: !!int # 0, If no devices are connected.
