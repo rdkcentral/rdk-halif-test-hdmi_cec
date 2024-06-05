@@ -1,42 +1,46 @@
 ---
 hdmicec:
-    version: 4 
-    type: PlaybackDevice
-    active_source: true
-    vendor: SKY
-    pwr_status: on
-    name: sky_xione
+    emulated_device: SKY XiOne
     number_ports: 1
     ports:
       - id: 1
         type: out
         cec_supported: true
         arc_supported: false
-    number_devices: 2
-    devices:
-      - type: TV
+
+    number_devices: 4
+    device_map:
+      - name: Sony Bravia
+        type: TV
         version: 4
         active_source: false
         vendor: SONY
         pwr_status: on
-        name: Sony TV
-      - type: Chromecast
-        version: 4
-        active_source: false
-        vendor: GOOGLE
-        pwr_status: on
-        name: Chromecast
-
-    links:
-      - - name: Sony TV
-          id: 1
-          type: in
-        - name: sky_xione
-          id: 1
-          type: out
-      - - name: Sony TV
-          id: 2
-          type: in
-        - name: Chromecast
-          id: 1
-          type: out
+        port_id: 0
+        number_children: 1
+        children:
+        - name: Onkyo TX-SR393
+          type: AudioSystem
+          version: 4
+          active_source: false
+          vendor: ONKYO
+          pwr_status: on
+          port_id: 1
+          number_children: 2
+          children:
+            - name: Chromecast
+              type: PlaybackDevice
+              version: 4
+              active_source: false
+              vendor: GOOGLE
+              pwr_status: off
+              port_id: 1
+              number_children: 0
+            - name: SKY XiOne
+              type: PlaybackDevice
+              version: 4
+              active_source: true
+              vendor: SKY
+              pwr_status: on
+              port_id: 2
+              number_children: 0

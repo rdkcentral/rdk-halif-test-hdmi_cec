@@ -24,6 +24,7 @@ hdmicec:
         active_source: false
         vendor: SKY_UK
         pwr_status: on
+        port_id: 0
         number_children: 2
         children:
         - name: Sony

@@ -27,22 +27,22 @@
 #include "ut_kvp_profile.h"
 #include <assert.h>
 
-#define VC_LOG(format, ...)  UT_logPrefix(__FILE__, __LINE__, UT_LOG_ASCII_YELLOW"vcHdmiCec   "UT_LOG_ASCII_NC, format, ## __VA_ARGS__)
-
+#define VC_LOG(format, ...)                 UT_logPrefix(__FILE__, __LINE__, UT_LOG_ASCII_YELLOW"vcHdmiCec[LOG]   "UT_LOG_ASCII_NC, format, ## __VA_ARGS__)
+#define VC_LOG_ERROR(format, ...)           UT_logPrefix(__FILE__, __LINE__, UT_LOG_ASCII_RED"vcHdmiCec[ERROR] "UT_LOG_ASCII_NC, format, ## __VA_ARGS__)
 
 /**HDMI CEC HAL Data structures */
 
 #define MAX_OSD_NAME_LENGTH 16
 
-typedef enum {
+typedef enum
+{
   DEVICE_TYPE_TV = 0,
   DEVICE_TYPE_PLAYBACK,
   DEVICE_TYPE_AUDIO_SYSTEM,
   DEVICE_TYPE_RECORDER,
   DEVICE_TYPE_TUNER,
   DEVICE_TYPE_RESERVED,
-  DEVICE_TYPE_UNKNOWN,
-  DEVICE_TYPE_MAX
+  DEVICE_TYPE_UNKNOWN
 } vCHdmiCec_device_type_t;
 
 typedef enum
@@ -66,31 +66,34 @@ typedef enum
   LOGICAL_ADDRESS_BROADCAST        = 15
 } vCHdmiCec_logical_address_t;
 
-typedef enum {
+typedef enum
+{
   CEC_VERSION_UNKNOWN = 0,
   CEC_VERSION_1_2 = 1,
   CEC_VERSION_1_2A = 2,
   CEC_VERSION_1_3 = 3,
   CEC_VERSION_1_3A = 4,
   CEC_VERSION_1_4 = 5,
-  CEC_VERSION_2_0 = 6,
-  CEC_VERSION_MAX = 7
+  CEC_VERSION_2_0 = 6
 } vCHdmiCec_version_t;
 
-typedef enum {
+typedef enum
+{
   PORT_TYPE_INPUT = 0,
   PORT_TYPE_OUTPUT,
-  PORT_TYPE_MAX
+  PORT_TYPE_UNKNOWN
 } vCHdmiCec_port_type_t;
 
-typedef enum {
+typedef enum
+{
   POWER_STATUS_ON = 0,
   POWER_STATUS_STANDBY,
   POWER_STATUS_OFF,
-  POWER_STATUS_MAX
+  POWER_STATUS_UNKNOWN
 } vCHdmiCec_power_status_t;
 
-typedef struct {
+typedef struct
+{
   unsigned short id;
   unsigned int physical_address;
   vCHdmiCec_port_type_t type;
@@ -98,51 +101,91 @@ typedef struct {
   bool arc_supported;
 } vCHdmiCec_port_info_t;
 
-typedef enum {
+typedef enum
+{
   HAL_STATE_CLOSED = 0,
   HAL_STATE_OPEN,
   HAL_STATE_READY
 } vCHdmiCec_hal_state_t;
 
-typedef enum {
+typedef enum
+{
   CEC_EVENT_HOTPLUG = 1,
   CEC_EVENT_COMMAND,
   CEC_EVENT_CONFIG,
   CEC_EVENT_MAX
 } vCHdmiCec_event_type_t;
 
-typedef struct {
-  bool connected;
-  unsigned int port_id;
-} vCHdmiCec_hotplug_event_t;
-
-typedef enum{
+typedef enum
+{
   CEC_ACTIVE_SOURCE = 0x82,
   CEC_IMAGE_VIEW_ON = 0x04,
   CEC_TEXT_VIEW_ON = 0x0D,
   CEC_INACTIVE_SOURCE = 0x9D,
   CEC_REQUEST_ACTIVE_SOURCE = 0x85,
   CEC_STANDBY = 0x36,
-  CEC_UNKNOWN = 0
+  CEC_COMMAND_UNKNOWN = 0
 } vCHdmiCec_command_t;
 
+typedef enum
+{
+  VENDOR_CODE_TOSHIBA = 0x000039,
+  VENDOR_CODE_SAMSUNG = 0x0000F0,
+  VENDOR_CODE_DENON = 0x0005CD,
+  VENDOR_CODE_MARANTZ = 0x000678,
+  VENDOR_CODE_LOEWE = 0x000982,
+  VENDOR_CODE_ONKYO = 0x0009B0,
+  VENDOR_CODE_MEDION = 0x000CB8,
+  VENDOR_CODE_TOSHIBA2 = 0x000CE7,
+  VENDOR_CODE_APPLE = 0x0010FA,
+  VENDOR_CODE_HARMAN_KARDON2 = 0x001950,
+  VENDOR_CODE_GOOGLE = 0x001A11,
+  VENDOR_CODE_AKAI = 0x0020C7,
+  VENDOR_CODE_AOC = 0x002467,
+  VENDOR_CODE_PANASONIC = 0x008045,
+  VENDOR_CODE_PHILIPS = 0x00903E,
+  VENDOR_CODE_DAEWOO = 0x009053,
+  VENDOR_CODE_YAMAHA = 0x00A0DE,
+  VENDOR_CODE_GRUNDIG = 0x00D0D5,
+  VENDOR_CODE_PIONEER = 0x00E036,
+  VENDOR_CODE_LG = 0x00E091,
+  VENDOR_CODE_SHARP = 0x08001F,
+  VENDOR_CODE_SONY = 0x080046,
+  VENDOR_CODE_BROADCOM = 0x18C086,
+  VENDOR_CODE_SHARP2 = 0x534850,
+  VENDOR_CODE_VIZIO = 0x6B746D,
+  VENDOR_CODE_BENQ = 0x8065E9,
+  VENDOR_CODE_HARMAN_KARDON = 0x9C645E,
+  VENDOR_CODE_UNKNOWN = 0
+} vCHdmiCec_vendor_code_t;
 
-typedef struct {
+typedef struct
+{
+  bool connected;
+  unsigned int port_id;
+} vCHdmiCec_hotplug_event_t;
+
+
+typedef struct
+{
   unsigned char src_logical_addr;
   unsigned char dest_logical_addr;
   vCHdmiCec_command_t command;
 } vCHdmiCec_command_event_t;
 
 
-typedef struct {
+typedef struct
+{
   vCHdmiCec_event_type_t type;
-  union {
+  union
+  {
     vCHdmiCec_command_event_t cec_cmd;
     vCHdmiCec_hotplug_event_t hot_plug;
   };
 } vCHdmiCec_event_t;
 
-struct vCHdmiCec_device_info_t {
+struct vCHdmiCec_device_info_t
+{
   /*Variables to manage a non-binary tree of devices*/
   unsigned int number_children;
   struct vCHdmiCec_device_info_t* parent;
@@ -156,18 +199,21 @@ struct vCHdmiCec_device_info_t {
   unsigned int logical_address;
   bool active_source;
   unsigned int vendor_id;
+  unsigned short parent_port_id;
   vCHdmiCec_power_status_t power_status;
   char osd_name[MAX_OSD_NAME_LENGTH];
 } vCHdmiCec_device_info_t;
 
-typedef struct {
+typedef struct
+{
   HdmiCecRxCallback_t rx_cb_func;
   void* rx_cb_data;
   HdmiCecTxCallback_t tx_cb_func;
   void* tx_cb_data;
 } vCHdmiCec_callbacks_t;
 
-typedef struct {
+typedef struct
+{
   vCHdmiCec_hal_state_t state;
   struct vCHdmiCec_device_info_t* emulated_device;
   int num_ports;
@@ -182,205 +228,151 @@ typedef struct {
 } vCHdmiCec_hal_t;
 
 
-/**Emulator Data types*/
-typedef struct {
+/**Virtual Componenent Data types*/
+typedef struct
+{
   unsigned short cp_port;
   char* cp_path;
   vCHdmiCec_hal_t * cec_hal;
 } vCHdmiCec_t;
 
+/*Common Data types*/
+
+typedef struct
+{
+  char* str;
+  int val;
+} strVal_t;
+
+
+/*Global variables*/
 static vCHdmiCec_t* gVCHdmiCec = NULL;
 
-struct  {
-  vCHdmiCec_device_type_t val;
-  char* str_type;
-} gDIMap [] = {
-  { DEVICE_TYPE_TV, "TV" },
-  { DEVICE_TYPE_PLAYBACK, "PlaybackDevice" },
-  { DEVICE_TYPE_AUDIO_SYSTEM, "AudioSystem" },
-  { DEVICE_TYPE_RECORDER, "RecordingDevice" },
-  { DEVICE_TYPE_TUNER, "Tuner" },
-  { DEVICE_TYPE_RESERVED, "Reserved" },
-  { DEVICE_TYPE_UNKNOWN, "Unknown"}
+const static strVal_t gDIStrVal [] = {
+  { "TV", (int) DEVICE_TYPE_TV },
+  { "PlaybackDevice", (int) DEVICE_TYPE_PLAYBACK },
+  { "AudioSystem" , (int) DEVICE_TYPE_AUDIO_SYSTEM },
+  { "RecordingDevice", (int) DEVICE_TYPE_RECORDER },
+  { "Tuner", (int) DEVICE_TYPE_TUNER },
+  { "Reserved",  (int) DEVICE_TYPE_RESERVED },
+  { "Unknown", (int) DEVICE_TYPE_UNKNOWN }
 };
 
-const static struct  {
-    char* name;
-    unsigned int code;
-  } gVCMap [] = {
-    {"TOSHIBA", 0x000039},
-    {"SAMSUNG", 0x0000F0},
-    {"DENON", 0x0005CD},
-    {"MARANTZ", 0x000678},
-    {"LOEWE", 0x000982},
-    {"ONKYO", 0x0009B0},
-    {"MEDION", 0x000CB8},
-    {"TOSHIBA2", 0x000CE7},
-    {"APPLE", 0x0010FA},
-    {"HARMAN_KARDON2", 0x001950},
-    {"GOOGLE", 0x001A11},
-    {"AKAI", 0x0020C7},
-    {"AOC", 0x002467},
-    {"PANASONIC", 0x008045},
-    {"PHILIPS", 0x00903E},
-    {"DAEWOO", 0x009053},
-    {"YAMAHA", 0x00A0DE},
-    {"GRUNDIG", 0x00D0D5},
-    {"PIONEER", 0x00E036},
-    {"LG", 0x00E091},
-    {"SHARP", 0x08001F},
-    {"SONY", 0x080046},
-    {"BROADCOM", 0x18C086},
-    {"SHARP2", 0x534850},
-    {"VIZIO", 0x6B746D},
-    {"BENQ", 0x8065E9},
-    {"HARMAN_KARDON", 0x9C645E},
-    {"UNKNOWN", 0},
+const static strVal_t gVCStrVal [] = {
+  {"TOSHIBA", VENDOR_CODE_TOSHIBA},
+  {"SAMSUNG", VENDOR_CODE_SAMSUNG},
+  {"DENON", VENDOR_CODE_DENON},
+  {"MARANTZ", VENDOR_CODE_MARANTZ},
+  {"LOEWE", VENDOR_CODE_LOEWE},
+  {"ONKYO", VENDOR_CODE_ONKYO},
+  {"MEDION", VENDOR_CODE_MEDION},
+  {"TOSHIBA2", VENDOR_CODE_TOSHIBA},
+  {"APPLE", VENDOR_CODE_APPLE},
+  {"HARMAN_KARDON2", VENDOR_CODE_HARMAN_KARDON2},
+  {"GOOGLE", VENDOR_CODE_GOOGLE},
+  {"AKAI", VENDOR_CODE_AKAI},
+  {"AOC", VENDOR_CODE_AOC},
+  {"PANASONIC", VENDOR_CODE_PANASONIC},
+  {"PHILIPS", VENDOR_CODE_PHILIPS},
+  {"DAEWOO", VENDOR_CODE_DAEWOO},
+  {"YAMAHA", VENDOR_CODE_YAMAHA},
+  {"GRUNDIG", VENDOR_CODE_GRUNDIG},
+  {"PIONEER", VENDOR_CODE_PIONEER},
+  {"LG", VENDOR_CODE_LG},
+  {"SHARP", VENDOR_CODE_SHARP},
+  {"SONY", VENDOR_CODE_SONY},
+  {"BROADCOM", VENDOR_CODE_BROADCOM},
+  {"SHARP2", VENDOR_CODE_SHARP2},
+  {"VIZIO", VENDOR_CODE_VIZIO},
+  {"BENQ", VENDOR_CODE_BENQ},
+  {"HARMAN_KARDON", VENDOR_CODE_HARMAN_KARDON},
+  {"UNKNOWN", VENDOR_CODE_UNKNOWN},
   };
 
-const static struct  {
-  vCHdmiCec_power_status_t status;
-  char* str;
-} gPSMap [] = {
-  { POWER_STATUS_ON, "on" },
-  { POWER_STATUS_OFF, "off" },
-  { POWER_STATUS_STANDBY, "standby" }
+const static strVal_t gPSStrVal [] = {
+  { "on", (int)POWER_STATUS_ON  },
+  { "off", (int)POWER_STATUS_OFF  },
+  { "standby", (int)POWER_STATUS_STANDBY },
+  { "unknown", (int)POWER_STATUS_UNKNOWN }
 };
 
-static char* GetDeviceTypeStr(vCHdmiCec_device_type_t type)
+const static strVal_t gPortStrVal [] = {
+  { "in", (int)PORT_TYPE_INPUT  },
+  { "out", (int)PORT_TYPE_OUTPUT },
+  { "unknown", (int)PORT_TYPE_UNKNOWN }
+};
+
+int GetValByStr(const strVal_t *map, int length, char* str, int default_val)
 {
-  char* result = NULL;
-  for (int i = 0;  i < sizeof (gDIMap) / sizeof (gDIMap[0]);  ++i)
+  int result = default_val;
+  
+  if(map == NULL || length <= 0 || str == NULL)
   {
-    if (type == gDIMap[i].val)
+    return result;
+  }
+
+  for (int i = 0;  i < length;  ++i)
+  {
+    if (!strcmp(str, map[i].str))
     {
-        result = gDIMap[i].str_type;
+        result = map[i].val;
         break;
     }
   }
   return result;
 }
 
-static vCHdmiCec_device_type_t GetDeviceType(char *type)
-{
-
-  vCHdmiCec_device_type_t result = DEVICE_TYPE_TV;
-
-  for (int i = 0;  i < sizeof (gDIMap) / sizeof (gDIMap[0]);  ++i)
-  {
-    if (!strcmp (type, gDIMap[i].str_type))
-    {
-        result = gDIMap[i].val;   
-        break; 
-    }
-  }
-
-  return result;
-}
-
-static char* GetVendorName(int code)
+char* GetStrByVal(const strVal_t *map, int length, int val)
 {
   char* result = NULL;
-
-  for (int i = 0;  i < sizeof (gVCMap) / sizeof (gVCMap[0]);  ++i)
+  
+  if(map == NULL || length <= 0)
   {
-    if (code == gVCMap[i].code)
-    {
-        result = gVCMap[i].name;   
-        break; 
-    }
+    return NULL;
   }
 
-  return result;
-}
-
-static unsigned int GetVendorCode(char *name)
-{
-  unsigned int result = 0;
-
-  for (int i = 0;  i < sizeof (gVCMap) / sizeof (gVCMap[0]);  ++i)
+  for (int i = 0;  i < length;  ++i)
   {
-    if (!strcmp (name, gVCMap[i].name))
+    if (val == (int)map[i].val)
     {
-        result = gVCMap[i].code;   
-        break; 
-    }
-  }
-
-  return result;
-}
-
-static char* GetDevicePowerStatusStr(vCHdmiCec_power_status_t status)
-{
-  char* result = NULL;
-
-  for (int i = 0;  i < sizeof (gPSMap) / sizeof (gPSMap[0]);  ++i)
-  {
-    if (status == gPSMap[i].status)
-    {
-        result = gPSMap[i].str;
-        break; 
+        result = map[i].str;
+        break;
     }
   }
   return result;
 }
 
-static vCHdmiCec_power_status_t GetDevicePowerStatus(char *name)
-{
-  vCHdmiCec_power_status_t result = POWER_STATUS_OFF;
-
-  for (int i = 0;  i < sizeof (gPSMap) / sizeof (gPSMap[0]);  ++i)
-  {
-    if (!strcmp (name, gPSMap[i].str))
-    {
-        result = gPSMap[i].status;
-        break; 
-    }
-  }
-
-  return result;
-}
-
-
-static vCHdmiCec_port_type_t GetPortType(char *type)
-{
-  vCHdmiCec_port_type_t result = PORT_TYPE_OUTPUT;
-
-  if(!strncmp(type, "in", sizeof("in")))
-  {
-    result = PORT_TYPE_INPUT;
-  }
-  return result;
-}
 
 void LoadPortsInfo (ut_kvp_instance_t* instance, vCHdmiCec_port_info_t* ports, unsigned int nPorts)
 {
-  if (ports != NULL && nPorts > 0)
+  char *prefix = "hdmicec/ports/";
+  char tmp[256];
+
+  if (instance == NULL || ports == NULL || nPorts <= 0)
   {
-    char *prefix = "hdmicec/ports/";
-    char tmp[256];
+    return;
+  }
 
-    for (int i = 0; i < nPorts; ++i)
-    {
-      char type[8];
-      strcpy(tmp, prefix);
-      int length = snprintf( NULL, 0, "%d", i );
-      snprintf( tmp + strlen(prefix) , length + 1, "%d", i );
+  for (int i = 0; i < nPorts; ++i)
+  {
+    char type[8];
+    strcpy(tmp, prefix);
+    int length = snprintf( NULL, 0, "%d", i );
+    snprintf( tmp + strlen(prefix) , length + 1, "%d", i );
 
-      strcpy( tmp + strlen(prefix) + length  , "/id");
-      ports[i].id = ut_kvp_getUInt32Field(instance, tmp);
+    strcpy( tmp + strlen(prefix) + length  , "/id");
+    ports[i].id = ut_kvp_getUInt32Field(instance, tmp);
 
-      strcpy(tmp + strlen(prefix) + length, "/type");
-      ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-      ports[i].type = GetPortType(type);
+    strcpy(tmp + strlen(prefix) + length, "/type");
+    ut_kvp_getStringField(instance, tmp, type, sizeof(type));
+    ports[i].type = GetValByStr(gPortStrVal, sizeof(gPortStrVal)/sizeof(strVal_t), type, (int)PORT_TYPE_UNKNOWN);
 
-      strcpy(tmp + strlen(prefix) + length, "/cec_supported");
-      ports[i].cec_supported = ut_kvp_getBoolField(instance, tmp);
+    strcpy(tmp + strlen(prefix) + length, "/cec_supported");
+    ports[i].cec_supported = ut_kvp_getBoolField(instance, tmp);
 
-      strcpy(tmp + strlen(prefix) + length, "/arc_supported");
-      ports[i].arc_supported = ut_kvp_getBoolField(instance, tmp);
+    strcpy(tmp + strlen(prefix) + length, "/arc_supported");
+    ports[i].arc_supported = ut_kvp_getBoolField(instance, tmp);
 
-    }
   }
 }
 
@@ -400,7 +392,6 @@ void ResetDevice(struct vCHdmiCec_device_info_t* device)
   device->vendor_id = 0;
   device->number_children = 0;
 }
-
 
 /* Load the device info into the passed in vCHdmiCec_device_info_t*
 * prefix can be 
@@ -423,7 +414,6 @@ void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vCHdmiCec
   }
   strcpy(tmp, prefix);
 
-  VC_LOG("LoadDeviceInfo: Loading %s", tmp);
   strcpy(tmp + strlen(prefix), "/name");
   ut_kvp_getStringField(instance, tmp, device->osd_name, MAX_OSD_NAME_LENGTH);
 
@@ -432,23 +422,25 @@ void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vCHdmiCec
 
   strcpy(tmp + strlen(prefix), "/pwr_status");
   ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-  device->power_status = GetDevicePowerStatus(type);
+  device->power_status = GetValByStr(gPSStrVal, sizeof(gPSStrVal)/sizeof(strVal_t), type, (int)POWER_STATUS_UNKNOWN);
 
   strcpy(tmp + strlen(prefix), "/version");
   device->version = (vCHdmiCec_version_t) ut_kvp_getUInt32Field(instance, tmp);
 
   strcpy(tmp + strlen(prefix), "/vendor");
   ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-  device->vendor_id = GetVendorCode(type);
+  device->vendor_id = GetValByStr(gVCStrVal, sizeof(gVCStrVal)/sizeof(strVal_t), type, (int)VENDOR_CODE_UNKNOWN);
 
   strcpy(tmp + strlen(prefix), "/type");
   ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-  device->type = GetDeviceType(type);
+  device->type = GetValByStr(gDIStrVal, sizeof(gDIStrVal)/sizeof(strVal_t), type, (int)DEVICE_TYPE_UNKNOWN);
+
+  strcpy(tmp + strlen(prefix), "/port_id");
+  device->parent_port_id = ut_kvp_getUInt32Field(instance, tmp);
 
   strcpy(tmp + strlen(prefix), "/number_children");
   device->number_children = (vCHdmiCec_version_t) ut_kvp_getUInt32Field(instance, tmp);
 }
-
 
 void InsertChild(struct vCHdmiCec_device_info_t* parent, struct vCHdmiCec_device_info_t* child)
 {
@@ -473,6 +465,9 @@ void InsertChild(struct vCHdmiCec_device_info_t* parent, struct vCHdmiCec_device
 
 void RemoveChild(struct vCHdmiCec_device_info_t* map, char* name)
 {
+  struct vCHdmiCec_device_info_t* tmp;
+  struct vCHdmiCec_device_info_t* prev;
+
   if(map == NULL || name == NULL)
   {
     return;
@@ -481,8 +476,9 @@ void RemoveChild(struct vCHdmiCec_device_info_t* map, char* name)
   {
     return;
   }
-  struct vCHdmiCec_device_info_t* tmp = map->first_child;
-  struct vCHdmiCec_device_info_t* prev = NULL;
+
+  tmp = map->first_child;
+  prev = NULL;
 
   //Lets traverse to get to the device
   while(tmp != NULL && strcmp(tmp->osd_name, name)!=0)
@@ -512,6 +508,7 @@ void RemoveChild(struct vCHdmiCec_device_info_t* map, char* name)
 
 struct vCHdmiCec_device_info_t* CreateDeviceMap (ut_kvp_instance_t* instance, char* profile_prefix)
 {
+  struct vCHdmiCec_device_info_t *device;
   if(instance == NULL || profile_prefix == NULL )
   {
     assert(instance != NULL);
@@ -519,7 +516,7 @@ struct vCHdmiCec_device_info_t* CreateDeviceMap (ut_kvp_instance_t* instance, ch
     return NULL;
   }
 
-  struct vCHdmiCec_device_info_t *device = (struct vCHdmiCec_device_info_t *)malloc(sizeof(struct vCHdmiCec_device_info_t));
+  device = (struct vCHdmiCec_device_info_t *)malloc(sizeof(struct vCHdmiCec_device_info_t));
   assert(device != NULL);
   ResetDevice(device);
   LoadDeviceInfo(instance, profile_prefix, device);
@@ -539,26 +536,36 @@ struct vCHdmiCec_device_info_t* CreateDeviceMap (ut_kvp_instance_t* instance, ch
 
 }
 
-void PrintDeviceMap(struct vCHdmiCec_device_info_t* map)
+void AllocateAddresses(struct vCHdmiCec_device_info_t * map)
 {
+  if(map == NULL)
+  {
+    return;
+  }
+  //TODO
+  //map->physical_address = (((map->parent_port_id & 0xF0 ) << 20)|( (0x04 & 0x0F ) << 16) |((0x04 & 0xF0) << 4)  | (0x04 & 0x0F));
+}
 
+void PrintDeviceMap(struct vCHdmiCec_device_info_t* map, int level)
+{
   if(map == NULL)
   {
     return;
   }
 
-  VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
-  VC_LOG("Device                        : %s", map->osd_name);
-  VC_LOG("Type                          : %s", GetDeviceTypeStr(map->type));
-  VC_LOG("Pwr Status                    : %s", GetDevicePowerStatusStr(map->power_status));
-  VC_LOG("------------------------");
+  VC_LOG(">>>>>>>>>>>> >>>>>>>>>> >>>>> >>>> >>> >> >");
+  VC_LOG("%*cDevice      : %s", level*4,' ', map->osd_name);
+  VC_LOG("%*cType        : %s", level*4,' ', GetStrByVal(gDIStrVal, sizeof(gDIStrVal)/sizeof(strVal_t), map->type));
+  VC_LOG("%*cPwr Status  : %s", level*4,' ', GetStrByVal(gPSStrVal, sizeof(gPSStrVal)/sizeof(strVal_t), map->power_status));
+  VC_LOG("-------------------------------------------");
 
-  PrintDeviceMap(map->first_child);
-  PrintDeviceMap(map->next_sibling);
+  PrintDeviceMap(map->first_child, level +1);
+  PrintDeviceMap(map->next_sibling, level);
 }
 
 struct vCHdmiCec_device_info_t* GetDeviceByName(struct vCHdmiCec_device_info_t* map, char* name)
 {
+  struct vCHdmiCec_device_info_t* device;
   if(map == NULL || name == NULL)
   {
     return NULL;
@@ -567,7 +574,7 @@ struct vCHdmiCec_device_info_t* GetDeviceByName(struct vCHdmiCec_device_info_t* 
   {
     return map;
   }
-  struct vCHdmiCec_device_info_t* device = GetDeviceByName(map->first_child, name);
+  device = GetDeviceByName(map->first_child, name);
   if(device != NULL)
   {
     return device;
@@ -609,7 +616,6 @@ void TeardownHal (vCHdmiCec_hal_t* hal)
   
 }
 
-
 vComponent_HdmiCec_Status vComponent_HdmiCec_Initialize( char* pProfilePath, unsigned short cpPort, char* pCPUrl, vComponent_HdmiCec_t** handle )
 {
   vCHdmiCec_t *result = NULL;
@@ -617,25 +623,26 @@ vComponent_HdmiCec_Status vComponent_HdmiCec_Initialize( char* pProfilePath, uns
   
   if(handle == NULL)
   {
-    VC_LOG("vComponent_HdmiCec_Initialize: Invalid handle param");
+    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Invalid handle param");
     return VC_HDMICEC_STATUS_INVALID_PARAM;
   }
   if(pProfilePath == NULL)
   {
-    VC_LOG("vComponent_HdmiCec_Initialize: Invalid Profile path");
+    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Invalid Profile path");
     return VC_HDMICEC_STATUS_INVALID_PARAM;
   }
 
   if(gVCHdmiCec != NULL)
   {
     //Already initialised
+    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Already Initialized");
     return VC_HDMICEC_STATUS_ALREADY_INITIALIZED;
   }
 
   result = (vCHdmiCec_t*)malloc(sizeof(vCHdmiCec_t));
   if(result == NULL)
   {
-    VC_LOG("vComponent_HdmiCec_Initialize: Out of memory");
+    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Out of memory");
     return VC_HDMICEC_STATUS_OUT_OF_MEMORY;
   }
   result->cp_path = pCPUrl;
@@ -645,7 +652,7 @@ vComponent_HdmiCec_Status vComponent_HdmiCec_Initialize( char* pProfilePath, uns
   status = ut_kvp_profile_open(pProfilePath);
   if(status != UT_KVP_STATUS_SUCCESS)
   {
-    VC_LOG("ut_kvp_profile_open: status: %d", status);
+    VC_LOG_ERROR("ut_kvp_profile_open: status: %d", status);
     assert(status == UT_KVP_STATUS_SUCCESS);
     free(result);
     return VC_HDMICEC_STATUS_PROFILE_READ_ERROR;
@@ -655,7 +662,6 @@ vComponent_HdmiCec_Status vComponent_HdmiCec_Initialize( char* pProfilePath, uns
   gVCHdmiCec = result;
   *handle = (vComponent_HdmiCec_t *)result;
   return VC_HDMICEC_STATUS_SUCCESS;
-
 }
 
 vComponent_HdmiCec_Status vComponent_HdmiCec_Deinitialize(vComponent_HdmiCec_t *pVCHdmiCec)
@@ -664,19 +670,19 @@ vComponent_HdmiCec_Status vComponent_HdmiCec_Deinitialize(vComponent_HdmiCec_t *
 
   if(vCHdmiCec == NULL)
   {
-    VC_LOG("vComponent_HdmiCec_Deinitialize: Invalid handle param");
+    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle param");
     return VC_HDMICEC_STATUS_INVALID_PARAM;
   }
 
   if(vCHdmiCec != gVCHdmiCec)
   {
-    VC_LOG("vComponent_HdmiCec_Deinitialize: Invalid handle");
+    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle");
     return VC_HDMICEC_STATUS_INVALID_HANDLE;
   }
 
   if(gVCHdmiCec == NULL)
   {
-    VC_LOG("vComponent_HdmiCec_Deinitialize: Already Deinitialized");
+    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Already Deinitialized");
     return VC_HDMICEC_STATUS_NOT_INITIALIZED;
   }
 
@@ -691,11 +697,12 @@ vComponent_HdmiCec_Status vComponent_HdmiCec_Deinitialize(vComponent_HdmiCec_t *
   return VC_HDMICEC_STATUS_SUCCESS;
 }
 
-
-
 HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 {
   char emulated_device[MAX_OSD_NAME_LENGTH];
+  vCHdmiCec_hal_t* cec;
+  ut_kvp_instance_t *profile_instance;
+  vCHdmiCec_port_info_t* ports;
 
   if(handle == NULL)
   {
@@ -712,22 +719,20 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
     return HDMI_CEC_IO_ALREADY_OPEN;
   }
 
-  vCHdmiCec_hal_t* cec = (vCHdmiCec_hal_t*)malloc(sizeof(vCHdmiCec_hal_t));
+  cec = (vCHdmiCec_hal_t*)malloc(sizeof(vCHdmiCec_hal_t));
   if(cec == NULL) 
   {
-    VC_LOG( "Out of Memory" );
+    VC_LOG_ERROR( "HdmiCecOpen: Out of Memory" );
     return HDMI_CEC_IO_GENERAL_ERROR;
   }
 
-  VC_LOG("HdmiCecOpen: Loading emulated Device Info");
-  ut_kvp_instance_t *profile_instance = ut_kvp_profile_getInstance();
+  profile_instance = ut_kvp_profile_getInstance();
   assert(profile_instance != NULL);
   
   ut_kvp_getStringField(profile_instance, "hdmicec/emulated_device", emulated_device, MAX_OSD_NAME_LENGTH);
 
   cec->num_ports = ut_kvp_getUInt32Field(profile_instance, "hdmicec/number_ports");
-  VC_LOG("HdmiCecOpen: Loading Ports Info");
-  vCHdmiCec_port_info_t* ports = (vCHdmiCec_port_info_t*) malloc(sizeof(vCHdmiCec_port_info_t) * cec->num_ports);
+  ports = (vCHdmiCec_port_info_t*) malloc(sizeof(vCHdmiCec_port_info_t) * cec->num_ports);
   assert(ports != NULL);
 
   LoadPortsInfo(profile_instance, ports, cec->num_ports);
@@ -738,10 +743,15 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
   //Device Discovery and Network Topology
   cec->num_devices = ut_kvp_getUInt32Field(profile_instance, "hdmicec/number_devices");
 
-  VC_LOG("HdmiCecOpen: Loading connected Device Info");
-
   cec->devices_map = CreateDeviceMap(profile_instance, "hdmicec/device_map/0");
   cec->emulated_device = GetDeviceByName(cec->devices_map, emulated_device);
+  if(cec->emulated_device == NULL)
+  {
+    VC_LOG_ERROR("HdmiCecOpen: Couldnt load emulated device info");
+    assert(cec->emulated_device != NULL);
+    TeardownHal(cec);
+    return HDMI_CEC_IO_GENERAL_ERROR;
+  }
   if(cec->emulated_device->type == DEVICE_TYPE_TV)
   { 
     VC_LOG("HdmiCecOpen: Emulating a TV");
@@ -756,14 +766,14 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
   VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
   VC_LOG("Emulated Device               : %s", cec->emulated_device->osd_name);
-  VC_LOG("Type                          : %s", GetDeviceTypeStr(cec->emulated_device->type));
-  VC_LOG("Pwr Status                    : %s", GetDevicePowerStatusStr(cec->emulated_device->power_status));
+  VC_LOG("Type                          : %s", GetStrByVal(gDIStrVal, sizeof(gDIStrVal)/sizeof(strVal_t), cec->emulated_device->type));
+  VC_LOG("Pwr Status                    : %s", GetStrByVal(gPSStrVal, sizeof(gPSStrVal)/sizeof(strVal_t), cec->emulated_device->power_status));
   VC_LOG("Number of Ports               : %d", cec->num_ports);
   VC_LOG("Number of devices in Network  : %d", cec->num_devices);
-  VC_LOG("==========================\r\n");
+  VC_LOG("===========================");
 
-  PrintDeviceMap(cec->devices_map);
-  VC_LOG("==========================\r\n");
+  PrintDeviceMap(cec->devices_map, 0);
+  VC_LOG("=================================");
 
   *handle = (int) cec;
   gVCHdmiCec->cec_hal = cec;
@@ -777,11 +787,13 @@ HDMI_CEC_STATUS HdmiCecClose(int handle)
 
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecClose: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecClose: Invalid Handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
@@ -797,17 +809,20 @@ HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddr
 
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecGetPhysicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecGetPhysicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
 
   if(physicalAddress == NULL)
   {
+    VC_LOG_ERROR("HdmiCecGetPhysicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
@@ -819,17 +834,20 @@ HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 {
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecAddLogicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecAddLogicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
 
   if(gVCHdmiCec->cec_hal->emulated_device->type != DEVICE_TYPE_TV || logicalAddresses != 0)
   {
+    VC_LOG_ERROR("HdmiCecAddLogicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
@@ -844,23 +862,28 @@ HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
+
 
   //Remove Logical Address only for Sink device
   if(gVCHdmiCec->cec_hal->emulated_device->type != DEVICE_TYPE_TV || logicalAddresses != 0)
   {
+    VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
   if(gVCHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
   {
     //Looks like logical address is already removed. 
+    VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Logical Address not added");
     return HDMI_CEC_IO_NOT_ADDED;
   }
   //Reset back to 0x0F
@@ -873,17 +896,19 @@ HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 {
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecGetLogicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecGetLogicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
-
   if(logicalAddress == NULL)
   {
+    VC_LOG_ERROR("HdmiCecGetLogicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
@@ -896,13 +921,16 @@ HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, voi
 {
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecSetRxCallback: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecSetRxCallback: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
+
 
   gVCHdmiCec->cec_hal->callbacks.rx_cb_func = cbfunc;
   gVCHdmiCec->cec_hal->callbacks.rx_cb_data = data;
@@ -914,11 +942,13 @@ HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, voi
 {
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecSetTxCallback: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecSetTxCallback: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
@@ -931,30 +961,34 @@ HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* re
 {
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecTx: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecTx: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
 
   if(buf == NULL || len <= 0 || result == NULL)
   {
+    VC_LOG_ERROR("HdmiCecTx: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
   if(gVCHdmiCec->cec_hal->emulated_device->type == DEVICE_TYPE_TV && gVCHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
   {
     //If Logical Address is not set for a sink device, we cannot transmit
+    VC_LOG_ERROR("HdmiCecTx: Send failed");
     return HDMI_CEC_IO_SENT_FAILED;
   }
 
   VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
   VC_LOG("HdmiCecTx: ");
   for (int i = 0; i < len; i++) {
-    VC_LOG("%02X ", buf[i]);
+    printf("%02X ", buf[i]);
   }
   VC_LOG("==========================");
   *result = HDMI_CEC_IO_SENT_BUT_NOT_ACKD;
@@ -967,16 +1001,20 @@ HDMI_CEC_STATUS HdmiCecTxAsync(int handle, const unsigned char* buf, int len)
 {
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
+    VC_LOG_ERROR("HdmiCecTxAsync: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
   if(handle == 0)
   {
+    VC_LOG_ERROR("HdmiCecTxAsync: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
+
   if(buf == NULL || len <= 0)
   {
+    VC_LOG_ERROR("HdmiCecTxAsync: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
@@ -984,13 +1022,14 @@ HDMI_CEC_STATUS HdmiCecTxAsync(int handle, const unsigned char* buf, int len)
             || gVCHdmiCec->cec_hal->callbacks.tx_cb_func == NULL)
   {
     //If Logical Address is not set for a sink device, we cannot transmit
+    VC_LOG_ERROR("HdmiCecTxAsync: Send failed");
     return HDMI_CEC_IO_SENT_FAILED;
   }
 
   VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
   VC_LOG("HdmiCecTxAsync: ");
   for (int i = 0; i < len; i++) {
-    VC_LOG("%02X ", buf[i]);
+    printf("%02X ", buf[i]);
   }
   VC_LOG("==========================");
 
