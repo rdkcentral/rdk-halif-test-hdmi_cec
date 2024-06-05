@@ -67,7 +67,6 @@
 #include <time.h>
 
 #include <ut.h>
-#include <ut_cunit.h>
 #include "ut_log.h"
 #include "hdmi_cec_driver.h"
 
@@ -295,7 +294,7 @@ void test_hdmicec_hal_l1_open_positive( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     
     result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_LOG("open failed %d", result); UT_FAIL_FATAL("open failed"); }
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
@@ -845,6 +844,12 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
     result = HdmiCecRemoveLogicalAddress( handle,  -1 );
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
+    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
+
+    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
+    if (HDMI_CEC_IO_ALREADY_REMOVED != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
+
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
 
@@ -852,16 +857,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_ADDED != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
-
-    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
-
-    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_NOT_ADDED != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
+    if (HDMI_CEC_IO_ALREADY_REMOVED != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecClose(handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
