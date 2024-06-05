@@ -1,0 +1,4 @@
+---
+hdmicec:
+  features:
+    extendedEnumsSupported: false
