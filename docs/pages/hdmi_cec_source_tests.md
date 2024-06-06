@@ -78,7 +78,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
 | 2| [Physical Address](#physical-address)| Enable the television connected to the DUT first to get the valid physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| Y  |NA||
-| | | Verify the physical addresses allocated by connecting two sink devices through an HDMI switch.| HdmiCecGetPhysicalAddress| NA | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.|
+| | | Verify the physical addresses allocated by connecting a source and sink device through an HDMI switch.| HdmiCecGetPhysicalAddress| NA | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.|
 
 ### Emulator Requirements - Physical Address
 
@@ -88,6 +88,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 ### Control Plane Requirements - Physical Address
 
 - The control plane will allow removing or adding a node to the network.
+  - allowing add source node before the `DUT` switched ON.  
   - allowing add sink node before the `DUT` switched ON.    
 
 ## CEC Synchronous Transmission
@@ -128,7 +129,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description| HAL APIs |L2|L3|Control plane requirements|
 |-----|------------------|-----------|----------|--|--|--------------------------|
-| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Sink Platform. Validating whether the CEC Transmission (use Polling command) works when the HDMI port is disconnected should result in ACK not being received while the TX still works as expected. | HdmiCecTx | NA | Y  | Control Panel to control the Hotplug activities |
+| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Source Platform. Validating whether the CEC Transmission (use Polling command) works when the HDMI port is disconnected should result in ACK not being received while the TX still works as expected. | HdmiCecTx | NA | Y  | Control Panel to control the Hotplug activities |
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should succeed, but the message should not be Acknowledged.| HdmiCecTx | NA | Y  | Control Panel to control the external devices connected.|
 
 ### Emulator Requirements - CEC HotPlug Functionality
@@ -161,7 +162,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 The module must be configured during the boot sequence in the case of emulation as if it were a real hardware device with or without multiple connected HDMI nodes.
 
-### Test Configuration for Sink Devices
+### Test Configuration for Source Devices
 
 The following information shall be helpful for further running the Automation Rack Test for this specific module and further configuration will help for the Design and Development of Virtual Device.
 
