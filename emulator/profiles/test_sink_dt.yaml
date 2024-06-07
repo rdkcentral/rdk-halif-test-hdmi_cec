@@ -1,0 +1,62 @@
+---
+hdmicec:
+    emulated_device: Sky Glass
+    number_ports: 3
+    ports:
+      - id: 1
+        type: in
+        cec_supported: true
+        arc_supported: true
+      - id: 2
+        type: in
+        cec_supported: true
+        arc_supported: true
+      - id: 3
+        type: in
+        cec_supported: true
+        arc_supported: false
+
+    number_devices: 5
+    device_map:
+      - name: Sky Glass
+        type: TV
+        version: 4 
+        active_source: false
+        vendor: SKY_UK
+        pwr_status: on
+        number_children: 2
+        children:
+        - name: Sony
+          type: AudioSystem
+          version: 4
+          active_source: false
+          vendor: SONY
+          pwr_status: on
+          port_id: 1
+          number_children: 2
+          children: 
+            - name: Chromecast
+              type: PlaybackDevice
+              version: 4
+              active_source: false
+              vendor: GOOGLE
+              pwr_status: on
+              port_id: 1
+              number_children: 0
+            - name: SKY xione
+              type: PlaybackDevice
+              version: 4
+              active_source: false
+              vendor: SKY
+              pwr_status: on
+              port_id: 2
+              number_children: 0
+        - name: SONY PS3
+          type: PlaybackDevice
+          version: 4
+          active_source: false
+          vendor: SONY
+          pwr_status: on
+          port_id: 2
+          number_children: 0
+
