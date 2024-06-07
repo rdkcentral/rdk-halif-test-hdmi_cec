@@ -42,6 +42,8 @@ typedef enum
   DEVICE_TYPE_RECORDER,
   DEVICE_TYPE_TUNER,
   DEVICE_TYPE_RESERVED,
+  DEVICE_TYPE_FREEUSE,
+  DEVICE_TYPE_UNREGISTERED,
   DEVICE_TYPE_UNKNOWN
 } vCHdmiCec_device_type_t;
 
@@ -63,7 +65,9 @@ typedef enum
   LOGICAL_ADDRESS_RESERVED2        = 13,
   LOGICAL_ADDRESS_FREEUSE          = 14,
   LOGICAL_ADDRESS_UNREGISTERED     = 15,
-  LOGICAL_ADDRESS_BROADCAST        = 15
+  LOGICAL_ADDRESS_BROADCAST        = 15,
+  LOGICAL_ADDRESS_MAX              = 16
+
 } vCHdmiCec_logical_address_t;
 
 typedef enum
@@ -212,6 +216,10 @@ typedef struct
   void* tx_cb_data;
 } vCHdmiCec_callbacks_t;
 
+typedef struct {
+    bool allocated[LOGICAL_ADDRESS_MAX];
+} vCHdmiCec_logical_address_pool_t;
+
 typedef struct
 {
   vCHdmiCec_hal_state_t state;
@@ -220,8 +228,8 @@ typedef struct
   vCHdmiCec_port_info_t *ports;
   int num_devices;
   struct vCHdmiCec_device_info_t* devices_map;
-
   vCHdmiCec_callbacks_t callbacks;
+  vCHdmiCec_logical_address_pool_t address_pool;
   //TODO
   // Eventing Queue, Thread for callback
 
@@ -244,7 +252,6 @@ typedef struct
   int val;
 } strVal_t;
 
-
 /*Global variables*/
 static vCHdmiCec_t* gVCHdmiCec = NULL;
 
@@ -255,6 +262,8 @@ const static strVal_t gDIStrVal [] = {
   { "RecordingDevice", (int) DEVICE_TYPE_RECORDER },
   { "Tuner", (int) DEVICE_TYPE_TUNER },
   { "Reserved",  (int) DEVICE_TYPE_RESERVED },
+  { "FreeUse", (int) DEVICE_TYPE_FREEUSE },
+  { "Unregistered", (int) DEVICE_TYPE_UNREGISTERED },
   { "Unknown", (int) DEVICE_TYPE_UNKNOWN }
 };
 
@@ -536,31 +545,157 @@ struct vCHdmiCec_device_info_t* CreateDeviceMap (ut_kvp_instance_t* instance, ch
 
 }
 
-void AllocateAddresses(struct vCHdmiCec_device_info_t * map)
+void InitLogicalAddressPool(vCHdmiCec_logical_address_pool_t *pool)
 {
-  if(map == NULL)
+  assert(pool != NULL);
+  for (int i = 0; i < LOGICAL_ADDRESS_MAX; i++) {
+      pool->allocated[i] = false;
+  }
+}
+
+vCHdmiCec_logical_address_t AllocateLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_device_type_t device_type)
+{
+  vCHdmiCec_logical_address_t possible_addresses[LOGICAL_ADDRESS_MAX];
+  int num_possible_addresses = 0;
+
+  assert(pool != NULL);
+
+  switch (device_type)
+  {
+    case DEVICE_TYPE_TV:
+      possible_addresses[0] = LOGICAL_ADDRESS_TV;
+      num_possible_addresses = 1;
+      break;
+    case DEVICE_TYPE_PLAYBACK:
+      possible_addresses[0] = LOGICAL_ADDRESS_PLAYBACKDEVICE1;
+      possible_addresses[1] = LOGICAL_ADDRESS_PLAYBACKDEVICE2;
+      possible_addresses[2] = LOGICAL_ADDRESS_PLAYBACKDEVICE3;
+      num_possible_addresses = 3;
+      break;
+    case DEVICE_TYPE_AUDIO_SYSTEM:
+      possible_addresses[0] = LOGICAL_ADDRESS_AUDIOSYSTEM;
+      num_possible_addresses = 1;
+      break;
+    case DEVICE_TYPE_RECORDER:
+      possible_addresses[0] = LOGICAL_ADDRESS_RECORDINGDEVICE1;
+      possible_addresses[1] = LOGICAL_ADDRESS_RECORDINGDEVICE2;
+      possible_addresses[2] = LOGICAL_ADDRESS_RECORDINGDEVICE3;
+      num_possible_addresses = 3;
+        break;
+    case DEVICE_TYPE_TUNER:
+      possible_addresses[0] = LOGICAL_ADDRESS_TUNER1;
+      possible_addresses[1] = LOGICAL_ADDRESS_TUNER2;
+      possible_addresses[2] = LOGICAL_ADDRESS_TUNER3;
+      possible_addresses[3] = LOGICAL_ADDRESS_TUNER4;
+      num_possible_addresses = 4;
+      break;
+    case DEVICE_TYPE_RESERVED:
+      possible_addresses[0] = LOGICAL_ADDRESS_RESERVED1;
+      possible_addresses[1] = LOGICAL_ADDRESS_RESERVED2;
+      num_possible_addresses = 2;
+      break;
+    case DEVICE_TYPE_FREEUSE:
+      possible_addresses[0] = LOGICAL_ADDRESS_FREEUSE;
+      num_possible_addresses = 1;
+      break;
+    case DEVICE_TYPE_UNREGISTERED:
+    default:
+      possible_addresses[0] = LOGICAL_ADDRESS_UNREGISTERED;
+      num_possible_addresses = 1;
+      break;
+  }
+
+  for (int i = 0; i < num_possible_addresses; i++)
+  {
+    if (!pool->allocated[possible_addresses[i]])
+    {
+      pool->allocated[possible_addresses[i]] = true;
+      return possible_addresses[i];
+    }
+  }
+  return DEVICE_TYPE_UNREGISTERED; // No available addresses for the given device type
+}
+
+void ReleaseLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_logical_address_t address)
+{
+  assert(pool != NULL);
+  if (address >= 0 && address <= LOGICAL_ADDRESS_MAX)
+  {
+    pool->allocated[address] = false;
+  }
+}
+
+void AllocatePhysicalLogicalAddress(struct vCHdmiCec_device_info_t * map, struct vCHdmiCec_device_info_t * emulated_device, vCHdmiCec_logical_address_pool_t* pool)
+{
+  unsigned char physicalAddress[4];
+  if(map == NULL || emulated_device == NULL || pool == NULL)
   {
     return;
   }
-  //TODO
-  //map->physical_address = (((map->parent_port_id & 0xF0 ) << 20)|( (0x04 & 0x0F ) << 16) |((0x04 & 0xF0) << 4)  | (0x04 & 0x0F));
+  //Allocate physical address
+  if(map->parent == NULL)
+  {
+    //This is the root.
+    map->physical_address = 0;
+  }
+  else
+  {
+    physicalAddress[0] = (map->parent->physical_address >> 20) & 0x0F;
+    physicalAddress[1] = (map->parent->physical_address >> 16) & 0x0F;
+    physicalAddress[2] = (map->parent->physical_address >> 4) & 0x0F;
+    physicalAddress[3] = map->parent->physical_address & 0x0F;
+
+    for(int i = 0; i < sizeof(physicalAddress); ++i)
+    {
+      if(physicalAddress[i] == 0)
+      {
+        physicalAddress[i] = map->parent_port_id;
+        break;
+      }
+    }
+    map->physical_address = ((physicalAddress[0] & 0x0F) << 20) | ((physicalAddress[1] & 0x0F) << 16) | ((physicalAddress[2] & 0x0F) << 4) | (physicalAddress[3] & 0x0F);
+  }
+
+  //Allocate logical address
+  if(map->parent == NULL)
+  {
+    if(!strcmp(map->osd_name, emulated_device->osd_name))
+    {
+      //If the root device (TV) is the emulated device, then logical address is expected to be set by application
+      map->logical_address = LOGICAL_ADDRESS_BROADCAST; 
+    }
+  }
+  else
+  {
+      map->logical_address = AllocateLogicalAddress(pool, map->type);
+  }
+
+  AllocatePhysicalLogicalAddress(map->next_sibling, emulated_device, pool);
+  AllocatePhysicalLogicalAddress(map->first_child, emulated_device, pool);
 }
 
 void PrintDeviceMap(struct vCHdmiCec_device_info_t* map, int level)
 {
+  unsigned char physicalAddress[4];
   if(map == NULL)
   {
     return;
   }
+  physicalAddress[0] = (map->physical_address >> 20) & 0x0F;
+  physicalAddress[1] = (map->physical_address >> 16) & 0x0F;
+  physicalAddress[2] = (map->physical_address >> 4) & 0x0F;
+  physicalAddress[3] = map->physical_address & 0x0F;
 
   VC_LOG(">>>>>>>>>>>> >>>>>>>>>> >>>>> >>>> >>> >> >");
-  VC_LOG("%*cDevice      : %s", level*4,' ', map->osd_name);
-  VC_LOG("%*cType        : %s", level*4,' ', GetStrByVal(gDIStrVal, sizeof(gDIStrVal)/sizeof(strVal_t), map->type));
-  VC_LOG("%*cPwr Status  : %s", level*4,' ', GetStrByVal(gPSStrVal, sizeof(gPSStrVal)/sizeof(strVal_t), map->power_status));
+  VC_LOG("%*cDevice          : %s", level*4,' ', map->osd_name);
+  VC_LOG("%*cType            : %s", level*4,' ', GetStrByVal(gDIStrVal, sizeof(gDIStrVal)/sizeof(strVal_t), map->type));
+  VC_LOG("%*cPwr Status      : %s", level*4,' ', GetStrByVal(gPSStrVal, sizeof(gPSStrVal)/sizeof(strVal_t), map->power_status));
+  VC_LOG("%*cPhysical Address: %d.%d.%d.%d", level*4,' ', physicalAddress[0], physicalAddress[1], physicalAddress[2], physicalAddress[3]);
+  VC_LOG("%*cLogical Address : %d", level*4,' ',map->logical_address);
   VC_LOG("-------------------------------------------");
 
-  PrintDeviceMap(map->first_child, level +1);
   PrintDeviceMap(map->next_sibling, level);
+  PrintDeviceMap(map->first_child, level +1);
 }
 
 struct vCHdmiCec_device_info_t* GetDeviceByName(struct vCHdmiCec_device_info_t* map, char* name)
@@ -752,6 +887,9 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
     TeardownHal(cec);
     return HDMI_CEC_IO_GENERAL_ERROR;
   }
+  InitLogicalAddressPool(&cec->address_pool);
+  AllocatePhysicalLogicalAddress(cec->devices_map, cec->emulated_device, &cec->address_pool);
+
   if(cec->emulated_device->type == DEVICE_TYPE_TV)
   { 
     VC_LOG("HdmiCecOpen: Emulating a TV");
