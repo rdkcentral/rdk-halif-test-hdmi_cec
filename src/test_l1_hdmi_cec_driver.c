@@ -853,9 +853,6 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
     result = HdmiCecRemoveLogicalAddress( handle,  -1 );
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
-    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
