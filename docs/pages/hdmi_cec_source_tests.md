@@ -62,14 +62,16 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 ## Logical Address Discovery
 
 |Description|HAL APIs|L2|L3|Control plane requirements|
-|-----|------------------|-----------|--------|--|--|--------------------------|
-|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device. This will add the logical address, as per source functionality. As the connected device will be a playback device, the valid logical address would be 4, 8, 11, and 14. |HdmiCecGetLogicalAddress|N|Y
-|Connect 5 playback devices using a switch, and attempt to discover a logical address with the fifth device, which exceeds number of logical ports for playback devices. |HdmiCecGetLogicalAddress|N|Y
+|-----------|--------|--|--|--------------------------|
+|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device when there is sink device connected to the source device. It should return HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE. |HdmiCecOpen|Y|N|
+|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device. This will add the logical address, as per source functionality. As the connected device will be a playback device, the valid logical address would be 4, 8, and 11. |HdmiCecOpen|N|Y|
+|Connect 5 playback devices using a switch, and attempt to discover a logical address with the fifth device, which exceeds number of logical ports for playback devices. |HdmiCecOpen|N|Y|
+|Rapidly connect and disconnect HDMI connection in 100ms connection and 100ms disconnection cycle.|HdmiCecOpen|N|Y|
 
 ### Emulator Requirements
 
 - Boot with control configuration with various configurations having a predefined set of nodes:
-  - configuration to support the discovery of logical addresses. The caller to provide a create a proper logical address during Open and that should be provided when HDMICECGetLogicaladdress is used.
+  - configuration to support the discovery of logical addresses. The caller to provide a create a proper logical address during Open and that should be provided when HdmiCecOpen is used.
   - Verify for the valid logical address and return the appropriate error code based on the logical address availability.  
   - Emulator should simulate the logical address that a source device can provide.
 
@@ -77,6 +79,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 - The control plane will allow removing or adding a node to the network.
   - allowing adding/removing source node
+  - Allow adding/removing of sink node
   - allow the use of multiple source nodes
   - Support the CEC commands from the external devices on L3 Test Cases. 
 
@@ -84,9 +87,11 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |Description|HAL APIs|L2|L3|Control plane requirements|
 |-----------|--------|--|--|--------------------------|
-| Get the valid physical address allocated through the HAL function when there is no sink device connected. |HdmiCecGetPhysicalAddress| Y  |NA||
-| Enable a sink device connected to the DUT first to get the valid physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| N  |Y||
-| | | Verify the physical addresses allocated by connecting a source and sink device through an HDMI switch.| HdmiCecGetPhysicalAddress| NA | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.|
+| Enable a sink device connected to the DUT first to get the valid physical address allocated through the HAL function. The physical address should be 1.0.0.0|HdmiCecGetPhysicalAddress| N  |Y||
+|Verify the physical addresses allocated by connecting a source and sink device through an HDMI switch. The physical address should 1.1.0.0| HdmiCecGetPhysicalAddress| NA | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.||
+| Connect a sink device to the source device, get the physical address. Disconnect the sink device and attempt to get the physical address again|HdmiCecGetPhysicalAddress| N  |Y||
+
+@note Calling HdmiCecGetPhysicalAddress when before there is no device connected is not a valid test because HdmiCecOpen has not initiated.
 
 ### Emulator Requirements - Physical Address
 
@@ -103,8 +108,8 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |Description|HAL APIs|L2|L3|Control plane requirements|
 |-----------|--------|--|--|--------------------------|
-| Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for a logical address that doesn't exist. Result should return HDMI_CEC_IO_SENT_BUT_NOT_ACKD. | HdmiCecTx | Y | NA  |  Control plane can unplug or switch off a previously existing CEC device |
-| Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for supported CEC commands (as per 1.4b HDMI CEC spec). Result should return HDMI_CEC_IO_SENT_BUT_NOT_ACKD. | HdmiCecTx | Y | NA  |  Control plane can unplug or switch off a previously existing CEC device |
+| Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for a logical address that doesn't exist after the connected device is disconnected. Result should return HDMI_CEC_IO_SENT_BUT_NOT_ACKD. | HdmiCecTx | N | Y  |  Control plane can unplug or switch off a previously existing CEC device |
+| Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for supported CEC commands (as per 1.4b HDMI CEC spec) after the connected device is disconnected. Result should return HDMI_CEC_IO_SENT_BUT_NOT_ACKD. | HdmiCecTx | N | Y  |  Control plane can unplug or switch off a previously existing CEC device |
 | Verify the correct transmission of the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly. Result should return HDMI_CEC_IO_SENT_AND_ACKD.| HdmiCecTx | NA | Y  |Control plane to switch ON a CEC-supported device on the HDMI network so that it shall respond to the basic commands|
 | Broadcast a supported CEC Command to all the devices connected to the network without any error. Result should return HDMI_CEC_IO_SENT_AND_ACKD |HdmiCecTx| NA | Y  |Control plane to switch ON a CEC-supported device on the HDMI network to act on the broadcasted command|
 | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitoring the behaviour of the connected device accordingly. Result should return HDMI_CEC_IO_SENT_AND_ACKD.| HdmiCecTx | NA | Y  | Control plane to monitor the behaviour of the connected devices.  |
