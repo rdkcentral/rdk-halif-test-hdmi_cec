@@ -61,9 +61,10 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 ## Logical Address Discovery
 
-|S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
+|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
-| 1 |[Logical address](#logical-address-discovery)|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device. This will add the logical address, as per source functionality. |HdmiCecGetLogicalAddress|Y|NA
+|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device. This will add the logical address, as per source functionality. As the connected device will be a playback device, the valid logical address would be 4, 8, 11, and 14. |HdmiCecGetLogicalAddress|N|Y
+|Connect 5 playback devices using a switch, and attempt to discover a logical address with the fifth device, which exceeds number of logical ports for playback devices. |HdmiCecGetLogicalAddress|N|Y
 
 ### Emulator Requirements
 
@@ -76,6 +77,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 - The control plane will allow removing or adding a node to the network.
   - allowing adding/removing source node
+  - allow the use of multiple source nodes
   - Support the CEC commands from the external devices on L3 Test Cases. 
 
 ## Physical Address
