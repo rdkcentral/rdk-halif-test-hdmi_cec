@@ -72,18 +72,16 @@
 #include "vcomponent_hdmi_cec.h"
 
 
-struct emulator_info {
+struct vcomponent_info {
   char *pProfilePath;
-  unsigned short cpPort;
-  char* pCpPath;
   vComponent_HdmiCec_t* handle;
 };
 
-struct emulator_info gVCInfo = {NULL, 8888, NULL};
+struct vcomponent_info gVCInfo = {NULL, NULL};
 
 void start_virtual_component (void)
 {
-    vComponent_HdmiCec_Status status;
+    vComponent_HdmiCec_Status_t status;
     
     if(gVCInfo.pProfilePath == NULL)
     {
@@ -91,19 +89,23 @@ void start_virtual_component (void)
         return;
     }
 
-    status = vComponent_HdmiCec_Initialize(gVCInfo.pProfilePath, gVCInfo.cpPort, gVCInfo.pCpPath, &gVCInfo.handle);
+    gVCInfo.handle = vComponent_HdmiCec_Initialize();
+    if(gVCInfo.handle == NULL)
+    {
+        UT_LOG("Error starting Virtual Component - vComponent_HdmiCec_Initialize");
+        return;
+    }
+    status = vComponent_HdmiCec_Open(gVCInfo.handle, gVCInfo.pProfilePath, false);
     if(status != VC_HDMICEC_STATUS_SUCCESS)
     {
-        UT_LOG("Error starting Virtual Component [%d]\n", status);
+        UT_LOG("Error Starting Virtual Component vComponent_HdmiCec_Open[%d]\n", status);
     }
-
-        UT_LOG("Virtual Component started\n");
-
+    UT_LOG("Virtual Component started\n");
 }
 
 void stop_virtual_component(void)
 {
-    vComponent_HdmiCec_Status status;
+    vComponent_HdmiCec_Status_t status;
     if(gVCInfo.handle == NULL)
     {
         assert(gVCInfo.handle != NULL);
@@ -112,7 +114,7 @@ void stop_virtual_component(void)
     status = vComponent_HdmiCec_Deinitialize(gVCInfo.handle);
     if(status != VC_HDMICEC_STATUS_SUCCESS)
     {
-        UT_LOG("Error stopping Virtual Component [%d]\n", status);
+        UT_LOG("Error stopping Virtual Component - vComponent_HdmiCec_Deinitialize");
     }
     gVCInfo.handle = NULL;
     UT_LOG("Virtual Component stopped\n");
@@ -126,15 +128,13 @@ static UT_test_suite_t * pSuite = NULL;
  *
  * @return int - 0 on success, otherwise failure
  */
-int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath )
+int register_vcomponent_tests ( char* profile)
 {
     if(profile == NULL) 
     {
         return -1;
     }
     gVCInfo.pProfilePath = profile;
-    gVCInfo.cpPort = cpPort;
-    gVCInfo.pCpPath = cpPath;
 
     /* add a suite to the registry */
     pSuite = UT_add_suite( "[HDMI CEC Virtual Component Lifecycle control]", NULL, NULL );
