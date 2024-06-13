@@ -268,7 +268,8 @@ void vCHdmiCec_Device_RemoveChild(struct vCHdmiCec_device_info_t* map, char* nam
   {
     prev->next_sibling = tmp->next_sibling;
   }
-  free(tmp);
+  //Remove the entire tree under this device.
+  vCHdmiCec_Device_DestroyMap(tmp);
 }
 
 struct vCHdmiCec_device_info_t* vCHdmiCec_Device_Get(struct vCHdmiCec_device_info_t* map, char* name)
