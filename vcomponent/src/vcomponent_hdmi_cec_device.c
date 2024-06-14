@@ -173,8 +173,8 @@ void vCHdmiCec_Device_PrintMap(struct vCHdmiCec_device_info_t* map, int level)
   {
     return;
   }
-  physicalAddress[0] = (map->physical_address >> 20) & 0x0F;
-  physicalAddress[1] = (map->physical_address >> 16) & 0x0F;
+  physicalAddress[0] = (map->physical_address >> 12) & 0x0F;
+  physicalAddress[1] = (map->physical_address >> 8) & 0x0F;
   physicalAddress[2] = (map->physical_address >> 4) & 0x0F;
   physicalAddress[3] = map->physical_address & 0x0F;
 
@@ -314,8 +314,8 @@ void vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(struct vCHdmiCec_device_i
   }
   else
   {
-    physicalAddress[0] = (map->parent->physical_address >> 20) & 0x0F;
-    physicalAddress[1] = (map->parent->physical_address >> 16) & 0x0F;
+    physicalAddress[0] = (map->parent->physical_address >> 12) & 0x0F;
+    physicalAddress[1] = (map->parent->physical_address >> 8) & 0x0F;
     physicalAddress[2] = (map->parent->physical_address >> 4) & 0x0F;
     physicalAddress[3] = map->parent->physical_address & 0x0F;
 
@@ -327,7 +327,7 @@ void vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(struct vCHdmiCec_device_i
         break;
       }
     }
-    map->physical_address = ((physicalAddress[0] & 0x0F) << 20) | ((physicalAddress[1] & 0x0F) << 16) | ((physicalAddress[2] & 0x0F) << 4) | (physicalAddress[3] & 0x0F);
+    map->physical_address = ((physicalAddress[0] & 0x0F) << 12) | ((physicalAddress[1] & 0x0F) << 8) | ((physicalAddress[2] & 0x0F) << 4) | (physicalAddress[3] & 0x0F);
   }
 
   //Allocate logical address
