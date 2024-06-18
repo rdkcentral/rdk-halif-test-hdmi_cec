@@ -87,6 +87,7 @@
 static int gTestGroup = 1;
 static int gTestID = 1;
 static bool extendedEnumsSupported=false;
+static bool sourceDevice=false;
 
 #define CEC_GET_CEC_VERSION (0x9F)
 #define CEC_DEVICE_VENDOR_ID (0x87)
@@ -2240,6 +2241,8 @@ int test_hdmicec_hal_l1_register( void )
     {
         return -1;
     }
+    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
+    sourceDevice = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/sourceDevice" );
 
     UT_add_test( pSuiteCommon, "open_Positive", test_hdmicec_hal_l1_open_positive);
     UT_add_test( pSuiteCommon, "open_negative", test_hdmicec_hal_l1_open_negative);
@@ -2251,29 +2254,30 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteCommon, "setRxCallback_negative", test_hdmicec_hal_l1_setRxCallback_negative);
     UT_add_test( pSuiteCommon, "setTxCallback_Positive", test_hdmicec_hal_l1_setTxCallback_positive);
     UT_add_test( pSuiteCommon, "setTxCallback_negative", test_hdmicec_hal_l1_setTxCallback_negative);
-
-    UT_add_test( pSuite_panel, "addLogicalAddressSink_Positive", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive);
-    UT_add_test( pSuite_panel, "addLogicalAddressSink_negative", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative);
-    UT_add_test( pSuite_panel, "removeLogicalAddressSink_Positive", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_positive);
-    UT_add_test( pSuite_panel, "removeLogicalAddressSink_negative", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative);
-    UT_add_test( pSuite_panel, "getLogicalAddressSink_Positive", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive);
-    UT_add_test( pSuite_panel, "getLogicalAddressSink_negative", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative);
-    UT_add_test( pSuite_panel, "TxSink_Positive", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive);
-    UT_add_test( pSuite_panel, "TxSink_negative", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative);
-    UT_add_test( pSuite_panel, "TxAsyncSink_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive);
-    UT_add_test( pSuite_panel, "TxAsyncSink_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative);
-    //UT_add_test( pSuite_panel, "addLogicalAddressWithAddressInUseSink", test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice);
-    //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSink", test_hdmicec_hal_l1_portDisconnected_sink);
-
-    UT_add_test( pSuite_stb, "getLogicalAddressSource_Positive", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive);
-    UT_add_test( pSuite_stb, "getLogicalAddressSource_negative", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
-    UT_add_test( pSuite_stb, "TxSource_Positive", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive);
-    UT_add_test( pSuite_stb, "TxSource_negative", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative);
-    UT_add_test( pSuite_stb, "TxAsyncSource_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive);
-    UT_add_test( pSuite_stb, "TxAsyncSource_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative);
-    //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
-    //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
-    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
+    if(sourceDevice)
+    {
+        UT_add_test( pSuite_stb, "getLogicalAddressSource_Positive", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive);
+        UT_add_test( pSuite_stb, "getLogicalAddressSource_negative", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
+        UT_add_test( pSuite_stb, "TxAsyncSource_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive);
+        UT_add_test( pSuite_stb, "TxAsyncSource_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative);
+        UT_add_test( pSuite_stb, "TxSource_Positive", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive);
+        UT_add_test( pSuite_stb, "TxSource_negative", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative);
+        //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
+        //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
+    }else{
+        UT_add_test( pSuite_panel, "addLogicalAddressSink_Positive", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive);
+        UT_add_test( pSuite_panel, "addLogicalAddressSink_negative", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative);
+        UT_add_test( pSuite_panel, "removeLogicalAddressSink_Positive", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_positive);
+        UT_add_test( pSuite_panel, "removeLogicalAddressSink_negative", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative);
+        UT_add_test( pSuite_panel, "getLogicalAddressSink_Positive", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive);
+        UT_add_test( pSuite_panel, "getLogicalAddressSink_negative", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative);
+        UT_add_test( pSuite_panel, "TxSink_Positive", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive);
+        UT_add_test( pSuite_panel, "TxSink_negative", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative);
+        UT_add_test( pSuite_panel, "TxAsyncSink_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive);
+        UT_add_test( pSuite_panel, "TxAsyncSink_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative);
+        //UT_add_test( pSuite_panel, "addLogicalAddressWithAddressInUseSink", test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice);
+        //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSink", test_hdmicec_hal_l1_portDisconnected_sink);
+    }
     return 0;
 }
 
