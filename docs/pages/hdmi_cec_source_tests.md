@@ -14,13 +14,14 @@
 
 ## Acronyms, Terms and Abbreviations
 
-- `CEC` - Consumer Electronics Control
-- `HAL` - Hardware Abstraction layer
+- `CEC`  - Consumer Electronics Control
+- `HAL`  - Hardware Abstraction layer
 - `HDMI` - High Definition Multimedia Interface
-- `L2` - Level 2 Testing ()
-- `L3` - Level 3 Testing ()
-- `Sink device` - Any piece of equipment or technology that receives an input signal or data from another device or system.
-- `Source Device` - Any piece of equipment or technology that provides an input signal or data to another device or system.
+- `L2`   - Level 2 Testing ()
+- `L3`   - Level 3 Testing ()
+- `DUT`  - Device Under Test
+- `Sink device` - An equipment or technology that receives an input signal or data from another device or system.
+- `Source Device` - An equipment or technology that provides an input signal or data to another device or system.
 
 ## Scope
 
@@ -35,11 +36,11 @@ Consumer Electronics Control (CEC) is a single-wire bidirectional bus within an 
 The HAL layers within RDK serve as a bridge between the underlying low-level SoC drivers and the higher-level RDK layers that utilize the functionality offered by these HAL functions. Specifically concerning the CEC Module, the HAL layers facilitate the following functionalities:
 
 - Logical Address discovery 
-- Get Logical address
-- Get Physical address
-- Syncronous transmission, and communicating via hotplug connectivity
+- Get a Logical address
+- Get a Physical address
+- Synchronous transmission, and communication via hotplug connectivity
 
-Interface of the test is available here: [Hdmicec HAL header](https://github.com/rdkcentral/rdk-halif-hdmi_cec/blob/main/include/hdmi_cec_driver.h)
+The interface of the test is available here: [Hdmicec HAL header](https://github.com/rdkcentral/rdk-halif-hdmi_cec/blob/main/include/hdmi_cec_driver.h)
 
 The Hdmicec Hal Spec document: [Hdmicec HAL Spec](https://github.com/rdkcentral/rdk-halif-hdmi_cec/blob/main/docs/pages/hdmi-cec_halSpec.md)
 
@@ -47,11 +48,11 @@ The Hdmicec Hal Spec document: [Hdmicec HAL Spec](https://github.com/rdkcentral/
 
 The HAL CEC layer facilitates the transmission and reception of CEC information on the CEC bus. It does not handle any specific opcode commands, nor does it validate supported HAL CEC opcodes for sending or receiving.
 
-It is the responsibility of the caller to manage the opcodes. The current test cases will verify responses from connected devices for a subset of opcodes as part of the testing process.
+The caller is responsible for managing the opcodes. The current test cases will verify responses from connected devices for a subset of opcodes as part of the testing process.
 
 |S.No.|Test Functionality|Description|
 |-----|------------------|-----------|
-| 1 |[Logical address](#logical-address-discovery)|Facilitating the Discovery of logical addresses getting logical address of the device (for source devices) |
+| 1 |[Logical address](#logical-address-discovery)|Facilitating the Discovery of logical addresses by getting the logical address of the device (for source devices) |
 | 2| [Physical Address](#physical-address)| Retrieving the physical address |
 | 3| [CEC Synchronous Transmission](#cec-synchronous-transmission)| Transmitting CEC frames and reporting on their acknowledgement |
 | 4| [CEC Receive functionality](#cec-receive-functionality)| Receiving CEC information from other devices and passing it to the layer above through a registered callback function |
@@ -63,17 +64,17 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |Description|HAL APIs|L2|L3|Control plane requirements|
 |-----------|--------|--|--|--------------------------|
-|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device when there is sink device connected to the source device. It should return HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE. |HdmiCecOpen|Y|N|
-|Get the logical address discovered during cec open and validate the address for a proper playback/tuner device. This will add the logical address, as per source functionality. As the connected device will be a playback device, the valid logical address would be 4, 8, and 11. |HdmiCecOpen|N|Y|
-|Connect 5 playback devices using a switch, and attempt to discover a logical address with the fifth device, which exceeds number of logical ports for playback devices. |HdmiCecOpen|N|Y|
-|Rapidly connect and disconnect HDMI connection in 100ms connection and 100ms disconnection cycle.|HdmiCecOpen|N|Y|
+|Trying to get a logical address discovered during CEC open, and validate the return value when the `DUT` is not connected to a Sink device. It should return HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE.|HdmiCecOpen|Y|N|
+|Get the logical address discovered during CEC open and validate the address for a proper playback/tuner device. This will add the logical address, as per source functionality. As the connected device will be a playback device, the valid logical address would be 4, 8, and 11. |HdmiCecOpen HdmiCecGetLogicalAddress|N|Y|
+|Connect 5 playback devices using a switch, and attempt to discover a logical address with the fifth device, which exceeds the number of logical ports for playback devices. It should return HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE|HdmiCecOpen|N|Y|
+|Rapidly connect and disconnect HDMI connection in 100ms connection and 100ms disconnection cycle.|HdmiCecOpen  HdmiCecGetLogicalAddress|N|Y|
 
 ### Emulator Requirements
 
 - Boot with control configuration with various configurations having a predefined set of nodes:
-  - configuration to support the discovery of logical addresses. The caller to provide a create a proper logical address during Open and that should be provided when HdmiCecOpen is used.
+  - configuration to support the discovery of logical addresses. The caller creates a proper logical address during Open and that should be provided when HdmiCecOpen is used.
   - Verify for the valid logical address and return the appropriate error code based on the logical address availability.  
-  - Emulator should simulate the logical address that a source device can provide.
+  - The emulator should simulate the logical address that a source device can provide.
 
 ### Control Plane Requirements
 
@@ -88,10 +89,10 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |Description|HAL APIs|L2|L3|Control plane requirements|
 |-----------|--------|--|--|--------------------------|
 | Enable a sink device connected to the DUT first to get the valid physical address allocated through the HAL function. The physical address should be 1.0.0.0|HdmiCecGetPhysicalAddress| N  |Y||
-|Verify the physical addresses allocated by connecting a source and sink device through an HDMI switch. The physical address should 1.1.0.0| HdmiCecGetPhysicalAddress| NA | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.||
+|Verify the physical addresses allocated by connecting a source and sink device through an HDMI switch. The physical address should 1.1.0.0| HdmiCecGetPhysicalAddress| N | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.||
 | Connect a sink device to the source device, get the physical address. Disconnect the sink device and attempt to get the physical address again|HdmiCecGetPhysicalAddress| N  |Y||
 
-@note Calling HdmiCecGetPhysicalAddress when before there is no device connected is not a valid test because HdmiCecOpen has not initiated.
+@note Calling HdmiCecGetPhysicalAddress when no device is connected to `DUT` is not a valid test because HdmiCecOpen has not been initiated.
 
 ### Emulator Requirements - Physical Address
 
@@ -110,9 +111,9 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 |-----------|--------|--|--|--------------------------|
 | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for a logical address that doesn't exist after the connected device is disconnected. Result should return HDMI_CEC_IO_SENT_BUT_NOT_ACKD. | HdmiCecTx | N | Y  |  Control plane can unplug or switch off a previously existing CEC device |
 | Transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version for supported CEC commands (as per 1.4b HDMI CEC spec) after the connected device is disconnected. Result should return HDMI_CEC_IO_SENT_BUT_NOT_ACKD. | HdmiCecTx | N | Y  |  Control plane can unplug or switch off a previously existing CEC device |
-| Verify the correct transmission of the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly. Result should return HDMI_CEC_IO_SENT_AND_ACKD.| HdmiCecTx | NA | Y  |Control plane to switch ON a CEC-supported device on the HDMI network so that it shall respond to the basic commands|
-| Broadcast a supported CEC Command to all the devices connected to the network without any error. Result should return HDMI_CEC_IO_SENT_AND_ACKD |HdmiCecTx| NA | Y  |Control plane to switch ON a CEC-supported device on the HDMI network to act on the broadcasted command|
-| Transmit a CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitoring the behaviour of the connected device accordingly. Result should return HDMI_CEC_IO_SENT_AND_ACKD.| HdmiCecTx | NA | Y  | Control plane to monitor the behaviour of the connected devices.  |
+| Verify the correct transmission of the supported CEC commands (as per 1.4b HDMI CEC spec) to the connected device and ensure it is acknowledged properly. The result should return HDMI_CEC_IO_SENT_AND_ACKD.| HdmiCecTx | N | Y  |Control plane to switch ON a CEC-supported device on the HDMI network so that it shall respond to the basic commands|
+| Broadcast a supported CEC Command to all the devices connected to the network without any error. The result should return HDMI_CEC_IO_SENT_AND_ACKD |HdmiCecTx| N | Y  |Control plane to switch ON a CEC-supported device on the HDMI network to act on the broadcasted command|
+| Transmit a CEC Command (as per 1.4b HDMI CEC spec) to put the connected device into standby mode and await the device's response. Monitoring the behaviour of the connected device accordingly. The result should return HDMI_CEC_IO_SENT_AND_ACKD.| HdmiCecTx | N | Y  | Control plane to monitor the behaviour of the connected devices.  |
 
 
 ### Emulator Requirements - CEC Transmission
@@ -127,11 +128,11 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description| HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|---------|--|--|--------------------------|
-| 5| [CEC Receive functionality](#cec-receive-functionality)| Transmit a CEC Command that expects a response (Eg. GetCECVersion) to a connected device and see the response is received correctly. Set the Rx Callback before sending the data. Validate the received CEC Version.|HdmiCecSetRxCallback HdmiCecTx | NA |Y| Control plane to switch ON a CEC device that can respond to the Transmitted CEC Command|
+| 5| [CEC Receive functionality](#cec-receive-functionality)| Transmit a CEC Command that expects a response (Eg. GetCECVersion) to a connected device and see the response is received correctly. Set the Rx Callback before sending the data. Validate the received CEC Version.|HdmiCecSetRxCallback HdmiCecTx | N |Y| Control plane to switch ON a CEC device that can respond to the Transmitted CEC Command|
 | | | Transmit a CEC command from the connected devices and consider the Acknowledgement and responses are received correctly from the host device (`DUT` TV here)| HdmiCecSetRxCallback | NA | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`|
-| | | Transmit an OSD CEC command from the connected devices and consider the Acknowledgement and responses are received correctly from the host device (`DUT` TV here). Make the OSD String to max length| HdmiCecSetRxCallback | NA | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`|
-| | | Transmit an OSD CEC command from the connected devices continuously for 30 seconds changing the patterns in the payload and considering the Acknowledgement and responses are received correctly from the host device (`DUT` TV here). Make the OSD String to max length| HdmiCecSetRxCallback | NA | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`. Also, Control plane to detect the OSD Display on the Sink device to validate|
-| | | Set the Logical address to 0 on `DUT` and make sure that it doesn't receive the messages sent to devices with different logical address.| HdmiCecSetRxCallback | NA | Y  | Control Plane to initiate a command to send CEC frames from CEC adaptor with a different logical address other than zero|
+| | | Transmit an OSD CEC command from the connected devices and consider the Acknowledgement and responses are received correctly from the host device (`DUT` TV here). Make the OSD String to max length| HdmiCecSetRxCallback | N | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`|
+| | | Transmit an OSD CEC command from the connected devices continuously for 30 seconds changing the patterns in the payload and considering the Acknowledgement and responses are received correctly from the host device (`DUT` TV here). Make the OSD String to max length| HdmiCecSetRxCallback | N | Y  | Control panel to control the third-party devices to Transmit the required commands to  `DUT`. Also, Control plane to detect the OSD Display on the Sink device to validate|
+| | | Set the Logical address to 0 on `DUT` and make sure that it doesn't receive the messages sent to devices with different logical address.| HdmiCecSetRxCallback | N | Y  | Control Plane to initiate a command to send CEC frames from CEC adaptor with a different logical address other than zero|
 
 ### Emulator Requirements - CEC Receive functionality
 1. Emulate the Tx and Rx HAL functionalities with the required responses.
@@ -144,7 +145,7 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description| HAL APIs |L2|L3|Control plane requirements|
 |-----|------------------|-----------|----------|--|--|--------------------------|
-| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Source Platform. Validating whether the CEC Transmission (use Polling command) works when the HDMI port is disconnected should result in ACK not being received while the TX still works as expected. | HdmiCecTx | NA | Y  | Control Panel to control the Hotplug activities |
+| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Source Platform. Validating whether the CEC Transmission (use Polling command) works when the HDMI port is disconnected should result in ACK not being received while the TX still works as expected. | HdmiCecTx | N | Y  | Control Panel to control the Hotplug activities |
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should succeed, but the message should not be Acknowledged.| HdmiCecTx | NA | Y  | Control Panel to control the external devices connected.|
 
 ### Emulator Requirements - CEC HotPlug Functionality
@@ -159,8 +160,8 @@ It is the responsibility of the caller to manage the opcodes. The current test c
 
 |S.No.|Test Functionality|Description| HAL APIs |L2|L3|Control plane requirements|
 |-----|------------------|-----------|----------|--|--|--------------------------|
-| 7| Introduce fault in the CEC Bus | Observe the behaviour when the CEC line is pulled high during the CEC Transmission using a CEC Adaptor that provision to keep the CEC line pulled high| HdmiCecTx | NA | Y  |CEC Adaptor used shall have a provision to introduce the fault. The control plane should be able to command to pull the CEC line high, else it should follow a manual process|
-| 8| Overloading the CEC bus. | Overload the CEC bus with too many messages  (by connecting more devices in the network) and observe the behaviour| HdmiCecTx | NA | Y  |Control plane to initiate the CEC Transmission through all the connected devices continuously with a command that expects the response as well to overload the CEC Network.  |
+| 7| Introduce fault in the CEC Bus | Observe the behaviour when the CEC line is pulled high during the CEC Transmission using a CEC Adaptor that provision to keep the CEC line pulled high| HdmiCecTx | N | Y  |CEC Adaptor used shall have a provision to introduce the fault. The control plane should be able to command to pull the CEC line high, else it should follow a manual process|
+| 8| Overloading the CEC bus. | Overload the CEC bus with too many messages  (by connecting more devices in the network) and observe the behaviour| HdmiCecTx | N | Y  |Control plane to initiate the CEC Transmission through all the connected devices continuously with a command that expects the response as well to overload the CEC Network.  |
 
 ### Emulator Requirements
 1. Emulator to support the HDMI_CEC_IO_SENT_FAILED during the above scenarios
