@@ -1,0 +1,5 @@
+---
+hdmicec:
+  cecSourceDevice: false
+  features:
+    extendedEnumsSupported: false

@@ -2242,7 +2242,7 @@ int test_hdmicec_hal_l1_register( void )
         return -1;
     }
     extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
-    sourceDevice = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/sourceDevice" );
+    sourceDevice = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/cecSourceDevice" );
 
     UT_add_test( pSuiteCommon, "open_Positive", test_hdmicec_hal_l1_open_positive);
     UT_add_test( pSuiteCommon, "open_negative", test_hdmicec_hal_l1_open_negative);

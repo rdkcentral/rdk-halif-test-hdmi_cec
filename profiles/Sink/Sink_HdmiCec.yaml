@@ -1,5 +1,5 @@
 ---
 hdmicec:
-  sourceDevice: false
+  cecSourceDevice: true
   features:
     extendedEnumsSupported: false
