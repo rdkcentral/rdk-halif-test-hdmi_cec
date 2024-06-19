@@ -57,7 +57,7 @@ If user chose to run the test in interactive mode, then the test case has to be 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
 | 01 | Invoke HdmiCecOpen with a valid handle when the `DUT` is not connected to a Sink device | handle = valid handle | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should be successful |
-| 02 | If the status is not HDMI_CEC_IO_SUCCESS, invoke HdmiCecClose with the handle | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | If the status is HDMI_CEC_IO_SUCCESS, invoke HdmiCecClose with the handle | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
 ```mermaid
