@@ -68,8 +68,8 @@
 
 #include <ut.h>
 #include <ut_log.h>
-#include <ut_kvp_profile.h>
 #include "hdmi_cec_driver.h"
+#include "test_utils.h"
 
 /**
      * Set CEC play back logical address here
@@ -86,7 +86,6 @@
 
 static int gTestGroup = 1;
 static int gTestID = 1;
-static bool extendedEnumsSupported=false;
 static bool sourceDevice=false;
 
 #define CEC_GET_CEC_VERSION (0x9F)
@@ -111,7 +110,7 @@ static bool sourceDevice=false;
 
 #define CHECK_FOR_EXTENDED_ERROR_CODE( result, enhanced, old )\
 {\
-   if ( extendedEnumsSupported == true )\
+   if ( gExtendedEnumSupported == true )\
    {\
       UT_ASSERT_EQUAL( enhanced, result );\
    }\
@@ -2254,7 +2253,7 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteCommon, "setRxCallback_negative", test_hdmicec_hal_l1_setRxCallback_negative);
     UT_add_test( pSuiteCommon, "setTxCallback_Positive", test_hdmicec_hal_l1_setTxCallback_positive);
     UT_add_test( pSuiteCommon, "setTxCallback_negative", test_hdmicec_hal_l1_setTxCallback_negative);
-    if(sourceDevice)
+    if(gCecDeviceType == cecDevicesSource)
     {
         UT_add_test( pSuite_stb, "getLogicalAddressSource_Positive", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive);
         UT_add_test( pSuite_stb, "getLogicalAddressSource_negative", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
@@ -2264,7 +2263,9 @@ int test_hdmicec_hal_l1_register( void )
         UT_add_test( pSuite_stb, "TxSource_negative", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative);
         //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
         //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
-    }else{
+    }
+    else if (gCecDeviceType == cecDeviceSink)
+    {
         UT_add_test( pSuite_panel, "addLogicalAddressSink_Positive", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive);
         UT_add_test( pSuite_panel, "addLogicalAddressSink_negative", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative);
         UT_add_test( pSuite_panel, "removeLogicalAddressSink_Positive", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_positive);

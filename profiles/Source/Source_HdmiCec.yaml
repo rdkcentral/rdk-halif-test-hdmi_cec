@@ -1,5 +1,9 @@
----
-hdmicec:
-  cecSourceDevice: false
-  features:
-    extendedEnumsSupported: false
+Device:
+  Type: source
+  Name: xione
+
+# cec Device Type 0- None, 1 - Sink, 2 - Source
+cecDeviceType: 1
+
+# Extended Error code enum suppot for the platform
+extendedEnumsSupported: false

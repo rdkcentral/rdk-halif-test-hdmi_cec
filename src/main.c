@@ -62,6 +62,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include "test_utils.h"
 
 extern int register_hdmicec_hal_l1_tests( void );
 extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
@@ -105,6 +106,13 @@ int main(int argc, char** argv)
 
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
+
+    if ( test_utils_parseconfig() == -1 )
+    {
+        printf("\n Failed to parse the configuration file");
+        test_utils_parseconfig_term();
+        return -1;
+    }
 
     register_hdmicec_hal_l1_tests ();
 
