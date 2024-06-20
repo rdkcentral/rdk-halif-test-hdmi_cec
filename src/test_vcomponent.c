@@ -69,7 +69,7 @@
 #include <ut_cunit.h>
 #include "ut_log.h"
 #include "hdmi_cec_driver.h"
-#include "../vcomponent/include/vcomponent_hdmi_cec.h"
+#include "vcomponent_hdmi_cec.h"
 
 
 struct emulator_info {
