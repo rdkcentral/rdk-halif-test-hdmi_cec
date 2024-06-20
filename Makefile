@@ -34,14 +34,14 @@ TOP_DIR := $(ROOT_DIR)
 SRC_DIRS = $(ROOT_DIR)/src
 INC_DIRS := $(ROOT_DIR)/../include
 HAL_LIB := RCECHal
-VCOMPONENT_SRCS := $(ROOT_DIR)/vcomponent/src/vcomponent_hdmi_cec.c
+#VCOMPONENT_SRCS := $(ROOT_DIR)/vcomponent/src/vcomponent_hdmi_cec.c
 
 ifeq ($(TARGET),)
 $(info TARGET NOT SET )
 $(info TARGET FORCED TO Linux)
 TARGET=linux
-SRC_DIRS += $(ROOT_DIR)/vcomponent/src
-INC_DIRS += $(ROOT_DIR)/vcomponent/include
+#SRC_DIRS += $(ROOT_DIR)/vcomponent/src
+#INC_DIRS += $(ROOT_DIR)/vcomponent/include
 YLDFLAGS += -lpthread -lrt
 endif
 
@@ -51,7 +51,7 @@ ifeq ($(TARGET),arm)
 HAL_LIB_DIR := $(ROOT_DIR)/libs
 YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)  -lpthread -lrt
 ifeq ("$(wildcard $(HAL_LIB_DIR)/lib$(HAL_LIB).so)","")
-SETUP_VCOMPONENT_LIBS := vcomponent
+#SETUP_VCOMPONENT_LIBS := vcomponent
 endif
 endif
 
