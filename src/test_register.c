@@ -62,13 +62,23 @@
 
 /* L1 Testing Functions */
 extern int test_hdmicec_hal_l1_register( void );
+extern int test_hdmicec_hal_l2_register( void );
 
 
 int register_hdmicec_hal_l1_tests( void )
 {
     int registerFailed=0;
 
-    registerFailed |= test_hdmicec_hal_l1_register();
+    registerFailed |= test_hdmicec_hal_l_register();
+
+    return registerFailed;
+}
+
+int register_hdmicec_hal_l2_tests( void )
+{
+    int registerFailed=0;
+
+    registerFailed |= test_hdmicec_hal_l2_register();
 
     return registerFailed;
 }
