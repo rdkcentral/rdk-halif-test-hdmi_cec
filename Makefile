@@ -76,7 +76,7 @@ build: $(SETUP_VCOMPONENT_LIBS)
 #Build against the real library leads to the SOC library dependency also.SOC lib dependency cannot be specified in the ut Makefile, since it is supposed to be common across may platforms. So in order to over come this situation, creating a template skelton library with empty templates so that the template library wont have any other Soc dependency. And in the real platform mount copy bind with the actual library will work fine.
 vcomponent:
 	echo $(CC)
-	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include $(VCOMPONENT_SRCS) -o lib$(HAL_LIB).so
+	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include -I$(ROOT_DIR)/vcomponent/include -I$(ROOT_DIR)/ut-core/include $(VCOMPONENT_SRCS) -o lib$(HAL_LIB).so
 	mkdir -p $(HAL_LIB_DIR)
 	cp $(ROOT_DIR)/lib$(HAL_LIB).so $(HAL_LIB_DIR)
 
