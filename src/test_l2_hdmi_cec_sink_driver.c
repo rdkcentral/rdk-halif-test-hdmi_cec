@@ -461,7 +461,7 @@ static UT_test_suite_t * pSuite = NULL;
  * @return int - 0 on success, otherwise failure
  */
     
-int test_hdmicec_hal_l2_register(void)
+int test_hdmi_cec_driver_sink_l2_register(void)
 {
     // Create the test suite
     pSuite = UT_add_suite("[L2 HDMICEC PANEL TestCase] ", NULL, NULL);
