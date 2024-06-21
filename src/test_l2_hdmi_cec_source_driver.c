@@ -128,7 +128,7 @@ static UT_test_suite_t * pSuite = NULL;
  * @return int - 0 on success, otherwise failure
  */
 
-int test_hdmi_cec_driver_l2_register(void)
+int test_hdmi_cec_driver_source_l2_register(void)
 {
     // Create the test suite
     pSuite = UT_add_suite("[L2 hdmi_cec_driver]", NULL, NULL);
