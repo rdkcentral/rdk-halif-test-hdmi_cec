@@ -1,19 +1,20 @@
 /*
-* If not stated otherwise in this file or this component's LICENSE file the
-* following copyright and licenses apply:*
-* Copyright 2024 RDK Management
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
+ * If not stated otherwise in this file or this component's LICENSE file the
+ * following copyright and licenses apply:
+ *
+ * Copyright 2016 RDK Management
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
 */
 
 /**
@@ -59,15 +60,39 @@
 */
 
 
-extern int test_hdmicec_hal_l1_register(void);
-extern int test_hdmicec_hal_l2_register(void);
+/* L1 Testing Functions */
+extern int test_hdmicec_hal_l1_register( void );
+extern int test_hdmi_cec_driver_source_l2_register( void );
+extern int test_hdmi_cec_driver_sink_l2_register( void );
 
-int register_hal_tests( void )
+
+int register_hdmicec_hal_l1_tests( void )
 {
     int registerFailed=0;
 
     registerFailed |= test_hdmicec_hal_l1_register();
-    registerFailed |= test_hdmicec_hal_l2_register();
 
     return registerFailed;
 }
+
+int register_hdmicec_hal_source_l2_tests( void )
+{
+    int registerFailed=0;
+
+    registerFailed |= test_hdmi_cec_driver_source_l2_register();
+
+    return registerFailed;
+}
+int register_hdmicec_hal_sink_l2_tests( void )
+{
+    int registerFailed=0;
+
+    registerFailed |= test_hdmi_cec_driver_sink_l2_register();
+
+    return registerFailed;
+}
+
+/** @} */ // End of HDMI CEC HAL Tests Register File
+/** @} */ // End of HDMI CEC HAL Tests
+/** @} */ // End of HDMI CEC Module
+/** @} */ // End of HPK

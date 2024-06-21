@@ -66,15 +66,39 @@ int main(int argc, char** argv)
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
     /* Check if tests are registered successfully */
-    registerReturn = register_hal_tests();
+    registerReturn = register_hdmicec_hal_l1_tests();
     
     if (registerReturn == 0)
     {
-        printf("register_hal_tests() returned success");
+        printf("register_hdmicec_hal_l1_tests() returned success");
     }
     else
     {
-        printf("register_hal_tests() returned failure");
+        printf("register_hdmicec_hal_l1_tests() returned failure");
+        return 1;
+    }
+
+    registerReturn = register_hdmicec_hal_source_l2_tests();
+    
+    if (registerReturn == 0)
+    {
+        printf("register_hdmicec_hal_source_l2_tests() returned success");
+    }
+    else
+    {
+        printf("register_hdmicec_hal_source_l2_tests() returned failure");
+        return 1;
+    }
+
+    registerReturn = register_hdmicec_hal_sink_l2_tests();
+    
+    if (registerReturn == 0)
+    {
+        printf("register_hdmicec_hal_sink_l2_tests() returned success");
+    }
+    else
+    {
+        printf("register_hdmicec_hal_sink_l2_tests() returned failure");
         return 1;
     }
 

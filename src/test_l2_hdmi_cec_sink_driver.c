@@ -23,20 +23,20 @@
  */
 
 /**
- * @addtogroup HDMI_CEC HDMI CEC Module
+ * @addtogroup HDMI_CEC HDMI CEC Sink Module
  * @{
  *
  */
 
 /**
- * @defgroup HDMI_CEC_HALTESTS HDMI CEC HAL Tests
+ * @defgroup HDMI_CEC_HALTESTS HDMI CEC Sink HAL Tests
  * @{
  *
  */
 
 
 /**
- * @defgroup HDMI_CEC_HALTESTS_L2 HDMI CEC HAL Tests L2 File
+ * @defgroup HDMI_CEC_HALTESTS_L2 HDMI CEC Sink HAL Tests L2 File
  * @{
  * @parblock
  *
@@ -461,7 +461,7 @@ static UT_test_suite_t * pSuite = NULL;
  * @return int - 0 on success, otherwise failure
  */
     
-int test_hdmicec_hal_l2_register(void)
+int test_hdmi_cec_driver_sink_l2_register(void)
 {
     // Create the test suite
     pSuite = UT_add_suite("[L2 HDMICEC PANEL TestCase] ", NULL, NULL);
@@ -480,3 +480,8 @@ int test_hdmicec_hal_l2_register(void)
 
     return 0;
 }
+
+/** @} */ // End of HDMI CEC HAL Sink Tests L2 File
+/** @} */ // End of HDMI CEC HAL Sink Tests
+/** @} */ // End of HDMI CEC Sink Module
+/** @} */ // End of HPK
