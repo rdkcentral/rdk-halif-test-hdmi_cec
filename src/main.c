@@ -62,7 +62,13 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdlib.h>
-#include "test_utils.h"
+
+#define TEST_UTIL_DEVICE_TYPE_SIZE     8
+#define TEST_UTIL_DEVICE_NAME_SIZE     64
+
+static char    deviceType[TEST_UTIL_DEVICE_TYPE_SIZE];
+static char    deviceName[TEST_UTIL_DEVICE_NAME_SIZE];
+static int32_t sourceType;
 
 extern int register_hdmicec_hal_l1_tests( void );
 extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
@@ -73,6 +79,8 @@ int main(int argc, char** argv)
     char* pProfilePath = NULL;
     unsigned short cpPort = 8888;
     char* pUrl = NULL;
+    ut_kvp_status_t status;
+
 
     while ((opt = getopt(argc, argv, "p:c:u:")) != -1)
     {
@@ -107,12 +115,18 @@ int main(int argc, char** argv)
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
 
-    if ( test_utils_parseconfig() == -1 )
-    {
-        printf("\n Failed to parse the configuration file");
-        test_utils_parseconfig_term();
+    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/Device/Type", deviceType, TEST_UTIL_DEVICE_TYPE_SIZE);
+    if (status != UT_KVP_STATUS_SUCCESS ) {
+        UT_LOG_ERROR("Failed to get the platform type");
         return -1;
     }
+    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/Device/Name", deviceName, TEST_UTIL_DEVICE_NAME_SIZE);
+    if (status != UT_KVP_STATUS_SUCCESS ) {
+        UT_LOG_ERROR("Failed to get the platform name");
+        return -1;
+    }
+
+    UT_LOG_DEBUG("Device Type: %s, Device Name: %s", deviceType, deviceName);
 
     register_hdmicec_hal_l1_tests ();
 

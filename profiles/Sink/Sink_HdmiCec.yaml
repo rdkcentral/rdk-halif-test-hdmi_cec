@@ -1,9 +1,11 @@
-Device:
-  Type: sink
-  Name: element
+hdmicec:
+  Device:
+    Type: sink
+    Name: element
 
-# cec Device Type 0- None, 1 - Sink, 2 - Source
-cecDeviceType: 2
+  # cec Device Type 0- None, 1 - Sink, 2 - Source
+  cecDeviceType: 2
 
-# Extended Error code enum suppot for the platform
-extendedEnumsSupported: false
+  features:
+    # Extended Error code enum suppot for the platform
+    extendedEnumsSupported: false

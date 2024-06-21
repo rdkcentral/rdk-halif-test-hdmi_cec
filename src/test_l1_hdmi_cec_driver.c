@@ -68,8 +68,8 @@
 
 #include <ut.h>
 #include <ut_log.h>
+#include <ut_kvp_profile.h>
 #include "hdmi_cec_driver.h"
-#include "test_utils.h"
 
 /**
      * Set CEC play back logical address here
@@ -83,10 +83,15 @@
 /// Set the CEC sink (Display device) logical address here
 #define DEFAULT_LOGICAL_ADDRESS_PANEL 0
 
+typedef enum _eCecDeviceType {
+    cecDeviceNone     = 0,
+    cecDeviceSink     = 1,
+    cecDevicesSource  = 2,
+}eCecDeviceType_t;
 
 static int gTestGroup = 1;
 static int gTestID = 1;
-static bool sourceDevice=false;
+static bool extendedEnumsSupported=false;
 
 #define CEC_GET_CEC_VERSION (0x9F)
 #define CEC_DEVICE_VENDOR_ID (0x87)
@@ -2241,7 +2246,7 @@ int test_hdmicec_hal_l1_register( void )
         return -1;
     }
     extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
-    sourceDevice = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/cecSourceDevice" );
+    int32_t cecDeviceType = ut_kvp_getUInt32Field( ut_kvp_profile_getInstance(), "hdmicec/cecDeviceType" );
 
     UT_add_test( pSuiteCommon, "open_Positive", test_hdmicec_hal_l1_open_positive);
     UT_add_test( pSuiteCommon, "open_negative", test_hdmicec_hal_l1_open_negative);
