@@ -115,7 +115,7 @@ static bool extendedEnumsSupported=false;
 
 #define CHECK_FOR_EXTENDED_ERROR_CODE( result, enhanced, old )\
 {\
-   if ( gExtendedEnumSupported == true )\
+   if ( extendedEnumsSupported == true )\
    {\
       UT_ASSERT_EQUAL( enhanced, result );\
    }\
