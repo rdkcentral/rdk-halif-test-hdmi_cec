@@ -1,6 +1,6 @@
 ---
 hdmicec:
-    emulated_device: Sky Glass
+    emulated_device: TVPanel
     number_ports: 3
     ports:
       - id: 1
@@ -18,11 +18,11 @@ hdmicec:
 
     number_devices: 5
     device_map:
-      - name: Sky Glass
+      - name: TVPanel
         type: TV
         version: 4 
         active_source: false
-        vendor: SKY_UK
+        vendor: TEST_VENDOR
         pwr_status: on
         port_id: 0
         number_children: 2
@@ -44,11 +44,11 @@ hdmicec:
               pwr_status: on
               port_id: 1
               number_children: 0
-            - name: SKY xione
+            - name: IPSTB
               type: PlaybackDevice
               version: 4
               active_source: false
-              vendor: SKY
+              vendor: TEST_VENDOR
               pwr_status: on
               port_id: 2
               number_children: 0
