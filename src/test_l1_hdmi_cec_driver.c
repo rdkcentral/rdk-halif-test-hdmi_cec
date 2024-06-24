@@ -2258,7 +2258,7 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteCommon, "setRxCallback_negative", test_hdmicec_hal_l1_setRxCallback_negative);
     UT_add_test( pSuiteCommon, "setTxCallback_Positive", test_hdmicec_hal_l1_setTxCallback_positive);
     UT_add_test( pSuiteCommon, "setTxCallback_negative", test_hdmicec_hal_l1_setTxCallback_negative);
-    if(gCecDeviceType == cecDevicesSource)
+    if(cecDeviceType == cecDevicesSource)
     {
         UT_add_test( pSuite_stb, "getLogicalAddressSource_Positive", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive);
         UT_add_test( pSuite_stb, "getLogicalAddressSource_negative", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
@@ -2269,7 +2269,7 @@ int test_hdmicec_hal_l1_register( void )
         //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
         //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
     }
-    else if (gCecDeviceType == cecDeviceSink)
+    else if (cecDeviceType == cecDeviceSink)
     {
         UT_add_test( pSuite_panel, "addLogicalAddressSink_Positive", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive);
         UT_add_test( pSuite_panel, "addLogicalAddressSink_negative", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative);

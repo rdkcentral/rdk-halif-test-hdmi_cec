@@ -62,6 +62,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include "ut_kvp_profile.h"
 
 #define TEST_UTIL_DEVICE_TYPE_SIZE     8
 #define TEST_UTIL_DEVICE_NAME_SIZE     64
