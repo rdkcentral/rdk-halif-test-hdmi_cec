@@ -66,10 +66,14 @@
 extern int register_hdmicec_hal_l1_tests( void );
 extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
+
+#ifdef VCOMPONENT
 extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+#endif
 
 int main(int argc, char** argv) 
 {
+#ifdef VCOMPONENT
     int opt;
     char* pProfilePath = NULL;
     unsigned short cpPort = 8888;
@@ -102,7 +106,7 @@ int main(int argc, char** argv)
                 break;
         }
     }
-
+#endif
 
 
     /* Register tests as required, then call the UT-main to support switches and triggering */
@@ -111,10 +115,13 @@ int main(int argc, char** argv)
     register_hdmicec_hal_l1_tests ();
     register_hdmicec_hal_source_l2_tests ();
     register_hdmicec_hal_sink_l2_tests ();
+#ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath, cpPort, pUrl);
+#endif
 
     UT_run_tests();
 
+#ifdef VCOMPONENT
     if(pProfilePath != NULL)
     {
         free(pProfilePath);
@@ -124,6 +131,7 @@ int main(int argc, char** argv)
     {
         free(pUrl);
     }
+#endif
 }
 
 /** @} */ // End of HDMI CEC HAL Tests Main File
