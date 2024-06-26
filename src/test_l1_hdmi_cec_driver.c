@@ -2251,15 +2251,15 @@ int test_hdmicec_hal_l1_register( void )
     }
     pSuiteCommon = UT_add_suite("[L1 HDMICEC Common TestCase]", NULL, NULL);
     //Checking if the HAL under test is source device HAL
-    if (!strncmp(gDeviceType, TEST_UTIL_TYPE_SOURCE_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
+    if (!strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
         pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
     }
     //Checking if the HAL under test is sink device HAL
-    else if(!strncmp(gDeviceType, TEST_UTIL_TYPE_SINK_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
+    else if(!strncmp(deviceType, TEST_UTIL_TYPE_SINK_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
         pSuite_panel = UT_add_suite("[L1 HDMICEC PANEL TestCase]", NULL, NULL);
     }
     else {
-        UT_LOG_ERROR("Platform type: %s", gDeviceType);
+        UT_LOG_ERROR("Platform type: %s", deviceType);
     }
 
     if ((NULL == pSuiteCommon))
