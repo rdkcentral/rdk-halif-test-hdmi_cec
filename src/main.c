@@ -67,10 +67,6 @@
 #define TEST_UTIL_DEVICE_TYPE_SIZE     8
 #define TEST_UTIL_DEVICE_NAME_SIZE     64
 
-static char    deviceType[TEST_UTIL_DEVICE_TYPE_SIZE];
-static char    deviceName[TEST_UTIL_DEVICE_NAME_SIZE];
-static int32_t sourceType;
-
 extern int register_hdmicec_hal_l1_tests( void );
 extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
 
@@ -81,6 +77,8 @@ int main(int argc, char** argv)
     unsigned short cpPort = 8888;
     char* pUrl = NULL;
     ut_kvp_status_t status;
+    char    deviceType[TEST_UTIL_DEVICE_TYPE_SIZE];
+    char    deviceName[TEST_UTIL_DEVICE_NAME_SIZE];
 
 
     while ((opt = getopt(argc, argv, "p:c:u:")) != -1)

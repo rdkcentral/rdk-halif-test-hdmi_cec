@@ -79,6 +79,9 @@
 */
 #define DEFAULT_LOGICAL_ADDRESS_STB 3
 
+#define TEST_UTIL_DEVICE_TYPE_SIZE     8
+#define TEST_UTIL_TYPE_SOURCE_VALUE     "source"
+#define TEST_UTIL_TYPE_SINK_VALUE       "sink"
 
 /// Set the CEC sink (Display device) logical address here
 #define DEFAULT_LOGICAL_ADDRESS_PANEL 0
@@ -2236,18 +2239,33 @@ static UT_test_suite_t *pSuite_panel = NULL;
  */
 int test_hdmicec_hal_l1_register( void )
 {
-
+    ut_kvp_status_t status;
+    char    deviceType[TEST_UTIL_DEVICE_TYPE_SIZE];
+    // Reading Extended enum support form profile file
+    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
+    // Getting device type from profile.
+    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/Device/Type", deviceType, TEST_UTIL_DEVICE_TYPE_SIZE);
+    if (status != UT_KVP_STATUS_SUCCESS ) {
+        UT_LOG_ERROR("Failed to get the platform type");
+        return -1;
+    }
     pSuiteCommon = UT_add_suite("[L1 HDMICEC Common TestCase]", NULL, NULL);
-    pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
-    pSuite_panel = UT_add_suite("[L1 HDMICEC PANEL TestCase]", NULL, NULL);
+    //Checking if the HAL under test is source device HAL
+    if (!strncmp(gDeviceType, TEST_UTIL_TYPE_SOURCE_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
+        pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
+    }
+    //Checking if the HAL under test is sink device HAL
+    else if(!strncmp(gDeviceType, TEST_UTIL_TYPE_SINK_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
+        pSuite_panel = UT_add_suite("[L1 HDMICEC PANEL TestCase]", NULL, NULL);
+    }
+    else {
+        UT_LOG_ERROR("Platform type: %s", gDeviceType);
+    }
 
-    if ((NULL == pSuiteCommon) || (NULL == pSuite_stb) || (NULL == pSuite_panel))
+    if ((NULL == pSuiteCommon))
     {
         return -1;
     }
-    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
-    int32_t cecDeviceType = ut_kvp_getUInt32Field( ut_kvp_profile_getInstance(), "hdmicec/cecDeviceType" );
-
     UT_add_test( pSuiteCommon, "open_Positive", test_hdmicec_hal_l1_open_positive);
     UT_add_test( pSuiteCommon, "open_negative", test_hdmicec_hal_l1_open_negative);
     UT_add_test( pSuiteCommon, "close_Positive", test_hdmicec_hal_l1_close_positive);
@@ -2258,8 +2276,8 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteCommon, "setRxCallback_negative", test_hdmicec_hal_l1_setRxCallback_negative);
     UT_add_test( pSuiteCommon, "setTxCallback_Positive", test_hdmicec_hal_l1_setTxCallback_positive);
     UT_add_test( pSuiteCommon, "setTxCallback_negative", test_hdmicec_hal_l1_setTxCallback_negative);
-    if(cecDeviceType == cecDevicesSource)
-    {
+    //Add Source related tests to suite only if it is an STB HAL
+    if (NULL != pSuite_stb) {
         UT_add_test( pSuite_stb, "getLogicalAddressSource_Positive", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive);
         UT_add_test( pSuite_stb, "getLogicalAddressSource_negative", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
         UT_add_test( pSuite_stb, "TxAsyncSource_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive);
@@ -2269,8 +2287,8 @@ int test_hdmicec_hal_l1_register( void )
         //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
         //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
     }
-    else if (cecDeviceType == cecDeviceSink)
-    {
+    // Add Sink related tests to suite if it is an Panle HAL
+    if(NULL != pSuite_panel) {
         UT_add_test( pSuite_panel, "addLogicalAddressSink_Positive", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive);
         UT_add_test( pSuite_panel, "addLogicalAddressSink_negative", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative);
         UT_add_test( pSuite_panel, "removeLogicalAddressSink_Positive", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_positive);
