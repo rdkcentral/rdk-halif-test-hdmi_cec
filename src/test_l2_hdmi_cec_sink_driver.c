@@ -134,7 +134,7 @@ void test_l2_hdmi_cec_sink_hal_GetDefaultLogicalAddress(void)
 *
 * **Test Procedure:**
 * Refer to UT specification documentation 
-* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
+* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 void test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress(void)
 {
@@ -201,7 +201,7 @@ void test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress(void)
 *
 * **Test Procedure:**
 * Refer to UT specification documentation 
-* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
+* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
 void test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
@@ -279,7 +279,7 @@ void test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
 *
 * **Test Procedure:**
 * Refer to UT specification documentation 
-* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
+* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
 void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
@@ -349,7 +349,7 @@ void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
 *
 * **Test Procedure:**
 * Refer to UT specification documentation 
-* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
+* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
 void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
@@ -401,7 +401,7 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
 *
 * **Test Procedure:**
 * Refer to UT specification documentation 
-* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
+* [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
 void test_l2_hdmi_cec_sink_hal_TransmitCECCommand(void)
