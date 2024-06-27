@@ -113,7 +113,7 @@ void test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability(void)
     // Return value should be HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE, when the DUT is not connected to a Sink device.
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE);
 
-    if (status == HDMI_CEC_IO_SUCCESS)
+    if (status == HDMI_CEC_IO_SUCCESS || status == HDMI_CEC_IO_ALREADY_OPEN)
     {
         UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
         HDMI_CEC_STATUS close_status = HdmiCecClose(handle);

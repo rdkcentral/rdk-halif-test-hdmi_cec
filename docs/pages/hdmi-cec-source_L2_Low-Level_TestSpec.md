@@ -63,7 +63,7 @@ graph TB
     Step1[Call HdmiCecOpen] -->|Success| Step2[Check returned status]
     Step1 -->|Failure| TestFail1[Test Case Failed: HdmiCecOpen failed]
     Step2 -->|Status is <br> HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE| Step4[TestCase Success]
-    Step2 -->|Status is not <br> HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE| TestFail2[Test Case Failed]
+    Step2 -->|Status is <br> HDMI_CEC_IO_SUCCESS or HDMI_CEC_IO_ALREADY_OPEN| TestFail2[Test Case Failed]
     TestFail2 -->|Status is HDMI_CEC_IO_SUCCESS| Step3[Call HdmiCecClose]
     Step3 -->|Success| Step5[HdmiCecClose success]
     Step3 -->|Failure| TestFail3[Test Case Failed: HdmiCecClose failed]
