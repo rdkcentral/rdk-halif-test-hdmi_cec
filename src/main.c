@@ -117,7 +117,7 @@ int main(int argc, char** argv)
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
 
-    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "dsAudio/Type", szReturnedString, UT_KVP_MAX_ELEMENT_SIZE);
+    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/type", szReturnedString, UT_KVP_MAX_ELEMENT_SIZE);
 
     register_hdmicec_hal_l1_tests ();
 
