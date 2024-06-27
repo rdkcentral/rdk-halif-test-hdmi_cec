@@ -20,6 +20,8 @@
 #ifndef __VCOMPONENT_HDMI_CEC_H
 #define __VCOMPONENT_HDMI_CEC_H
 
+#include "ut_log.h"
+
 #define VC_LOG(format, ...)                 UT_logPrefix(__FILE__, __LINE__, UT_LOG_ASCII_YELLOW"vcHdmiCec[LOG]   "UT_LOG_ASCII_NC, format, ## __VA_ARGS__)
 #define VC_LOG_ERROR(format, ...)           UT_logPrefix(__FILE__, __LINE__, UT_LOG_ASCII_RED"vcHdmiCec[ERROR] "UT_LOG_ASCII_NC, format, ## __VA_ARGS__)
 

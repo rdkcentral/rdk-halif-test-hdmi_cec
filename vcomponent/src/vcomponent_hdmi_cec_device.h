@@ -150,79 +150,129 @@ typedef struct
 } strVal_t;
 
 /**
-* Creates a map of devices in a parent child n-ary tree.
-* Recursively loads the device map from passed in profile instance
-* To load from root device, prefix shall be
-*   "hdmicec/device_map/0"
-*
-*  Returns pointer to newly created vCHdmiCec_device_info_t
-*
-*/
+ * @brief Creates a map of devices in a parent-child n-ary tree.
+ *
+ * Recursively loads the device map from the provided profile instance.
+ * To load from the root device, the prefix should be "hdmicec/device_map/0".
+ *
+ * @param instance Pointer to the profile instance from which to load the device map.
+ * @param profile_prefix Prefix for the profile keys to load the device map.
+ * @return Pointer to the newly created vCHdmiCec_device_info_t structure.
+ */
 struct vCHdmiCec_device_info_t* vCHdmiCec_Device_CreateMapFromProfile (ut_kvp_instance_t* instance, char* profile_prefix);
 
-/*
-* Destroys the Device map from the root to all children/siblings. Frees up the memory.
-*/
+/**
+ * @brief Destroys the device map from the root to all children/siblings.
+ *
+ * Frees up the memory used by the device map.
+ *
+ * @param map Pointer to the root of the device map to be destroyed.
+ */
 void vCHdmiCec_Device_DestroyMap(struct vCHdmiCec_device_info_t* map);
 
-/*
-* Prints the Device map recursively. To print devices from root, pas level = 0
-*/
+/**
+ * @brief Prints the device map recursively.
+ *
+ * To print devices from the root, pass level = 0.
+ *
+ * @param map Pointer to the root of the device map to be printed.
+ * @param level The level in the hierarchy from which to start printing.
+ */
 void vCHdmiCec_Device_PrintMap(struct vCHdmiCec_device_info_t* map, int level);
 
-
-/*
- * Resets a device to its intitial values.
-*/
+/**
+ * @brief Resets a device to its initial values.
+ *
+ * @param device Pointer to the device to be reset.
+ */
 void vCHdmiCec_Device_Reset (struct vCHdmiCec_device_info_t* device);
-/*
-* Adds a new child to the parent
-*/
+
+/**
+ * @brief Adds a new child to the parent device.
+ *
+ * @param parent Pointer to the parent device.
+ * @param child Pointer to the child device to be added.
+ */
 void vCHdmiCec_Device_InsertChild(struct vCHdmiCec_device_info_t* parent, struct vCHdmiCec_device_info_t* child);
 
-/*
-* Removes a new child from the parent. Removing a child device will remove all devices connected through the child.
-*/
+/**
+ * @brief Removes a child from the parent device.
+ *
+ * Removing a child device will remove all devices connected through the child.
+ *
+ * @param map Pointer to the root of the device map.
+ * @param name Name of the child device to be removed.
+ */
 void vCHdmiCec_Device_RemoveChild(struct vCHdmiCec_device_info_t* map, char* name);
 
-/*
-* Find a device by its name. Returns NULL if device not found.
-*/
+/**
+ * @brief Finds a device by its name.
+ *
+ * @param map Pointer to the root of the device map.
+ * @param name Name of the device to be found.
+ * @return Pointer to the device if found, NULL otherwise.
+ */
 struct vCHdmiCec_device_info_t* vCHdmiCec_Device_Get(struct vCHdmiCec_device_info_t* map, char* name);
 
-
-/*
-* Initializes the Logical address pool that is passed in.
-*/
+/**
+ * @brief Initializes the logical address pool.
+ *
+ * @param pool Pointer to the logical address pool to be initialized.
+ */
 void vCHdmiCec_Device_InitLogicalAddressPool(vCHdmiCec_logical_address_pool_t *pool);
 
-/*
-* Traverses through the map and recursively allocates physical and logical address to all the devices in the map.
-* If the emulated device is the root device (TV, sink), then logical address is set to 0x0F.
-* Logical addresses are picked up from the passed in pool.
-*/
+/**
+ * @brief Allocates physical and logical addresses to all devices in the map recursively.
+ *
+ * If the emulated device is the root device (TV, sink), the logical address is set to 0x0F.
+ * Logical addresses are picked from the provided pool.
+ *
+ * @param map Pointer to the root of the device map.
+ * @param emulated_device Pointer to the emulated device.
+ * @param pool Pointer to the logical address pool.
+ */
 void vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(struct vCHdmiCec_device_info_t *map, struct vCHdmiCec_device_info_t *emulated_device, vCHdmiCec_logical_address_pool_t* pool);
 
-/*
-* Allocate an available logical address based on the device type.
-*/
+/**
+ * @brief Allocates an available logical address based on the device type.
+ *
+ * @param pool Pointer to the logical address pool.
+ * @param device_type The type of device for which to allocate a logical address.
+ * @return Allocated logical address.
+ */
 vCHdmiCec_logical_address_t vCHdmiCec_Device_AllocateLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_device_type_t device_type);
 
-/*
- * Release an already allocated Logical address back to pool.
-*/
+/**
+ * @brief Releases an already allocated logical address back to the pool.
+ *
+ * @param pool Pointer to the logical address pool.
+ * @param address The logical address to be released.
+ */
 void vCHdmiCec_Device_ReleaseLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_logical_address_t address);
 
-/*
-* Gets the value (int - enum) associated with the String from the passed in array of strVal_t*
-* If no match found in array, default_val is returned.
-*/
+/**
+ * @brief Gets the value (int - enum) associated with the string from the provided array of strVal_t.
+ *
+ * If no match is found in the array, default_val is returned.
+ *
+ * @param map Pointer to the array of strVal_t.
+ * @param length Length of the array.
+ * @param str The string to be matched.
+ * @param default_val The default value to be returned if no match is found.
+ * @return The value associated with the string, or default_val if no match is found.
+ */
 int vCHdmiCec_GetValue(const strVal_t *map, int length, char* str, int default_val);
 
-/*
-* Gets the String associated with the value (int - enum) from the passed in array of strVal_t*
-* If no match found for val, NULL is returned
-*/
+/**
+ * @brief Gets the string associated with the value (int - enum) from the provided array of strVal_t.
+ *
+ * If no match is found for the value, NULL is returned.
+ *
+ * @param map Pointer to the array of strVal_t.
+ * @param length Length of the array.
+ * @param val The value to be matched.
+ * @return The string associated with the value, or NULL if no match is found.
+ */
 char* vCHdmiCec_GetString(const strVal_t *map, int length, int val);
 
 #endif //__VCHDMICEC_DEVICE_H
