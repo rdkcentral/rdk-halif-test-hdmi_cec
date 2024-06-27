@@ -82,7 +82,7 @@ D -->|Failure| D1[Test case fail]
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_AddAndGetLogicalAddress`|
 |Description|Setup all valid logical addresses b/w 0x00 to 0x0F for the `DUT` and retrieve each to ensure proper functionality, using HAL APIs.|
-|Test Group|Module : 02|
+|Test Group|02|
 |Test Case ID|002|
 |Priority|High|
 
@@ -127,7 +127,7 @@ F -->|HDMI_CEC_IO_SUCCESS| L[Test case success]
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_RemoveLogicalAddress`|
 |Description|Invoke the HAL API to delete the `DUT` logical address and verify that it is removed successfully.|
-|Test Group|Module : 02|
+|Test Group|02|
 |Test Case ID|003|
 |Priority|High|
 
@@ -176,7 +176,7 @@ F -- "Failure" --> F1[Test case fail]
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_BroadcastHdmiCecCommand`|
 |Description|After deleting the `DUT` logical address, try to send a broadcast CEC Command (as per 1.4b HDMI CEC spec) and confirm transmission is successful.|
-|Test Group|Module : 02|
+|Test Group|02|
 |Test Case ID|004|
 |Priority|High|
 
@@ -225,7 +225,7 @@ F -- "Failure" --> F1[Test case fail]
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_VerifyPhysicalAddress`|
 |Description|Verify the valid physical address allocated through the HAL function.|
-|Test Group|Module : 02|
+|Test Group|02|
 |Test Case ID|005|
 |Priority|High|
 
@@ -268,7 +268,7 @@ A -->|Failure| A1[Test case fail]
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_TransmitCECCommand`|
 |Description|DUT transmits a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC version of the device that doesn't exist.|
-|Test Group|Module : 02|
+|Test Group|02|
 |Test Case ID|006|
 |Priority|High|
 

@@ -39,7 +39,7 @@ The following functions are expecting to test the module operates correctly.
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_ValidateLogicalAddressUnavailability_source`|
 |Description|Trying to get a logical address discovered during CEC open and validate the return value when the `DUT` is not connected to a Sink device. It should return HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE.|
-|Test Group|Module : 02|
+|Test Group|02|
 |Test Case ID|001|
 |Priority|High|
 
