@@ -1,4 +1,4 @@
-# HDMI CEC DRIVER L2 Low Level Test Specification and Procedure Documentation
+# HDMI CEC DRIVER L2 Low-Level Test Specification and Procedure Documentation
  
 ## Table of Contents
             
@@ -25,10 +25,10 @@ This document describes the level 2 testing suite for the HDMI CEC DRIVER module
 - `API`  \- Application Program Interface
 ### Definitions
 
-- `ut-core` \- Common Testing Framework <https://github.com/rdkcentral/ut-core>, which wraps a open-source framework that can be expanded to the requirements for future framework.
+- `ut-core` \- Common Testing Framework <https://github.com/rdkcentral/ut-core>, which wraps an open-source framework that can be expanded to the requirements for future frameworks.
  
 ### References
-- `High Level Test Specification` - [hdmi_cec_sink_tests.md](hdmi_cec_sink_tests.md)
+- `High-Level Test Specification` - [hdmi_cec_sink_tests.md](hdmi_cec_sink_tests.md)
  
 ## Level 2 Test Procedure
 
@@ -40,18 +40,18 @@ The following functions are intended to test the HDMI CEC HAL module's operation
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_GetDefaultLogicalAddress`|
 |Description|Get the logical address of the `DUT` without actually adding the Logical Address and the API should return 0x0F as the default logical address.|
-|Test Group|Module : 02|
+|Test Group|02|
 |Test Case ID|001|
 |Priority|High|
 
-**Pre-Conditions :**
+**Pre-Conditions:**
 None
 
-**Dependencies :** 
+**Dependencies:** 
 None
 
-**User Interaction :** 
-If user chose to run the test in interactive mode, then the test case has to be selected via console.
+**User Interaction:** 
+If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
 
 #### Test Procedure :
 
@@ -64,19 +64,15 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 
 ```mermaid
-graph TD
-    style A fill:#bff,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#bff,stroke:#333,stroke-width:2px
-	  style E fill:#f00,stroke:#333,stroke-width:2px
-
-    A[Open HDMI CEC] --> B{Get Logical Address \n without adding one}
-    B -->|HDMI_CEC_IO_SUCCESS| C[Check Logical Address == 0xf]
-    C -->|Test successful| D[Close HDMI CEC]
-    B -->|Not HDMI_CEC_IO_SUCCESS| E[Test Fail]
-    C -->|NO| E
-    E --> D
+graph TB
+A[Call HdmiCecOpen] -->|HDMI_CEC_IO_SUCCESS| B[Call HdmiCecGetLogicalAddress]
+A -->|Failure| A1[Test case fail]
+B -->|HDMI_CEC_IO_SUCCESS| C[Check logical address]
+B -->|Failure| B1[Test case fail]
+C -->|Logical address is 0x0F| D[Call HdmiCecClose]
+C -->|Logical address is not 0x0F| C1[Test case fail]
+D -->|HDMI_CEC_IO_SUCCESS| E[Test case pass]
+D -->|Failure| D1[Test case fail]
 ```
 
 
@@ -90,14 +86,14 @@ graph TD
 |Test Case ID|002|
 |Priority|High|
 
-**Pre-Conditions :**
+**Pre-Conditions:**
 None
 
-**Dependencies :** 
+**Dependencies:** 
 None
 
-**User Interaction :** 
-If user chose to run the test in interactive mode, then the test case has to be selected via console.
+**User Interaction:** 
+If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
 
 #### Test Procedure :
 
@@ -112,24 +108,16 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 
 ```mermaid
-graph TD
-    style A fill:#bff,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#f9f,stroke:#333,stroke-width:2px
-    style D fill:#bbf,stroke:#333,stroke-width:2px
-    style E fill:#bbf,stroke:#333,stroke-width:2px
-    style F fill:#bbf,stroke:#333,stroke-width:2px
-    style G fill:#f9f,stroke:#333,stroke-width:2px
-    style H fill:#bff,stroke:#333,stroke-width:2px
-
-    A[Open HDMI CEC Driver] --> B{HdmiCecOpen: \n handle = valid pointer}
-    B -->|HDMI_CEC_IO_SUCCESS| C[Manage Logical Addresses]
-    C -->|Each step successful| D[Add Logical Address]
-    D -->|HDMI_CEC_IO_SUCCESS| E[Validate Added Logical Address]
-    E -->|Matched| F[Remove Logical Address]
-    F -->|HDMI_CEC_IO_SUCCESS| G[All Addresses processed?]
-    G -->|No| C
-    G -->|Yes| H[Close HDMI CEC Driver]
+graph TB
+A[HdmiCecOpen] -->|HDMI_CEC_IO_SUCCESS| B{Loop 0x00 to 0x0F}
+B --> |HDMI_CEC_IO_SUCCESS| C[HdmiCecAddLogicalAddress]
+C --> |HDMI_CEC_IO_SUCCESS| D[HdmiCecGetLogicalAddress]
+D --> |HDMI_CEC_IO_SUCCESS & Address Match| E[HdmiCecRemoveLogicalAddress]
+E --> |HDMI_CEC_IO_SUCCESS| B
+B --> |End of Loop| F[HdmiCecClose]
+A -->|Failure| G[Test case fail]
+F -->|Failure| K[Test case fail]
+F -->|HDMI_CEC_IO_SUCCESS| L[Test case success]
 ```
 
 
@@ -143,14 +131,14 @@ graph TD
 |Test Case ID|003|
 |Priority|High|
 
-**Pre-Conditions :**
+**Pre-Conditions:**
 None
 
-**Dependencies :** 
+**Dependencies:** 
 None
 
-**User Interaction :** 
-If user chose to run the test in interactive mode, then the test case has to be selected via console.
+**User Interaction:** 
+If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
 
 #### Test Procedure :
 
@@ -165,23 +153,19 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 
 ```mermaid
-graph TD
-    style A fill:#bff,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#bbf,stroke:#333,stroke-width:2px
-    style E fill:#bbf,stroke:#333,stroke-width:2px
-    style F fill:#bbf,stroke:#333,stroke-width:2px
-    style G fill:#bff,stroke:#333,stroke-width:2px
-    style H fill:#bbf,stroke:#333,stroke-width:2px
-
-    A[Open HDMI CEC Driver] --> B{HdmiCecOpen:\n handle = valid handle}
-    B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address]
-    C -->|HDMI_CEC_IO_SUCCESS| D[Get Logical Address]
-    D -->|HDMI_CEC_IO_SUCCESS| E[Remove Logical Address]
-    E -->|HDMI_CEC_IO_SUCCESS| F[Get Logical Address]
-    F -->|HDMI_CEC_IO_SUCCESS| H[Compare Logical Address 0x0F]
-    H -->|HDMI_CEC_IO_SUCCESS| G[Close HDMI CEC Driver]
+graph TB
+A[HdmiCecOpen] -- "HDMI_CEC_IO_SUCCESS" --> B[HdmiCecAddLogicalAddress]
+A -- "Failure" --> A1[Test case fail]
+B -- "HDMI_CEC_IO_SUCCESS" --> C[HdmiCecGetLogicalAddress]
+B -- "Failure" --> B1[Test case fail]
+C -- "HDMI_CEC_IO_SUCCESS & Logical Address = current logical address" --> D[HdmiCecRemoveLogicalAddress]
+C -- "Failure" --> C1[Test case fail]
+D --"HDMI_CEC_IO_SUCCESS" -->E[HdmiCecGetLogicalAddress]
+D -- "Failure" --> D1[Test case fail]
+E -- "HDMI_CEC_IO_SUCCESS & Logical Address = 0x0F" --> F[HdmiCecClose]
+E -- "Failure" --> E1[Test case fail]
+F -- "HDMI_CEC_IO_SUCCESS" --> G[Test case pass]
+F -- "Failure" --> F1[Test case fail]
 ```
 
 
@@ -196,14 +180,14 @@ graph TD
 |Test Case ID|004|
 |Priority|High|
 
-**Pre-Conditions :**
+**Pre-Conditions:**
 None
 
-**Dependencies :** 
+**Dependencies:** 
 None
 
-**User Interaction :** 
-If user chose to run the test in interactive mode, then the test case has to be selected via console.
+**User Interaction:** 
+If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
 
 #### Test Procedure :
 
@@ -218,21 +202,19 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 
 ```mermaid
-graph TD
-    style A fill:#bff,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#bbf,stroke:#333,stroke-width:2px
-    style E fill:#bbf,stroke:#333,stroke-width:2px
-    style F fill:#bbf,stroke:#333,stroke-width:2px
-    style G fill:#bff,stroke:#333,stroke-width:2px
-
-    A[Open HDMI CEC Driver] --> B{HdmiCecOpen:\n handle = valid buffer}
-    B -->|HDMI_CEC_IO_SUCCESS| C[Add Logical Address]
-    C -->|HDMI_CEC_IO_SUCCESS| D[Remove Logical Address]
-    D -->|HDMI_CEC_IO_SUCCESS| E[Broadcast CEC Message]
-    E -->|HDMI_CEC_IO_SUCCESS| F[Check Transmission Result]
-    F -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| G[Close HDMI CEC Driver]
+graph TB
+A[HdmiCecOpen] -- "HDMI_CEC_IO_SUCCESS" --> B[HdmiCecAddLogicalAddress]
+A -- "Failure" --> A1[Test case fail]
+B -- "HDMI_CEC_IO_SUCCESS" --> C[HdmiCecRemoveLogicalAddress]
+B -- "Failure" --> B1[Test case fail]
+C -- "HDMI_CEC_IO_SUCCESS" --> D[HdmiCecTx]
+C -- "Failure" --> C1[Test case fail]
+D -- "HDMI_CEC_IO_SUCCESS" --> E[Check HdmiCecTx result]
+D -- "Failure" --> D1[Test case fail]
+E -- "HDMI_CEC_IO_SENT_AND_ACKD" --> F[HdmiCecClose]
+E -- "Failure" --> E1[Test case fail]
+F -- "HDMI_CEC_IO_SUCCESS" --> G[Test case success]
+F -- "Failure" --> F1[Test case fail]
 ```
 
 
@@ -247,14 +229,14 @@ graph TD
 |Test Case ID|005|
 |Priority|High|
 
-**Pre-Conditions :**
+**Pre-Conditions:**
 None
 
-**Dependencies :**
+**Dependencies:**
 None
 
-**User Interaction :**
-If user chose to run the test in interactive mode, then the test case has to be selected via console.
+**User Interaction:**
+If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
 
 #### Test Procedure :
 
@@ -268,16 +250,15 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 
 ```mermaid
-graph TD
-    style A fill:#bff,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#bff,stroke:#333,stroke-width:2px
-    
-    A[Open HDMI CEC Driver] --> B{HdmiCecGetPhysicalAddress}
-    B -->|Not HDMI_CEC_IO_SUCCESS | D
-    B -->|HDMI_CEC_IO_SUCCESS| C[Verify physical address < 0xFFFF]
-    C -->D[Close HDMI CEC Driver]
+graph TB
+A[HdmiCecOpen] -->|HDMI_CEC_IO_SUCCESS| B[HdmiCecGetPhysicalAddress]
+B -->|HDMI_CEC_IO_SUCCESS| C{Verify Physical Address < F.F.F.F}
+B -->|Failure| B1[Test case fail]
+C -->|Success| D[HdmiCecClose]
+C -->|Failure| C1[Test case fail]
+D -->|HDMI_CEC_IO_SUCCESS| E[Test case success]
+D -->|Failure| D1[Test case fail]
+A -->|Failure| A1[Test case fail]
 ```
 
 
@@ -286,19 +267,19 @@ graph TD
 |Title|Details|
 |--|--|
 |Function Name|`test_l2_hdmi_cec_driver_TransmitCECCommand`|
-|Description|DUT transmit a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC version of device that doesn't exist.|
+|Description|DUT transmits a CEC Command (as per 1.4b HDMI CEC spec) to get the CEC version of the device that doesn't exist.|
 |Test Group|Module : 02|
 |Test Case ID|006|
 |Priority|High|
 
-**Pre-Conditions :**
+**Pre-Conditions:**
 None
 
-**Dependencies :** 
+**Dependencies:** 
 None
 
-**User Interaction :** 
-If user chose to run the test in interactive mode, then the test case has to be selected via console.
+**User Interaction:** 
+If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
 
 #### Test Procedure :
 
@@ -312,15 +293,16 @@ If user chose to run the test in interactive mode, then the test case has to be 
 
 
 ```mermaid
-graph TD
-    style A fill:#bff,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#bbf,stroke:#333,stroke-width:2px
-    style E fill:#bff,stroke:#333,stroke-width:2px
-
-    A[Open HDMI CEC Driver] --> B{HdmiCecAddLogicalAddress}
-    B -->|HDMI_CEC_IO_SUCCESS| C[Transmit CEC Command for \n a device not in the network]
-    C -->|HDMI_CEC_IO_SUCCESS| D[Check Result]
-    D -->|HDMI_CEC_IO_SENT_BUT_NOT_ACKD| E[Close HDMI CEC Driver]
+graph TB
+A[HdmiCecOpen] -- "HDMI_CEC_IO_SUCCESS" --> B[HdmiCecAddLogicalAddress]
+A -- "Not HDMI_CEC_IO_SUCCESS" --> A1[Test case fail]
+B -- "HDMI_CEC_IO_SUCCESS" --> C[Prepare CEC message]
+B -- "Not HDMI_CEC_IO_SUCCESS" --> B1[Test case fail]
+C --> D[HdmiCecTx]
+D -- "HDMI_CEC_IO_SENT_BUT_NOT_ACKD" --> E[HdmiCecRemoveLogicalAddress]
+D -- "Not HDMI_CEC_IO_SENT_BUT_NOT_ACKD" --> D1[Test case fail]
+E -- "HDMI_CEC_IO_SUCCESS" --> F[HdmiCecClose]
+E -- "Not HDMI_CEC_IO_SUCCESS" --> E1[Test case fail]
+F -- "HDMI_CEC_IO_SUCCESS" --> G[Test case success]
+F -- "Not HDMI_CEC_IO_SUCCESS" --> F1[Test case fail]
 ```
