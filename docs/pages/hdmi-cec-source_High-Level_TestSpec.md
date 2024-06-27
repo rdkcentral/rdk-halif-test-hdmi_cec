@@ -1,11 +1,5 @@
 # HDMI CEC Test Document
 
-## Version History
-
-| Date(DD/MM/YY) | Comment | Version |
-| -------------- | ------- | ------- |
-| 13/02/24 | First Release | 1.0.0 |
-
 ## Table of Contents
 
 - [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
