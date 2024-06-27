@@ -69,6 +69,8 @@ extern int register_hdmicec_hal_l1_tests( void );
 extern int register_vcomponent_tests ( char* profilei );
 #endif
 
+extern int test_l3_hdmi_cec_driver_register ( void );
+
 int main(int argc, char** argv) 
 {
 #ifdef VCOMPONENT
@@ -92,8 +94,9 @@ int main(int argc, char** argv)
                 break;
         }
     }
-#endif
     optind = 1; //Reset argv[] element pointer for further processing
+#endif
+    
 
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
@@ -102,6 +105,8 @@ int main(int argc, char** argv)
 #ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath);
 #endif
+
+ test_l3_hdmi_cec_driver_register ();
 
     UT_run_tests();
 

@@ -21,13 +21,32 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <pthread.h>
 
 #include "vcomponent_hdmi_cec.h"
 #include "hdmi_cec_driver.h"
 #include "vcomponent_hdmi_cec_device.h"
-#include "ut_log.h"
+#include "vcomponent_hdmi_cec_command.h"
 #include "ut_kvp_profile.h"
+#include "ut_control_plane.h"
 
+#define MAX_QUEUE_SIZE 32
+#define CONTROL_PLANE_PORT 8080
+
+typedef enum
+{
+  CEC_MSG_TYPE_COMMAND = 0,
+  CEC_MSG_TYPE_EVENT,
+  CEC_MSG_TYPE_CONFIG,
+  CEC_MSG_TYPE_EXIT_REQUESTED
+} vCHdmiCec_msg_type_t;
+
+typedef struct
+{
+  vCHdmiCec_msg_type_t type;
+  char* message;
+  uint32_t size;
+} vCHdmiCec_message_t;
 
 /**HDMI CEC HAL Data structures */
 typedef struct
@@ -45,51 +64,6 @@ typedef enum
   HAL_STATE_OPEN,
   HAL_STATE_READY
 } vCHdmiCec_hal_state_t;
-
-typedef enum
-{
-  CEC_EVENT_HOTPLUG = 1,
-  CEC_EVENT_COMMAND,
-  CEC_EVENT_CONFIG,
-  CEC_EVENT_MAX
-} vCHdmiCec_event_type_t;
-
-typedef enum
-{
-  CEC_ACTIVE_SOURCE = 0x82,
-  CEC_IMAGE_VIEW_ON = 0x04,
-  CEC_TEXT_VIEW_ON = 0x0D,
-  CEC_INACTIVE_SOURCE = 0x9D,
-  CEC_REQUEST_ACTIVE_SOURCE = 0x85,
-  CEC_STANDBY = 0x36,
-  CEC_COMMAND_UNKNOWN = 0
-} vCHdmiCec_command_t;
-
-typedef struct
-{
-  bool connected;
-  unsigned int port_id;
-} vCHdmiCec_hotplug_event_t;
-
-
-typedef struct
-{
-  unsigned char src_logical_addr;
-  unsigned char dest_logical_addr;
-  vCHdmiCec_command_t command;
-} vCHdmiCec_command_event_t;
-
-
-typedef struct
-{
-  vCHdmiCec_event_type_t type;
-  union
-  {
-    vCHdmiCec_command_event_t cec_cmd;
-    vCHdmiCec_hotplug_event_t hot_plug;
-  };
-} vCHdmiCec_event_t;
-
 
 typedef struct
 {
@@ -109,19 +83,21 @@ typedef struct
   struct vCHdmiCec_device_info_t* devices_map;
   vCHdmiCec_callbacks_t callbacks;
   vCHdmiCec_logical_address_pool_t address_pool;
-  //TODO
-  // Eventing Queue, Thread for callback
 
+  pthread_t msg_handler_thread;
+  uint32_t msg_count;
+  vCHdmiCec_message_t msg_queue[MAX_QUEUE_SIZE];
+  pthread_mutex_t msg_queue_mutex;
+  pthread_cond_t msg_queue_condition;
+  volatile bool exit_request;
 } vCHdmiCec_hal_t;
-
 
 /**Virtual Componenent Data types*/
 typedef struct
 {
-  unsigned short cp_port;
-  char* cp_path;
   vCHdmiCec_hal_t * cec_hal;
   ut_kvp_instance_t *profile_instance;
+  ut_controlPlane_instance_t *cp_instance;
   bool bOpened;
 } vCHdmiCec_t;
 
@@ -135,6 +111,249 @@ const static strVal_t gPortStrVal [] = {
   { "unknown", (int)PORT_TYPE_UNKNOWN }
 };
 
+
+static void EnqueueMessage(vCHdmiCec_message_t *msg, vCHdmiCec_hal_t *hal );
+static vCHdmiCec_message_t* DequeueMessage(vCHdmiCec_hal_t *hal);
+static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data);
+static void* MessageHandler(void *data);
+
+
+static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size)
+{
+  ut_kvp_instance_t *kvpInstance = NULL;
+  ut_kvp_status_t status;
+
+  if (msg == NULL)
+  {
+      return NULL;
+  }
+
+  kvpInstance = ut_kvp_createInstance();
+  assert(kvpInstance != NULL);
+  status = ut_kvp_openMemory(kvpInstance, msg, size);
+  if (status != UT_KVP_STATUS_SUCCESS)
+  {
+      VC_LOG_ERROR("ut_kvp_openMemory() - Read Failure\n");
+      ut_kvp_destroyInstance(kvpInstance);
+      return NULL;
+  }
+  return kvpInstance;
+}
+
+static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_command_t *cec_cmd)
+{
+  char str[UT_KVP_MAX_ELEMENT_SIZE];
+  vCHdmiCec_opcode_t opcode = CEC_OPCODE_UNKNOWN;
+  struct vCHdmiCec_device_info_t *src, *dest;
+  vCHdmiCec_logical_address_t la;
+
+  if(cec_cmd == NULL)
+  {
+    return;
+  }
+
+  vCHdmiCec_Command_Clear(cec_cmd);
+  ut_kvp_instance_t *kvpInstance = KVPInstanceOpen(cmd, size);
+  ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_MSG_COMMAND, str, UT_KVP_MAX_ELEMENT_SIZE);
+  opcode = vCHdmiCec_Command_GetOpCode(str);
+  if(opcode == CEC_OPCODE_UNKNOWN)
+  {
+    VC_LOG_ERROR("ParseCommand: Opcode[%s] Unknown", str);
+    return;
+  }
+  VC_LOG("ParseCommand: Opcode[%s]", str);
+
+  ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_CMD_INITIATOR, str, UT_KVP_MAX_ELEMENT_SIZE);
+  src = vCHdmiCec_Device_Get(hal->devices_map, str);
+  if(src == NULL)
+  {
+    VC_LOG_ERROR("ParseCommand: Initiator[%s] Unknown", str);
+    return;
+  }
+  VC_LOG("ParseCommand: Initiator[%s] ", str);
+  ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_CMD_DESTINATION, str, UT_KVP_MAX_ELEMENT_SIZE);
+  if(strcmp(str, CEC_BROADCAST) != 0)
+  {
+    dest = vCHdmiCec_Device_Get(hal->devices_map, str);
+    if(dest == NULL)
+    {
+      VC_LOG_ERROR("ParseCommand: Destination[%s] Unknown", str);
+      return;
+    }
+  }
+
+  VC_LOG("ParseCommand: Destination[%s] ", str);
+
+  if(dest == NULL)
+  {
+    la = LOGICAL_ADDRESS_BROADCAST;
+  }
+  else 
+  {
+    la = dest->logical_address;
+  }
+  vCHdmiCec_Command_Format(cec_cmd, src->logical_address, la, opcode);
+
+  switch (opcode)
+  {
+    case CEC_ACTIVE_SOURCE:
+    case CEC_INACTIVE_SOURCE:
+    {
+      uint8_t buf[4];
+      buf[0] = (src->physical_address >> 12) & 0x0F;
+      buf[1] = (src->physical_address >> 8) & 0x0F;
+      buf[2] = (src->physical_address >> 4) & 0x0F;
+      buf[3] = src->physical_address & 0x0F;
+      vCHdmiCec_Command_PushBackArray(cec_cmd, buf, sizeof(buf));
+    }
+    break;
+
+    default:
+    {
+    }
+    break;
+  }
+  ut_kvp_destroyInstance(kvpInstance);
+}
+
+
+static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
+{
+  vCHdmiCec_message_t msg;
+  vCHdmiCec_hal_t *hal = (vCHdmiCec_hal_t*) user_data;
+
+  if(hal == NULL || hal->state != HAL_STATE_READY)
+  {
+    return;
+  }
+
+  if(strstr(key, CEC_MSG_COMMAND))
+  {
+    msg.type = CEC_MSG_TYPE_COMMAND;
+  }
+  else if(strstr(key, CEC_MSG_EVENT))
+  {
+    msg.type = CEC_MSG_TYPE_EVENT;
+  }
+  else if(strstr(key, CEC_MSG_CONFIG))
+  {
+    msg.type = CEC_MSG_TYPE_CONFIG;
+  }
+  else
+  {
+    VC_LOG_ERROR("ProcessMsg: Unknown Message Type [%s]", key);
+    return;
+  }
+
+  msg.message = ut_kvp_getData(instance);
+  msg.size = strlen(msg.message);
+  EnqueueMessage(&msg, hal);
+}
+
+static void EnqueueMessage(vCHdmiCec_message_t *msg, vCHdmiCec_hal_t *hal )
+{
+    pthread_mutex_lock(&hal->msg_queue_mutex);
+    if (hal->msg_count < MAX_QUEUE_SIZE)
+    {
+      hal->msg_queue[hal->msg_count].size = msg->size;
+      hal->msg_queue[hal->msg_count].type = msg->type;
+      hal->msg_queue[hal->msg_count].message = msg->message;
+      hal->msg_count++;
+      pthread_cond_signal(&hal->msg_queue_condition);
+    }
+    pthread_mutex_unlock(&hal->msg_queue_mutex);
+}
+
+static vCHdmiCec_message_t* DequeueMessage(vCHdmiCec_hal_t *hal)
+{
+    vCHdmiCec_message_t *msg;
+
+    pthread_mutex_lock(&hal->msg_queue_mutex);
+    while (hal->msg_count == 0)
+    {
+        pthread_cond_wait(&hal->msg_queue_condition, &hal->msg_queue_mutex);
+    }
+    msg = &hal->msg_queue[0]; //Get the top
+    //Adjust the queue
+    for (int i = 0; i < hal->msg_count - 1; i++)
+    {
+        hal->msg_queue[i] = hal->msg_queue[i + 1];
+    }
+    hal->msg_count--;
+    pthread_mutex_unlock(&hal->msg_queue_mutex);
+    return msg;
+}
+
+/*
+static void ResetMessage(vCHdmiCec_message_t* msg)
+{
+  msg->size = 0;
+  if(msg->message != NULL)
+  {
+    free(msg->message);
+    msg->message = NULL;
+  }
+}*/
+
+static void* MessageHandler(void *data)
+{
+  vCHdmiCec_hal_t *hal = (vCHdmiCec_hal_t *)data;
+  vCHdmiCec_message_t *msg;
+
+  if (hal == NULL)
+  {
+    return NULL;
+  }
+
+  while (!hal->exit_request)
+  {
+    msg = DequeueMessage(hal);
+
+    switch (msg->type)
+    {
+      case CEC_MSG_TYPE_EXIT_REQUESTED:
+      {
+        VC_LOG("EXIT REQUESTED in MessageHandler\n");
+        hal->exit_request = true;
+      }
+      break;
+
+      case CEC_MSG_TYPE_COMMAND:
+      {
+        vCHdmiCec_command_t cmd;
+        uint32_t len;
+        uint8_t cec_data[VCHDMICEC_MAX_DATA_SIZE];
+        ParseCommand(hal, msg->message, msg->size, &cmd);
+        len = vCHdmiCec_Command_GetRawBytes(&cmd, cec_data, VCHDMICEC_MAX_DATA_SIZE);
+        if(hal->callbacks.rx_cb_func != NULL)
+        {
+          hal->callbacks.rx_cb_func((int)hal, hal->callbacks.rx_cb_data, cec_data, len);
+        }
+      }
+      break;
+
+      case CEC_MSG_TYPE_EVENT:
+      {
+
+      }
+      break;
+
+      case CEC_MSG_TYPE_CONFIG:
+      {
+
+      }
+      break;
+
+      default:
+      {
+
+      }
+      break;
+    }
+    //ResetMessage(msg);
+  }
+  return NULL;
+}
 
 void LoadPortsInfo (ut_kvp_instance_t* instance, vCHdmiCec_port_info_t* ports, unsigned int nPorts)
 {
@@ -171,14 +390,24 @@ void LoadPortsInfo (ut_kvp_instance_t* instance, vCHdmiCec_port_info_t* ports, u
 
 void TeardownHal (vCHdmiCec_hal_t* hal)
 {
+  vCHdmiCec_message_t msg = {0};
   if(hal == NULL)
   {
     return;
   }
 
+  if ( hal->msg_handler_thread )
+  {
+    memset(&msg, 0, sizeof(msg));
+    msg.type = CEC_MSG_TYPE_EXIT_REQUESTED;
+    EnqueueMessage(&msg, hal);
+    if (pthread_join(hal->msg_handler_thread, NULL) != 0)
+    {
+      VC_LOG_ERROR("Failed to join msg_handler_thread from instance\n");
+    }
+  }
+  hal->msg_handler_thread = 0;
   vCHdmiCec_Device_DestroyMap(hal->devices_map);
-    //Stop all events
-    //Exit Eventing
 
   if(hal->ports)
   {
@@ -203,6 +432,7 @@ vComponent_HdmiCec_t* vComponent_HdmiCec_Initialize( void )
   assert(result->profile_instance != NULL);
   result->cec_hal = NULL;
   result->bOpened = false;
+  result->cp_instance = NULL;
 
   gVCHdmiCec = result;
   return (vComponent_HdmiCec_t *)result;
@@ -252,7 +482,8 @@ if(pProfilePath == NULL)
 
   if(enableCPMsgs)
   {
-    //TODO Open Control Plane
+    vCHdmiCec->cp_instance = UT_ControlPlane_Init(CONTROL_PLANE_PORT);
+    assert(vCHdmiCec->cp_instance != NULL);
   }
   vCHdmiCec->bOpened = true;
   return VC_HDMICEC_STATUS_SUCCESS;
@@ -323,6 +554,10 @@ vComponent_HdmiCec_Status_t vComponent_HdmiCec_Deinitialize(vComponent_HdmiCec_t
   {
     vComponent_HdmiCec_Close(pVCHdmiCec);
   }
+  if(vCHdmiCec->cp_instance != NULL)
+  {
+    UT_ControlPlane_Exit(vCHdmiCec->cp_instance);
+  }
   ut_kvp_destroyInstance(vCHdmiCec->profile_instance);
   free(vCHdmiCec);
   gVCHdmiCec = NULL;
@@ -358,6 +593,8 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
     return HDMI_CEC_IO_GENERAL_ERROR;
   }
 
+  memset(cec, 0, sizeof(vCHdmiCec_hal_t));
+
   profile_instance = gVCHdmiCec->profile_instance;
   assert(profile_instance != NULL);
   
@@ -371,6 +608,11 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
   cec->ports = ports;
 
   //Setup Eventing and callback
+  cec->exit_request = false;
+  pthread_mutex_init( &cec->msg_queue_mutex, NULL );
+  pthread_cond_init( &cec->msg_queue_condition, NULL );
+  pthread_create(&cec->msg_handler_thread, NULL, MessageHandler, (void*) cec );
+
 
   //Device Discovery and Network Topology
   cec->num_devices = ut_kvp_getUInt32Field(profile_instance, "hdmicec/number_devices");
@@ -410,6 +652,12 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
   *handle = (int) cec;
   gVCHdmiCec->cec_hal = cec;
+  if(gVCHdmiCec->cp_instance != NULL)
+  {
+    UT_ControlPlane_RegisterCallbackOnMessage(gVCHdmiCec->cp_instance, "hdmicec/command", &ProcessMsg, (void*) cec);
+    UT_ControlPlane_Start(gVCHdmiCec->cp_instance);
+  }
+
   cec->state = HAL_STATE_READY;
 
   return HDMI_CEC_IO_SUCCESS;
@@ -417,7 +665,6 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
 HDMI_CEC_STATUS HdmiCecClose(int handle)
 {
-
   if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecClose: Not Opened");

@@ -98,7 +98,7 @@ void start_virtual_component (void)
         UT_LOG("Error starting Virtual Component - vComponent_HdmiCec_Initialize");
         return;
     }
-    status = vComponent_HdmiCec_Open(gVCInfo.handle, gVCInfo.pProfilePath, false);
+    status = vComponent_HdmiCec_Open(gVCInfo.handle, gVCInfo.pProfilePath, true);
     if(status != VC_HDMICEC_STATUS_SUCCESS)
     {
         UT_LOG("Error Starting Virtual Component vComponent_HdmiCec_Open[%d]\n", status);
