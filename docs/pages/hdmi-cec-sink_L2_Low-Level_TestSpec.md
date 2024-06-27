@@ -237,13 +237,13 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 01 | Call the pre-requisite API HdmiCecOpen() | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 02 | Call the API HdmiCecGetPhysicalAddress() | handle = valid handle, physicalAddress = valid address | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 03 | Check the return status of HdmiCecGetPhysicalAddress() | status = return status of HdmiCecGetPhysicalAddress() | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 04 | Verify that the physical address obtained is greater than or equal to F.F.F.F | physicalAddress = obtained physical address | physicalAddress >= 0xFFFF | Should be successful |
+| 04 | Verify that the physical address obtained is equal to 0.0.0.0 | physicalAddress = obtained physical address | physicalAddress == 0x0000 | Should be successful |
 | 05 | Call the post-requisite API HdmiCecClose() | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 ```mermaid
 graph TB
 A[HdmiCecOpen] -->|HDMI_CEC_IO_SUCCESS| B[HdmiCecGetPhysicalAddress]
-B -->|HDMI_CEC_IO_SUCCESS| C{Verify Physical Address >= F.F.F.F}
+B -->|HDMI_CEC_IO_SUCCESS| C{Verify Physical Address == 0.0.0.0}
 B -->|Failure| B1[Test case fail]
 C -->|Success| D[HdmiCecClose]
 C -->|Failure| C1[Test case fail]

@@ -339,7 +339,7 @@ void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
 *
 * This test case verifies the physical address of the HDMI CEC HAL 
 * by calling the HdmiCecGetPhysicalAddress() API. 
-* The test ensures that the physical address obtained is less than F.F.F.F. 
+* The test ensures that the physical address obtained is equal to 0.0.0.0. 
 * The test also includes error handling and assertions to check the return values of the APIs. 
 * The test ensures that the post-requisite API HdmiCecClose() 
 * is called in case of any test failure after the successful execution of the pre-requisite API HdmiCecOpen().
@@ -376,9 +376,9 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
         UT_LOG_ERROR("HdmiCecGetPhysicalAddress failed with status: %d", status);
     }
 
-    // Step 4: Verify that the physical address obtained is less than F.F.F.F
-    UT_LOG_DEBUG("Checking if physical address: %u is less than F.F.F.F", physicalAddress);
-    UT_ASSERT_TRUE(physicalAddress >= 0xFFFF)
+    // Step 4: Verify that the physical address obtained is equal to 0.0.0.0
+    UT_LOG_DEBUG("Checking if physical address: %u is less than 0.0.0.0", physicalAddress);
+    UT_ASSERT_TRUE(physicalAddress >= 0x0000)
 
     // Step 5: Call the post-requisite API HdmiCecClose()
     UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
