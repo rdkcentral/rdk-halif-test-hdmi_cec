@@ -67,7 +67,7 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 
 |S.No.|Test Functionality|Description|HAL APIs|L2|L3|Control plane requirements|
 |-----|------------------|-----------|--------|--|--|--------------------------|
-| 2| [Physical Address](#physical-address)| Verify the valid physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| Y  |NA||
+| 2| [Physical Address](#physical-address)| Verify the physical address allocated through the HAL function.|HdmiCecGetPhysicalAddress| Y  |NA||
 | | | Verify the physical addresses allocated by connecting two sink devices through an HDMI switch.| HdmiCecGetPhysicalAddress| NA | Y  | Enable the television connected to `DUT` to declare its physical address first before `DUT`.|
 
 ### Emulator Requirements - Physical Address
@@ -133,7 +133,7 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 
 |S.No.|Test Functionality|Description| HAL APIs |L2|L3|Control plane requirements|
 |-----|------------------|-----------|----------|--|--|--------------------------|
-| 7| Introduce fault in the CEC Bus | Absorve the behaviour when the CEC line is pulled high during the CEC Transmission using a CEC Adaptor that provision to keep the CEC line pulled high| HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  |CEC Adaptor used shall have a provision to introduce the fault. The control plane should be able to command to pull the CEC line high, else it should follow a manual process|
+| 7| Introduce fault in the CEC Bus | Observe the behaviour when the CEC line is pulled high during the CEC Transmission using a CEC Adaptor that provision to keep the CEC line pulled high| HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  |CEC Adaptor used shall have a provision to introduce the fault. The control plane should be able to command to pull the CEC line high, else it should follow a manual process|
 | 8| Overloading the CEC bus. | Overload the CEC bus with too many messages  (by connecting more devices in the network) and observe the behaviour| HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  |Control plane to initiate the CEC Transmission through all the connected devices continuously with a command that expects the response as well to overload the CEC Network.  |
 
 ### Emulator Requirements

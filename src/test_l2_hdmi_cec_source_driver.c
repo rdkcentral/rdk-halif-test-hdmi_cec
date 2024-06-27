@@ -83,18 +83,23 @@ static int gTestGroup = 2;
 static int gTestID = 1;
 
 /**
-* @brief This test validates the unavailability of logical address in HDMI CEC driver
+* @brief This test validates the unavailability of logical address in HDMI CEC HAL
 *
-* This test case is designed to validate the scenario when the logical address is unavailable in the HDMI CEC driver. The test invokes the HdmiCecOpen function and checks if the returned status is HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE. If the status is not HDMI_CEC_IO_SUCCESS, it invokes the HdmiCecClose function and checks if the returned status is HDMI_CEC_IO_SUCCESS.
+* This test case is designed to validate the scenario when the logical address 
+* is unavailable in the HDMI CEC HAL. The test invokes the HdmiCecOpen function 
+* and checks if the returned status is HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE. 
+* If the status is not HDMI_CEC_IO_SUCCESS, it invokes the HdmiCecClose function 
+* and checks if the returned status is HDMI_CEC_IO_SUCCESS.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 001@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [hdmi_cec_driver_source_L2_Low-Level_TestSpecification.md](../docs/pages/hdmi_cec_source_L2_Low-Level_TestSpec.md)
+* Refer to UT specification documentation 
+* [hdmi_cec_source_hal_source_L2_Low-Level_TestSpecification.md](../docs/pages/hdmi_cec_source_L2_Low-Level_TestSpec.md)
 */
 
-void test_l2_hdmi_cec_driver_ValidateLogicalAddressUnavailability_source(void)
+void test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability(void)
 {
     gTestID = 1;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -128,17 +133,17 @@ static UT_test_suite_t * pSuite = NULL;
  * @return int - 0 on success, otherwise failure
  */
 
-int test_hdmi_cec_driver_source_l2_register(void)
+int register_hdmicec_hal_source_l2_tests(void)
 {
     // Create the test suite
-    pSuite = UT_add_suite("[L2 hdmi_cec_driver]", NULL, NULL);
+    pSuite = UT_add_suite("[L2 HDMICEC Source Test Case]", NULL, NULL);
     if (pSuite == NULL)
     {
         return -1;
     }
     // List of test function names and strings
 
-    UT_add_test( pSuite, "l2_hdmi_cec_driver_ValidateLogicalAddressUnavailability_source", test_l2_hdmi_cec_driver_ValidateLogicalAddressUnavailability_source);
+    UT_add_test( pSuite, "l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability_source", test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability);
 
     return 0;
 }
