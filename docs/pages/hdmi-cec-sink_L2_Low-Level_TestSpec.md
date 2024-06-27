@@ -243,7 +243,7 @@ If the user chooses to run the test in interactive mode, then the test case has 
 ```mermaid
 graph TB
 A[HdmiCecOpen] -->|HDMI_CEC_IO_SUCCESS| B[HdmiCecGetPhysicalAddress]
-B -->|HDMI_CEC_IO_SUCCESS| C{Verify Physical Address < F.F.F.F}
+B -->|HDMI_CEC_IO_SUCCESS| C{Verify Physical Address >= F.F.F.F}
 B -->|Failure| B1[Test case fail]
 C -->|Success| D[HdmiCecClose]
 C -->|Failure| C1[Test case fail]

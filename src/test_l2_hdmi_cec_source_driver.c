@@ -96,7 +96,7 @@ static int gTestID = 1;
 *
 * **Test Procedure:**
 * Refer to UT specification documentation 
-* [hdmi_cec_source_hal_source_L2_Low-Level_TestSpecification.md](../docs/pages/hdmi_cec_source_L2_Low-Level_TestSpec.md)
+* [hdmi_cec_source_hal_source_L2_Low-Level_TestSpecification.md](../docs/pages/hdmi-cec-source_L2_Low-Level_TestSpec.md)
 */
 
 void test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability(void)
