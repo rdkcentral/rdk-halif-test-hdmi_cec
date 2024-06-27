@@ -91,7 +91,7 @@ static int gTestID = 1;
 * **Test Case ID:** 001@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation [hdmi_cec_driver_source_L2_Low-Level_TestSpecification.md](../../docs/pages/hdmi_cec_source_driver_L2_Low-Level_TestSpecification.md)
+* Refer to UT specification documentation [hdmi_cec_driver_source_L2_Low-Level_TestSpecification.md](../docs/pages/hdmi_cec_source_L2_Low-Level_TestSpec.md)
 */
 
 void test_l2_hdmi_cec_driver_ValidateLogicalAddressUnavailability_source(void)
