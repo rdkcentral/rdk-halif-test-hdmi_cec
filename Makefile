@@ -34,8 +34,9 @@ TOP_DIR := $(ROOT_DIR)
 SRC_DIRS = $(ROOT_DIR)/src
 INC_DIRS := $(ROOT_DIR)/../include
 HAL_LIB := RCECHal
-VCOMPONENT_SRCS := $(ROOT_DIR)/vcomponent/src/vcomponent_hdmi_cec.c
 SKELTON_SRCS := $(ROOT_DIR)/skeletons/src/hdmi_cec_driver.c
+VCOMPONENT_SRCS := $(shell find $($(ROOT_DIR)/vcomponent/src/) -name *.cpp -or -name *.c -or -name *.s)
+VCOMPONENT_OBJS := $(subst src,build,$(VCOMPONENT_SRCS:.c=.o))
 
 ifeq ($(TARGET),)
 $(info TARGET NOT SET )
@@ -92,7 +93,7 @@ skeleton:
 
 vcomponent:
 	echo $(CC)
-	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include -I$(ROOT_DIR)/vcomponent/include -I$(ROOT_DIR)/ut-core/include -I$(ROOT_DIR)/ut-core/framework/ut-control/include $(VCOMPONENT_SRCS) -o lib$(HAL_LIB).so
+	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include -I$(ROOT_DIR)/vcomponent/include -I$(ROOT_DIR)/ut-core/include -I$(ROOT_DIR)/ut-core/framework/ut-control/include $(VCOMPONENT_OBJS) -o lib$(HAL_LIB).so
 	mkdir -p $(HAL_LIB_DIR)
 	cp $(ROOT_DIR)/lib$(HAL_LIB).so $(HAL_LIB_DIR)
 

@@ -51,6 +51,7 @@ hdmicec:
     - VIZIO
     - BENQ
     - HARMAN_KARDON
+    - TEST_VENDOR
     - UNKNOWN
 
   #HDMI CEC Version supported by device
