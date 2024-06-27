@@ -27,7 +27,9 @@ This document describes the level 2 testing suite for the HDMI CEC HAL module.
 
 ### References
 
-- `High-Level Test Specification` - [hdmi_cec_sink_tests.md](hdmi_cec_sink_tests.md)
+- `High Level Test Specification` - [hdmi-cec-sink_High-Level_TestSpec.md](https://github.com/rdkcentral/rdk-halif-test-hdmi_cec/blob/main/docs/pages/hdmi-cec-sink_High-Level_TestSpec.md)
+- `HDMI CEC HAL Interface file` - [hdmi_cec_driver.h](https://github.com/rdkcentral/rdk-halif-hdmi_cec/blob/main/include/hdmi_cec_driver.h)
+
 
 ## Level 2 Test Procedure
 
