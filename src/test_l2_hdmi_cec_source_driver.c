@@ -133,7 +133,7 @@ static UT_test_suite_t * pSuite = NULL;
  * @return int - 0 on success, otherwise failure
  */
 
-int register_hdmicec_hal_source_l2_tests(void)
+int test_register_hdmicec_hal_source_l2_tests(void)
 {
     // Create the test suite
     pSuite = UT_add_suite("[L2 HDMICEC Source Test Case]", NULL, NULL);

@@ -459,7 +459,7 @@ static UT_test_suite_t * pSuite = NULL;
  * @return int - 0 on success, otherwise failure
  */
     
-int register_hdmicec_hal_sink_l2_tests(void)
+int test_register_hdmicec_hal_sink_l2_tests(void)
 {
     // Create the test suite
     pSuite = UT_add_suite("[L2 HDMICEC Sink Test Case] ", NULL, NULL);
@@ -474,7 +474,7 @@ int register_hdmicec_hal_sink_l2_tests(void)
     UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_RemoveLogicalAddress", test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress);
     UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand", test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand);
     UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_VerifyPhysicalAddress", test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress);
-    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_TransmitCECCommand", test_l2_hdmi_cec_driver_TransmitCECCommand);
+    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_TransmitCECCommand", test_l2_hdmi_cec_sink_hal_TransmitCECCommand);
 
     return 0;
 }
