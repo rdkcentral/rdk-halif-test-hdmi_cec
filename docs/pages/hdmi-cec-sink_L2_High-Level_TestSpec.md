@@ -78,7 +78,7 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 ### Control Plane Requirements - Physical Address
 
 - The control plane will allow removing or adding a node to the network.
-  - allowing add sink node before the `DUT` switched ON.    
+  - allowing add sink node before the `DUT` switched ON.
 
 ## CEC Synchronous Transmission
 
@@ -90,11 +90,13 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 | | | Transmit a HDMI CEC Command (as per 1.4b HDMI CEC spec) to get the CEC Version of a device that doesn't exist.| HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | Y | NA  |  Control plane can unplug or switch off a previously existing CEC device |
 
 ### Emulator Requirements - CEC Transmission
+
 - Boot configuration
   - Min case scenario multiple network nodes
   - Max case scenario multiple cec nodes
 
 ### Control Plane Requirements - CEC Transmission
+
 - The control plane will allow adding a device that can respond to the CEC Frames sent by `DUT`
 
 ## CEC Receive functionality
@@ -108,9 +110,11 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 | | | Set the Logical address to 0 on `DUT` and make sure that it doesn't receive the messages sent to devices with different logical address.| HdmiCecAddLogicalAddress, HdmiCecSetRxCallback, HdmiCecRemoveLogicalAddress | NA | Y  | Control Plane to initiate a command to send CEC frames from CEC adaptor with a different logical address other than zero|
 
 ### Emulator Requirements - CEC Receive functionality
+
 1. Emulate the Tx and Rx HAL functionalities with the required responses.
 
 ### Control Plane Requirements - CEC Transmission
+
 - The control plane will allow adding a device that can respond to the CEC Frames sent by `DUT`
 - The control plane to initiate CEC Transmissions from the connected devices as expected by the `DUT`
 
@@ -124,6 +128,7 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 ### Emulator Requirements - CEC HotPlug Functionality
 
 ### Control Plane Requirements - CEC HotPlug Functionality
+
 1. Control plane to initiate the HotPlug activity by commanding an IP power switch to the OFF State to which the Node device is connected.
 
 -----------
@@ -136,12 +141,16 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 | 7| Introduce fault in the CEC Bus | Observe the behaviour when the CEC line is pulled high during the CEC Transmission using a CEC Adaptor that provision to keep the CEC line pulled high| HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  |CEC Adaptor used shall have a provision to introduce the fault. The control plane should be able to command to pull the CEC line high, else it should follow a manual process|
 | 8| Overloading the CEC bus. | Overload the CEC bus with too many messages  (by connecting more devices in the network) and observe the behaviour| HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  |Control plane to initiate the CEC Transmission through all the connected devices continuously with a command that expects the response as well to overload the CEC Network.  |
 
-### Emulator Requirements
+### Emulator Requirements - Hardware verification
+
 1. Emulator to support the HDMI_CEC_IO_SENT_FAILED during the above scenarios
-   
+
 ### Control Plane Requirements
+
 1. Control Plane to control the external devices to pull the CEC line high.
+
 2. Control Plan to initiate multiple CEC commands from the different devices connected to the network. 
+
 -----------
 -----------
 
