@@ -66,6 +66,10 @@
 #include <ut_kvp_profile.h>
 
 extern int register_hdmicec_hal_l1_tests( void );
+
+#ifdef VCOMPONENT
+extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+#endif
 extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
 
