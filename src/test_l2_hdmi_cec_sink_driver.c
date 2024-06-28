@@ -42,8 +42,6 @@
  *
  * ### L2 Test Cases for HDMI CEC HAL :
  *
- * @file test_l2_hdmi_cec_driver.c
- * @page hdmi_cec_driver Level 2 Tests
  *
  * ## Module's Role
  * This module includes Level 2 functional tests (success and failure scenarios).
@@ -57,6 +55,11 @@
  * @endparblock
  */
 
+/**
+ * @file test_l2_hdmi_cec_sink_driver.c
+ *
+ */
+
 #include <ut.h>
 #include <ut_log.h>
 #include "hdmi_cec_driver.h"
@@ -67,17 +70,17 @@ static int gTestID = 1;
 /**
 * @brief Test for getting the default logical address of the HDMI CEC HAL
 *
-* This test case validates the functionality of getting the default logical 
+* This test case validates the functionality of getting the default logical
 * address of the HDMI CEC HAL. It first opens a connection to the HDMI CEC HAL,
-* then retrieves the logical address, checks if the address is correct, 
-* and finally closes the connection. This test is important to ensure 
+* then retrieves the logical address, checks if the address is correct,
+* and finally closes the connection. This test is important to ensure
 * that the HDMI CEC HAL is correctly assigning the default logical address.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 001@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation 
+* Refer to UT specification documentation
 * [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
@@ -122,18 +125,18 @@ void test_l2_hdmi_cec_sink_hal_GetDefaultLogicalAddress(void)
 * getting logical addresses in HDMI CEC HAL
 *
 * This test case is designed to validate the correct operation of the
-* HdmiCecAddLogicalAddress and HdmiCecGetLogicalAddress APIs. 
-* It does this by first opening a handle to the HDMI CEC HAL, 
-* then adding logical addresses to it, and finally retrieving 
-* those addresses to verify they were correctly added. 
-* The test ensures that the APIs return the expected status codes 
+* HdmiCecAddLogicalAddress and HdmiCecGetLogicalAddress APIs.
+* It does this by first opening a handle to the HDMI CEC HAL,
+* then adding logical addresses to it, and finally retrieving
+* those addresses to verify they were correctly added.
+* The test ensures that the APIs return the expected status codes
 * and that the retrieved addresses match the ones that were added.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 002@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation 
+* Refer to UT specification documentation
 * [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 void test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress(void)
@@ -191,16 +194,16 @@ void test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress(void)
 /**
 * @brief Test the removal of a logical address in the HDMI CEC HAL
 *
-* This function tests the removal of a logical address in the HDMI CEC HAL. 
+* This function tests the removal of a logical address in the HDMI CEC HAL.
 * It first opens the HAL, adds a logical address, removes the logical address,
-* checks that the logical address has been removed, 
+* checks that the logical address has been removed,
 * and finally closes the HAL.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 003@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation 
+* Refer to UT specification documentation
 * [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
@@ -268,17 +271,17 @@ void test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
 /**
 * @brief Test for broadcasting HDMI CEC command
 *
-* This function tests the HDMI CEC HAL's ability to broadcast a 
-* HDMI CEC command when logical address is removed. 
-* It first opens the HDMI CEC HAL, adds a logical address, removes 
-* the logical address, sends a broadcast HDMI CEC command, 
+* This function tests the HDMI CEC HAL's ability to broadcast a
+* HDMI CEC command when logical address is removed.
+* It first opens the HDMI CEC HAL, adds a logical address, removes
+* the logical address, sends a broadcast HDMI CEC command,
 * and finally closes the HDMI CEC HAL.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 004@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation 
+* Refer to UT specification documentation
 * [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
@@ -337,18 +340,18 @@ void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
 /**
 * @brief Test to verify the physical address of the HDMI CEC HAL
 *
-* This test case verifies the physical address of the HDMI CEC HAL 
-* by calling the HdmiCecGetPhysicalAddress() API. 
-* The test ensures that the physical address obtained is equal to 0.0.0.0. 
-* The test also includes error handling and assertions to check the return values of the APIs. 
-* The test ensures that the post-requisite API HdmiCecClose() 
+* This test case verifies the physical address of the HDMI CEC HAL
+* by calling the HdmiCecGetPhysicalAddress() API.
+* The test ensures that the physical address obtained is equal to 0.0.0.0.
+* The test also includes error handling and assertions to check the return values of the APIs.
+* The test ensures that the post-requisite API HdmiCecClose()
 * is called in case of any test failure after the successful execution of the pre-requisite API HdmiCecOpen().
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 005@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation 
+* Refer to UT specification documentation
 * [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
@@ -391,16 +394,16 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
 /**
 * @brief This test function is designed to test the transmission of CEC commands in the HDMI CEC HAL.
 *
-* This test function tests the transmission of CEC commands in the HDMI CEC HAL. 
-* It opens a connection, adds a logical address, sends a CEC command, 
-* removes the logical address, and then closes the connection. 
+* This test function tests the transmission of CEC commands in the HDMI CEC HAL.
+* It opens a connection, adds a logical address, sends a CEC command,
+* removes the logical address, and then closes the connection.
 * The test asserts that each operation returns the expected status.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 006@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation 
+* Refer to UT specification documentation
 * [hdmi-cec-sink_L2_Low-Level_TestSpec.md](../docs/pages/hdmi-cec-sink_L2_Low-Level_TestSpec.md)
 */
 
@@ -458,7 +461,7 @@ static UT_test_suite_t * pSuite = NULL;
  *
  * @return int - 0 on success, otherwise failure
  */
-    
+
 int test_register_hdmicec_hal_sink_l2_tests(void)
 {
     // Create the test suite
@@ -469,12 +472,17 @@ int test_register_hdmicec_hal_sink_l2_tests(void)
     }
     // List of test function names and strings
 
-    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_GetDefaultLogicalAddress", test_l2_hdmi_cec_sink_hal_GetDefaultLogicalAddress);
-    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress", test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress);
-    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_RemoveLogicalAddress", test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress);
-    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand", test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand);
-    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_VerifyPhysicalAddress", test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress);
-    UT_add_test( pSuite, "l2_hdmi_cec_sink_hal_TransmitCECCommand", test_l2_hdmi_cec_sink_hal_TransmitCECCommand);
+    UT_add_test( pSuite, "L2_GetDefaultLogicalAddress_Sink", test_l2_hdmi_cec_sink_hal_GetDefaultLogicalAddress);
+    UT_add_test( pSuite, "L2_AddAndGetLogicalAddress_Sink", test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress);
+    UT_add_test( pSuite, "L2_RemoveLogicalAddress_Sink", test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress);
+    UT_add_test( pSuite, "L2_BroadcastHdmiCecCommand_Sink", test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand);
+    UT_add_test( pSuite, "L2_VerifyPhysicalAddress_Sink", test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress);
+    UT_add_test( pSuite, "L2_TransmitCECCommand_Sink", test_l2_hdmi_cec_sink_hal_TransmitCECCommand);
 
     return 0;
 }
+
+/** @} */ // End of HDMI CEC HAL Tests L1 File
+/** @} */ // End of HDMI CEC HAL Tests
+/** @} */ // End of HDMI CEC Module
+/** @} */ // End of HPK

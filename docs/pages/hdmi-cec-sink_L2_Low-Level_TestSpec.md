@@ -1,23 +1,23 @@
-# HDMI CEC HAL L2 Low-Level Test Specification and Procedure Documentation
+# HDMI CEC Sink L2 Low-Level Test Specification and Procedure Documentation
 
 ## Table of Contents
 
 - [Overview](#overview)
-  - [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
-  - [Definitions](#definitions)
-  - [References](#references)
+- [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
+- [Definitions](#definitions)
+- [References](#references)
 - [Level 2 Test Procedure](#level-2-test-procedure)
 
 ## Overview
 
-This document describes the level 2 testing suite for the HDMI CEC HAL module.
+This document describes the level 2 Low-Level Test Specification and Procedure Documentation for the HDMI CEC Sink module.
 
 ### Acronyms, Terms and Abbreviations
 
 - `HAL`  \- Hardware Abstraction Layer, may include some common components
 - `UT`   \- Unit Test(s)
 - `HDMI` \- High-Definition Multimedia Interface
-- `CEC`  \- Consumer Electronics Contro  
+- `CEC`  \- Consumer Electronics Control
 - `DUT`  \- Device Under Test
 - `API`  \- Application Program Interface
 
@@ -29,7 +29,6 @@ This document describes the level 2 testing suite for the HDMI CEC HAL module.
 
 - `High Level Test Specification` - [hdmi-cec-sink_High-Level_TestSpec.md](https://github.com/rdkcentral/rdk-halif-test-hdmi_cec/blob/main/docs/pages/hdmi-cec-sink_High-Level_TestSpec.md)
 - `HDMI CEC HAL Interface file` - [hdmi_cec_driver.h](https://github.com/rdkcentral/rdk-halif-hdmi_cec/blob/main/include/hdmi_cec_driver.h)
-
 
 ## Level 2 Test Procedure
 
@@ -62,7 +61,6 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 02 | Call the API HdmiCecGetLogicalAddress() | handle = valid handle, logicalAddress = 0 | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 03 | Check the logical address |  | logicalAddress = 0x0F| Should be successful |
 | 04 | Call the post-requisite API HdmiCecClose() | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
-
 
 ```mermaid
 graph TB
@@ -106,7 +104,6 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 05 | Remove logical address using HdmiCecRemoveLogicalAddress API | handle = valid handle, logicalAddress = i | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 06 | Close HDMI CEC HAL using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
-
 ```mermaid
 graph TB
 A[HdmiCecOpen] -->|HDMI_CEC_IO_SUCCESS| B{Loop 0x00 to 0x0F}
@@ -149,7 +146,6 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 04 | Remove the logical address using HdmiCecRemoveLogicalAddress API | handle = valid handle, logicalAddress = 0x00 | HDMI_CEC_IO_SUCCESS | Should be successful |
 | 05 | Get the logical address using HdmiCecGetLogicalAddress API | handle = valid handle, logicalAddress = valid buffer | HDMI_CEC_IO_SUCCESS , logicalAddress = 0x0F | Should be successful |
 | 06 | Close the HDMI CEC HAL using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
-
 
 ```mermaid
 graph TB

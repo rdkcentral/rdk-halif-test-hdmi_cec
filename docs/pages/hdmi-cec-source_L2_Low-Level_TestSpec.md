@@ -1,4 +1,4 @@
-# HDMI CEC HAL L2 Low Level Test Specification and Procedure Documentation
+# HDMI CEC Source L2 Low Level Test Specification and Procedure Documentation
 
 ## Table of Contents
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-This document describes the level 2 testing suite for the HDMI CEC HAL module.
+This document describes the Source level 2 Low Level Test Specification and Procedure Documentation for the HDMI CEC HAL module Source.
 
 ### Acronyms, Terms and Abbreviations
 

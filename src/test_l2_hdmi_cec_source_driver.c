@@ -32,18 +32,19 @@
  */
 
 /**
- * @addtogroup HDMI_CEC HDMICEC Source
+ * @addtogroup HDMI_CEC HDMI CEC Module
  * @{
  *
  */
 
 /**
- * @addtogroup HDMI_CEC_HALTESTS HDMICEC Source HALTEST
+ * @defgroup HDMI_CEC_HALTESTS HDMI CEC HAL Tests
  * @{
+ *
  */
 
 /**
- * @defgroup HDMI_CEC_HALTESTS_L1 HDMICEC Source HALTEST L2 File
+ * @defgroup HDMI_CEC_HALTESTS_L2_SOURCE HDMI CEC Source HALTEST L2 File for Source
  * @{
  * @parblock
  *
@@ -58,10 +59,11 @@
  *
  * @endparblock
  */
-
 /**
-* @file test_l2_hdmi_cec_source_driver.c
-* @page hdmi_cec_driver Level 2 Tests
+ * @file test_l2_hdmi_cec_source_driver.c
+ *
+ */
+/**
 *
 * ## Module's Role
 * This module includes Level 2 functional tests (success and failure scenarios).
@@ -85,17 +87,17 @@ static int gTestID = 1;
 /**
 * @brief This test validates the unavailability of logical address in HDMI CEC HAL
 *
-* This test case is designed to validate the scenario when the logical address 
-* is unavailable in the HDMI CEC HAL. The test invokes the HdmiCecOpen function 
-* and checks if the returned status is HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE. 
-* If the status is not HDMI_CEC_IO_SUCCESS, it invokes the HdmiCecClose function 
+* This test case is designed to validate the scenario when the logical address
+* is unavailable in the HDMI CEC HAL. The test invokes the HdmiCecOpen function
+* and checks if the returned status is HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE.
+* If the status is not HDMI_CEC_IO_SUCCESS, it invokes the HdmiCecClose function
 * and checks if the returned status is HDMI_CEC_IO_SUCCESS.
 *
 * **Test Group ID:** 02@n
 * **Test Case ID:** 001@n
 *
 * **Test Procedure:**
-* Refer to UT specification documentation 
+* Refer to UT specification documentation
 * [hdmi_cec_source_hal_source_L2_Low-Level_TestSpecification.md](../docs/pages/hdmi-cec-source_L2_Low-Level_TestSpec.md)
 */
 
@@ -143,13 +145,13 @@ int test_register_hdmicec_hal_source_l2_tests(void)
     }
     // List of test function names and strings
 
-    UT_add_test( pSuite, "l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability_source", test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability);
+    UT_add_test( pSuite, "L2_ValidateLogicalAddressUnavailability_source", test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability);
 
     return 0;
 }
 
-/** @} */ // End of HDMI CEC HAL Source Tests L2 File
-/** @} */ // End of HDMI CEC HAL Source Tests
-/** @} */ // End of HDMI CEC Source Module
+/** @} */ // End of HDMI_CEC_HALTESTS_L2_SOURCE
+/** @} */ // End of HDMI_CEC_HALTESTS
+/** @} */ // End of HDMI_CEC Module
 /** @} */ // End of HPK
 
