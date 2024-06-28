@@ -62,15 +62,26 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <ut_log.h>
+#include <ut_kvp_profile.h>
 
 extern int register_hdmicec_hal_l1_tests( void );
 
 #ifdef VCOMPONENT
 extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
 #endif
+extern int register_hdmicec_hal_source_l2_tests( void );
+extern int register_hdmicec_hal_sink_l2_tests( void );
 
-int main(int argc, char** argv) 
+#ifdef VCOMPONENT
+extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+#endif
+
+int main(int argc, char** argv)
 {
+    ut_kvp_status_t status;
+    char szReturnedString[UT_KVP_MAX_ELEMENT_SIZE];
+
 #ifdef VCOMPONENT
     int opt;
     char* pProfilePath = NULL;
@@ -110,7 +121,24 @@ int main(int argc, char** argv)
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
 
+    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/type", szReturnedString, UT_KVP_MAX_ELEMENT_SIZE);
+    if (status == UT_KVP_STATUS_SUCCESS ) {
+        UT_LOG_DEBUG("Device Type: %s", szReturnedString);
+    }
+    else {
+        UT_LOG_ERROR("Failed to get the platform Device Type");
+        return -1;
+    }
+
     register_hdmicec_hal_l1_tests ();
+
+    if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+	register_hdmicec_hal_source_l2_tests ();
+    }
+
+    if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+	register_hdmicec_hal_sink_l2_tests ();
+    }
 #ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath, cpPort, pUrl);
 #endif
