@@ -122,7 +122,7 @@ Managing the opcodes is the responsibility of the caller. The existing test case
 
 |S.No.|Test Functionality|Description| HAL APIs |L2|L3|Control plane requirements|
 |-----|------------------|-----------|----------|--|--|--------------------------|
-| 6| [CEC HotPlug Functionality](#cec-hotplug-functionality)| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Sink Platform. Validating whether the CEC Transmission (use Polling command) works when the HDMI port is disconnected should result in ACK not being received while the TX still works as expected. | HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  | Control Panel to control the Hotplug activities |
+| 6| CEC HotPlug Functionality| Generate a Hotplug event by disconnecting the device connected to the HDMI port of the Sink Platform. Validating whether the CEC Transmission (use Polling command) works when the HDMI port is disconnected should result in ACK not being received while the TX still works as expected. | HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  | Control Panel to control the Hotplug activities |
 | | | Check the behaviour when a device has been remove from the network which is not directly connected to the TV device.  Send a CEC Tx command with acknowledgement using HAL Interface and check the behaviour. The Tx command should succeed, but the message should not be Acknowledged.| HdmiCecAddLogicalAddress, HdmiCecTx, HdmiCecRemoveLogicalAddress | NA | Y  | Control Panel to control the external devices connected.|
 
 ### Emulator Requirements - CEC HotPlug Functionality
