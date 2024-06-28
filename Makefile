@@ -34,6 +34,7 @@ TOP_DIR := $(ROOT_DIR)
 SRC_DIRS = $(ROOT_DIR)/src
 INC_DIRS := $(ROOT_DIR)/../include
 HAL_LIB := RCECHal
+VCOMPONENT_SRCS := $(ROOT_DIR)/vcomponent/src/vcomponent_hdmi_cec.c
 SKELTON_SRCS := $(ROOT_DIR)/skeletons/src/hdmi_cec_driver.c
 
 ifeq ($(TARGET),)
@@ -54,6 +55,17 @@ SETUP_SKELETON_LIBS := skeleton
 endif
 endif
 
+ifeq ($(TARGET),vcomponent)
+HAL_LIB_DIR := $(ROOT_DIR)/libs
+YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)  -lpthread -lrt
+INC_DIRS += $(ROOT_DIR)/vcomponent/include
+SETUP_SKELETON_LIBS := vcomponent
+XCFLAGS = -DVCOMPONENT
+export XCFLAGS
+endif
+
+
+
 .PHONY: clean list all
 
 export YLDFLAGS
@@ -64,18 +76,24 @@ export TARGET
 export TOP_DIR
 export HAL_LIB_DIR
 
-.PHONY: clean list build skeleton
-
+.PHONY: clean list build vcomponent
 
 build: $(SETUP_SKELETON_LIBS)
 	echo "SETUP_SKELETON_LIBS $(SETUP_SKELETON_LIBS)"
 	@echo UT [$@]
-	make -C ./ut-core
+	make -C ./ut-core framework
+	make -C ./ut-core test
 
 #Build against the real library leads to the SOC library dependency also.SOC lib dependency cannot be specified in the ut Makefile, since it is supposed to be common across may platforms. So in order to over come this situation, creating a template skelton library with empty templates so that the template library wont have any other Soc dependency. And in the real platform mount copy bind with the actual library will work fine.
 skeleton:
 	echo $(CC)
 	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include $(SKELTON_SRCS) -o lib$(HAL_LIB).so
+	mkdir -p $(HAL_LIB_DIR)
+	cp $(ROOT_DIR)/lib$(HAL_LIB).so $(HAL_LIB_DIR)
+
+vcomponent:
+	echo $(CC)
+	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include -I$(ROOT_DIR)/vcomponent/include -I$(ROOT_DIR)/ut-core/include -I$(ROOT_DIR)/ut-core/framework/ut-control/include $(VCOMPONENT_SRCS) -o lib$(HAL_LIB).so
 	mkdir -p $(HAL_LIB_DIR)
 	cp $(ROOT_DIR)/lib$(HAL_LIB).so $(HAL_LIB_DIR)
 
@@ -86,4 +104,4 @@ list:
 
 clean:
 	@echo UT [$@]
-	make -C ./ut-core clean
+	make -C ./ut-core cleanall

@@ -62,6 +62,8 @@
 
 /* L1 Testing Functions */
 extern int test_hdmicec_hal_l1_register( void );
+extern int test_register_hdmicec_hal_source_l2_tests( void );
+extern int test_register_hdmicec_hal_sink_l2_tests( void );
 
 
 int register_hdmicec_hal_l1_tests( void )
@@ -69,6 +71,23 @@ int register_hdmicec_hal_l1_tests( void )
     int registerFailed=0;
 
     registerFailed |= test_hdmicec_hal_l1_register();
+
+    return registerFailed;
+}
+
+int register_hdmicec_hal_source_l2_tests( void )
+{
+    int registerFailed=0;
+
+    registerFailed |= test_register_hdmicec_hal_source_l2_tests();
+
+    return registerFailed;
+}
+int register_hdmicec_hal_sink_l2_tests( void )
+{
+    int registerFailed=0;
+
+    registerFailed |= test_register_hdmicec_hal_sink_l2_tests();
 
     return registerFailed;
 }
