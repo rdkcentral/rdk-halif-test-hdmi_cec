@@ -220,9 +220,9 @@ static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_co
 static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
 {
   vCHdmiCec_message_t msg;
-  vCHdmiCec_hal_t *hal = (vCHdmiCec_hal_t*) user_data;
+  vCHdmiCec_t *vc = (vCHdmiCec_t*) user_data;
 
-  if(hal == NULL || hal->state != HAL_STATE_READY)
+  if(vc == NULL || vc->cec_hal == NULL || vc->cec_hal->state != HAL_STATE_READY)
   {
     return;
   }
@@ -247,7 +247,7 @@ static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
 
   msg.message = ut_kvp_getData(instance);
   msg.size = strlen(msg.message);
-  EnqueueMessage(&msg, hal);
+  EnqueueMessage(&msg, vc->cec_hal);
 }
 
 static void EnqueueMessage(vCHdmiCec_message_t *msg, vCHdmiCec_hal_t *hal )
@@ -293,8 +293,8 @@ static void ResetMessage(vCHdmiCec_message_t* msg)
     free(msg->message);
     msg->message = NULL;
   }
-}*/
-
+}
+*/
 static void* MessageHandler(void *data)
 {
   vCHdmiCec_hal_t *hal = (vCHdmiCec_hal_t *)data;
@@ -484,6 +484,8 @@ if(pProfilePath == NULL)
   {
     vCHdmiCec->cp_instance = UT_ControlPlane_Init(CONTROL_PLANE_PORT);
     assert(vCHdmiCec->cp_instance != NULL);
+    UT_ControlPlane_RegisterCallbackOnMessage(gVCHdmiCec->cp_instance, "hdmicec/command", &ProcessMsg, (void*) vCHdmiCec);
+    UT_ControlPlane_Start(vCHdmiCec->cp_instance);
   }
   vCHdmiCec->bOpened = true;
   return VC_HDMICEC_STATUS_SUCCESS;
@@ -652,12 +654,6 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
   *handle = (int) cec;
   gVCHdmiCec->cec_hal = cec;
-  if(gVCHdmiCec->cp_instance != NULL)
-  {
-    UT_ControlPlane_RegisterCallbackOnMessage(gVCHdmiCec->cp_instance, "hdmicec/command", &ProcessMsg, (void*) cec);
-    UT_ControlPlane_Start(gVCHdmiCec->cp_instance);
-  }
-
   cec->state = HAL_STATE_READY;
 
   return HDMI_CEC_IO_SUCCESS;
