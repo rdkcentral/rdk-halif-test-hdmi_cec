@@ -24,7 +24,7 @@
 
 #include "vcomponent_hdmi_cec.h"
 #include "hdmi_cec_driver.h"
-#include "vcomponent_hdmi_cec_device.h"
+#include "vchdmicec_device.h"
 #include "ut_log.h"
 #include "ut_kvp_profile.h"
 
@@ -127,6 +127,14 @@ typedef struct
 
 
 /*Global variables*/
+
+/* TODO:
+ * HdmiCec hal functions are taking in a int handle which is a problem in 64bit platforms like in Linux PCs.
+ * When HdmiCecOpen provides a handle, the handle is lost in translation due to this explicit conversion of
+ * pointer to int. Hence the subsequent HdmiCec functions dont have a reliable way to associate the integer
+ * handle to a memory instance of the driver struct.
+ * when the  int handle is upgraded to support a void * in the future. We should re-review if we want to use a Singleton or not at that time. 
+ */
 static vCHdmiCec_t* gVCHdmiCec = NULL;
 
 const static strVal_t gPortStrVal [] = {
@@ -377,6 +385,18 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
   cec->devices_map = vCHdmiCec_Device_CreateMapFromProfile(profile_instance, "hdmicec/device_map/0");
   cec->emulated_device = vCHdmiCec_Device_Get(cec->devices_map, emulated_device);
+
+  if(cec->num_devices < 1)
+  {
+    VC_LOG_ERROR( "HdmiCecOpen: number of devices < 1" );
+    assert(cec->num_devices >= 1);
+  }
+  if(cec->devices_map == NULL)
+  {
+    VC_LOG_ERROR( "HdmiCecOpen: device_map = NULL" );
+    assert(cec->devices_map != NULL);
+  }
+
   if(cec->emulated_device == NULL)
   {
     VC_LOG_ERROR("HdmiCecOpen: Couldnt load emulated device info");
@@ -516,8 +536,7 @@ HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
   if(gVCHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
   {
     //Looks like logical address is already removed. 
-    VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Logical Address not added");
-    return HDMI_CEC_IO_NOT_ADDED;
+    return HDMI_CEC_IO_ALREADY_REMOVED;
   }
   //Reset back to 0x0F
   gVCHdmiCec->cec_hal->emulated_device->logical_address = 0x0F;

@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#include "vcomponent_hdmi_cec_device.h"
+#include "vchdmicec_device.h"
 
 
 const static strVal_t gDIStrVal [] = {

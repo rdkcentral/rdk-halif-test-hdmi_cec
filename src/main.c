@@ -70,7 +70,7 @@ extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
 
 #ifdef VCOMPONENT
-extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+extern int register_vcomponent_tests ( char* profile );
 #endif
 
 int main(int argc, char** argv)
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 	register_hdmicec_hal_sink_l2_tests ();
     }
 #ifdef VCOMPONENT
-    register_vcomponent_tests(pProfilePath, cpPort, pUrl);
+    register_vcomponent_tests(pProfilePath);
 #endif
 
     UT_run_tests();
@@ -134,11 +134,6 @@ int main(int argc, char** argv)
     if(pProfilePath != NULL)
     {
         free(pProfilePath);
-    }
-
-    if(pUrl != NULL)
-    {
-        free(pUrl);
     }
 #endif
 }
