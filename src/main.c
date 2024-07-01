@@ -83,6 +83,10 @@ int main(int argc, char** argv)
     char* pProfilePath = NULL;
     unsigned short cpPort = 8888;
     char* pUrl = NULL;
+    ut_kvp_status_t status;
+    char    deviceType[TEST_UTIL_DEVICE_TYPE_SIZE];
+    char    deviceName[TEST_UTIL_DEVICE_NAME_SIZE];
+
 
     while ((opt = getopt(argc, argv, "p:c:u:")) != -1)
     {
@@ -129,11 +133,11 @@ int main(int argc, char** argv)
     register_hdmicec_hal_l1_tests ();
 
     if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
-	register_hdmicec_hal_source_l2_tests ();
+        register_hdmicec_hal_source_l2_tests ();
     }
 
     if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
-	register_hdmicec_hal_sink_l2_tests ();
+        register_hdmicec_hal_sink_l2_tests ();
     }
 #ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath, cpPort, pUrl);
