@@ -1,8 +1,0 @@
-hdmicec:
-  Device:
-    Type: sink
-    Name: element
-
-  features:
-    # Extended Error code enum suppot for the platform
-    extendedEnumsSupported: false

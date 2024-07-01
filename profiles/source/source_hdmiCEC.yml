@@ -1,0 +1,6 @@
+hdmicec:
+  type: source
+  name: stb
+
+  features:
+    extendedEnumsSupported: false

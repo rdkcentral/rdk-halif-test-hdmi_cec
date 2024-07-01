@@ -62,16 +62,23 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdlib.h>
-#include "ut_kvp_profile.h"
-
-#define TEST_UTIL_DEVICE_TYPE_SIZE     8
-#define TEST_UTIL_DEVICE_NAME_SIZE     64
+#include <ut_log.h>
+#include <ut_kvp_profile.h>
 
 extern int register_hdmicec_hal_l1_tests( void );
-extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+extern int register_hdmicec_hal_source_l2_tests( void );
+extern int register_hdmicec_hal_sink_l2_tests( void );
 
-int main(int argc, char** argv) 
+#ifdef VCOMPONENT
+extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+#endif
+
+int main(int argc, char** argv)
 {
+    ut_kvp_status_t status;
+    char szReturnedString[UT_KVP_MAX_ELEMENT_SIZE];
+
+#ifdef VCOMPONENT
     int opt;
     char* pProfilePath = NULL;
     unsigned short cpPort = 8888;
@@ -108,31 +115,37 @@ int main(int argc, char** argv)
                 break;
         }
     }
-
+#endif
 
 
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
 
-    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/Device/Type", deviceType, TEST_UTIL_DEVICE_TYPE_SIZE);
-    if (status != UT_KVP_STATUS_SUCCESS ) {
-        UT_LOG_ERROR("Failed to get the platform type");
+    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/type", szReturnedString, UT_KVP_MAX_ELEMENT_SIZE);
+    if (status == UT_KVP_STATUS_SUCCESS ) {
+        UT_LOG_DEBUG("Device Type: %s", szReturnedString);
+    }
+    else {
+        UT_LOG_ERROR("Failed to get the platform Device Type");
         return -1;
     }
-    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/Device/Name", deviceName, TEST_UTIL_DEVICE_NAME_SIZE);
-    if (status != UT_KVP_STATUS_SUCCESS ) {
-        UT_LOG_ERROR("Failed to get the platform name");
-        return -1;
-    }
-
-    UT_LOG_DEBUG("Device Type: %s, Device Name: %s", deviceType, deviceName);
 
     register_hdmicec_hal_l1_tests ();
 
+    if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+        register_hdmicec_hal_source_l2_tests ();
+    }
+
+    if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+        register_hdmicec_hal_sink_l2_tests ();
+    }
+#ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath, cpPort, pUrl);
+#endif
 
     UT_run_tests();
 
+#ifdef VCOMPONENT
     if(pProfilePath != NULL)
     {
         free(pProfilePath);
@@ -142,6 +155,7 @@ int main(int argc, char** argv)
     {
         free(pUrl);
     }
+#endif
 }
 
 /** @} */ // End of HDMI CEC HAL Tests Main File

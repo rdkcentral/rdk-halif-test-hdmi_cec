@@ -1,8 +1,0 @@
-hdmicec:
-  Device:
-    Type: source
-    Name: xione
-
-  features:
-    # Extended Error code enum suppot for the platform
-    extendedEnumsSupported: false
