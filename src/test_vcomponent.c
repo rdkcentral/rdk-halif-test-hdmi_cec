@@ -59,6 +59,9 @@
  * 
  */
 
+
+#ifdef VCOMPONENT
+
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -149,7 +152,7 @@ int register_vcomponent_tests ( char* profile)
     return 0;
 
 }
-
+#endif
 /** @} */ // End of HDMI CEC HAL Virtual Component Tests File
 /** @} */ // End of HDMI CEC HAL Tests
 /** @} */ // End of HDMI CEC Module

@@ -1,0 +1,6 @@
+hdmicec:
+  type: sink
+  name: panel
+
+  features:
+    extendedEnumsSupported: false
