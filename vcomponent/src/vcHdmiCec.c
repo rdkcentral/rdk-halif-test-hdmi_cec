@@ -23,8 +23,8 @@
 #include <assert.h>
 #include <pthread.h>
 
-#include "vcomponent_hdmi_cec.h"
 #include "hdmi_cec_driver.h"
+#include "vcHdmiCec.h"
 #include "vcDevice.h"
 #include "vcCommand.h"
 #include "ut_kvp_profile.h"
@@ -39,31 +39,31 @@ typedef enum
   CEC_MSG_TYPE_EVENT,
   CEC_MSG_TYPE_CONFIG,
   CEC_MSG_TYPE_EXIT_REQUESTED
-} vCHdmiCec_msg_type_t;
+} vcHdmiCec_msg_type_t;
 
 typedef struct
 {
-  vCHdmiCec_msg_type_t type;
+  vcHdmiCec_msg_type_t type;
   char* message;
   uint32_t size;
-} vCHdmiCec_message_t;
+} vcHdmiCec_message_t;
 
 /**HDMI CEC HAL Data structures */
 typedef struct
 {
   unsigned short id;
   unsigned int physical_address;
-  vCHdmiCec_port_type_t type;
+  vcDevice_port_type_t type;
   bool cec_supported;
   bool arc_supported;
-} vCHdmiCec_port_info_t;
+} vcHdmiCec_port_info_t;
 
 typedef enum
 {
   HAL_STATE_CLOSED = 0,
   HAL_STATE_OPEN,
   HAL_STATE_READY
-} vCHdmiCec_hal_state_t;
+} vcHdmiCec_hal_state_t;
 
 typedef struct
 {
@@ -71,35 +71,35 @@ typedef struct
   void* rx_cb_data;
   HdmiCecTxCallback_t tx_cb_func;
   void* tx_cb_data;
-} vCHdmiCec_callbacks_t;
+} vcHdmiCec_callbacks_t;
 
 typedef struct
 {
-  vCHdmiCec_hal_state_t state;
-  struct vCHdmiCec_device_info_t* emulated_device;
+  vcHdmiCec_hal_state_t state;
+  struct vcDevice_info_t* emulated_device;
   int num_ports;
-  vCHdmiCec_port_info_t *ports;
+  vcHdmiCec_port_info_t *ports;
   int num_devices;
-  struct vCHdmiCec_device_info_t* devices_map;
-  vCHdmiCec_callbacks_t callbacks;
-  vCHdmiCec_logical_address_pool_t address_pool;
+  struct vcDevice_info_t* devices_map;
+  vcHdmiCec_callbacks_t callbacks;
+  vcDevice_logical_address_pool_t address_pool;
 
   pthread_t msg_handler_thread;
   uint32_t msg_count;
-  vCHdmiCec_message_t msg_queue[MAX_QUEUE_SIZE];
+  vcHdmiCec_message_t msg_queue[MAX_QUEUE_SIZE];
   pthread_mutex_t msg_queue_mutex;
   pthread_cond_t msg_queue_condition;
   volatile bool exit_request;
-} vCHdmiCec_hal_t;
+} vcHdmiCec_hal_t;
 
 /**Virtual Componenent Data types*/
 typedef struct
 {
-  vCHdmiCec_hal_t * cec_hal;
+  vcHdmiCec_hal_t * cec_hal;
   ut_kvp_instance_t *profile_instance;
   ut_controlPlane_instance_t *cp_instance;
   bool bOpened;
-} vCHdmiCec_t;
+} vcHdmiCec_internal_t;
 
 
 /*Global variables*/
@@ -111,16 +111,17 @@ typedef struct
  * handle to a memory instance of the driver struct.
  * when the  int handle is upgraded to support a void * in the future. We should re-review if we want to use a Singleton or not at that time. 
  */
-static vCHdmiCec_t* gVCHdmiCec = NULL;
+static vcHdmiCec_internal_t* gvcHdmiCec = NULL;
 
-const static strVal_t gPortStrVal [] = {
+const static vcCommand_strVal_t gPortStrVal [] = {
   { "in", (int)PORT_TYPE_INPUT  },
   { "out", (int)PORT_TYPE_OUTPUT },
   { "unknown", (int)PORT_TYPE_UNKNOWN }
 };
 
-static void EnqueueMessage(vCHdmiCec_message_t *msg, vCHdmiCec_hal_t *hal );
-static vCHdmiCec_message_t* DequeueMessage(vCHdmiCec_hal_t *hal);
+static void TeardownHal (vcHdmiCec_hal_t* hal);
+static void EnqueueMessage(vcHdmiCec_message_t *msg, vcHdmiCec_hal_t *hal );
+static vcHdmiCec_message_t* DequeueMessage(vcHdmiCec_hal_t *hal);
 static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data);
 static void* MessageHandler(void *data);
 
@@ -147,22 +148,22 @@ static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size)
   return kvpInstance;
 }
 
-static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_command_t *cec_cmd)
+static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t *cec_cmd)
 {
   char str[UT_KVP_MAX_ELEMENT_SIZE];
-  vCHdmiCec_opcode_t opcode = CEC_OPCODE_UNKNOWN;
-  struct vCHdmiCec_device_info_t *src, *dest;
-  vCHdmiCec_logical_address_t la;
+  vcCommand_opcode_t opcode = CEC_OPCODE_UNKNOWN;
+  struct vcDevice_info_t *src, *dest;
+  vcCommand_logical_address_t la;
 
   if(cec_cmd == NULL)
   {
     return;
   }
 
-  vCHdmiCec_Command_Clear(cec_cmd);
+  vcCommand_Clear(cec_cmd);
   ut_kvp_instance_t *kvpInstance = KVPInstanceOpen(cmd, size);
   ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_MSG_COMMAND, str, UT_KVP_MAX_ELEMENT_SIZE);
-  opcode = vCHdmiCec_Command_GetOpCode(str);
+  opcode = vcCommand_GetOpCode(str);
   if(opcode == CEC_OPCODE_UNKNOWN)
   {
     VC_LOG_ERROR("ParseCommand: Opcode[%s] Unknown", str);
@@ -171,7 +172,7 @@ static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_co
   VC_LOG("ParseCommand: Opcode[%s]", str);
 
   ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_CMD_INITIATOR, str, UT_KVP_MAX_ELEMENT_SIZE);
-  src = vCHdmiCec_Device_Get(hal->devices_map, str);
+  src = vcDevice_Get(hal->devices_map, str);
   if(src == NULL)
   {
     VC_LOG_ERROR("ParseCommand: Initiator[%s] Unknown", str);
@@ -181,7 +182,7 @@ static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_co
   ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_CMD_DESTINATION, str, UT_KVP_MAX_ELEMENT_SIZE);
   if(strcmp(str, CEC_BROADCAST) != 0)
   {
-    dest = vCHdmiCec_Device_Get(hal->devices_map, str);
+    dest = vcDevice_Get(hal->devices_map, str);
     if(dest == NULL)
     {
       VC_LOG_ERROR("ParseCommand: Destination[%s] Unknown", str);
@@ -199,7 +200,7 @@ static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_co
   {
     la = dest->logical_address;
   }
-  vCHdmiCec_Command_Format(cec_cmd, src->logical_address, la, opcode);
+  vcCommand_Format(cec_cmd, src->logical_address, la, opcode);
 
   switch (opcode)
   {
@@ -211,7 +212,7 @@ static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_co
       buf[1] = (src->physical_address >> 8) & 0x0F;
       buf[2] = (src->physical_address >> 4) & 0x0F;
       buf[3] = src->physical_address & 0x0F;
-      vCHdmiCec_Command_PushBackArray(cec_cmd, buf, sizeof(buf));
+      vcCommand_PushBackArray(cec_cmd, buf, sizeof(buf));
     }
     break;
 
@@ -226,8 +227,8 @@ static void ParseCommand(vCHdmiCec_hal_t *hal, char* cmd, int size, vCHdmiCec_co
 
 static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
 {
-  vCHdmiCec_message_t msg;
-  vCHdmiCec_t *vc = (vCHdmiCec_t*) user_data;
+  vcHdmiCec_message_t msg;
+  vcHdmiCec_internal_t *vc = (vcHdmiCec_internal_t*) user_data;
 
   if(vc == NULL || vc->cec_hal == NULL || vc->cec_hal->state != HAL_STATE_READY)
   {
@@ -257,7 +258,7 @@ static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
   EnqueueMessage(&msg, vc->cec_hal);
 }
 
-static void EnqueueMessage(vCHdmiCec_message_t *msg, vCHdmiCec_hal_t *hal )
+static void EnqueueMessage(vcHdmiCec_message_t *msg, vcHdmiCec_hal_t *hal )
 {
     pthread_mutex_lock(&hal->msg_queue_mutex);
     if (hal->msg_count < MAX_QUEUE_SIZE)
@@ -271,9 +272,9 @@ static void EnqueueMessage(vCHdmiCec_message_t *msg, vCHdmiCec_hal_t *hal )
     pthread_mutex_unlock(&hal->msg_queue_mutex);
 }
 
-static vCHdmiCec_message_t* DequeueMessage(vCHdmiCec_hal_t *hal)
+static vcHdmiCec_message_t* DequeueMessage(vcHdmiCec_hal_t *hal)
 {
-    vCHdmiCec_message_t *msg;
+    vcHdmiCec_message_t *msg;
 
     pthread_mutex_lock(&hal->msg_queue_mutex);
     while (hal->msg_count == 0)
@@ -291,21 +292,10 @@ static vCHdmiCec_message_t* DequeueMessage(vCHdmiCec_hal_t *hal)
     return msg;
 }
 
-/*
-static void ResetMessage(vCHdmiCec_message_t* msg)
-{
-  msg->size = 0;
-  if(msg->message != NULL)
-  {
-    free(msg->message);
-    msg->message = NULL;
-  }
-}
-*/
 static void* MessageHandler(void *data)
 {
-  vCHdmiCec_hal_t *hal = (vCHdmiCec_hal_t *)data;
-  vCHdmiCec_message_t *msg;
+  vcHdmiCec_hal_t *hal = (vcHdmiCec_hal_t *)data;
+  vcHdmiCec_message_t *msg;
 
   if (hal == NULL)
   {
@@ -327,11 +317,11 @@ static void* MessageHandler(void *data)
 
       case CEC_MSG_TYPE_COMMAND:
       {
-        vCHdmiCec_command_t cmd;
+        vcCommand_t cmd;
         uint32_t len;
-        uint8_t cec_data[VCHDMICEC_MAX_DATA_SIZE];
+        uint8_t cec_data[VCCOMMAND_MAX_DATA_SIZE];
         ParseCommand(hal, msg->message, msg->size, &cmd);
-        len = vCHdmiCec_Command_GetRawBytes(&cmd, cec_data, VCHDMICEC_MAX_DATA_SIZE);
+        len = vcCommand_GetRawBytes(&cmd, cec_data, VCCOMMAND_MAX_DATA_SIZE);
         if(hal->callbacks.rx_cb_func != NULL)
         {
           hal->callbacks.rx_cb_func((int)hal, hal->callbacks.rx_cb_data, cec_data, len);
@@ -362,15 +352,13 @@ static void* MessageHandler(void *data)
   return NULL;
 }
 
-void LoadPortsInfo (ut_kvp_instance_t* instance, vCHdmiCec_port_info_t* ports, unsigned int nPorts)
+void LoadPortsInfo (ut_kvp_instance_t* instance, vcHdmiCec_port_info_t* ports, unsigned int nPorts)
 {
   char *prefix = "hdmicec/ports/";
   char tmp[256];
-
-  if (instance == NULL || ports == NULL || nPorts <= 0)
-  {
-    //TODO Open Control Plane
-  }
+  
+  assert(instance != NULL);
+  assert(ports != NULL);
 
   for (int i = 0; i < nPorts; ++i)
   {
@@ -384,7 +372,7 @@ void LoadPortsInfo (ut_kvp_instance_t* instance, vCHdmiCec_port_info_t* ports, u
 
     strcpy(tmp + strlen(prefix) + length, "/type");
     ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-    ports[i].type = vCHdmiCec_GetValue(gPortStrVal, sizeof(gPortStrVal)/sizeof(strVal_t), type, (int)PORT_TYPE_UNKNOWN);
+    ports[i].type = vcCommand_GetValue(gPortStrVal, COUNT_OF(gPortStrVal), type, (int)PORT_TYPE_UNKNOWN);
 
     strcpy(tmp + strlen(prefix) + length, "/cec_supported");
     ports[i].cec_supported = ut_kvp_getBoolField(instance, tmp);
@@ -395,9 +383,9 @@ void LoadPortsInfo (ut_kvp_instance_t* instance, vCHdmiCec_port_info_t* ports, u
   }
 }
 
-void TeardownHal (vCHdmiCec_hal_t* hal)
+static void TeardownHal (vcHdmiCec_hal_t* hal)
 {
-  vCHdmiCec_message_t msg = {0};
+  vcHdmiCec_message_t msg = {0};
   if(hal == NULL)
   {
     return;
@@ -414,7 +402,7 @@ void TeardownHal (vCHdmiCec_hal_t* hal)
     }
   }
   hal->msg_handler_thread = 0;
-  vCHdmiCec_Device_DestroyMap(hal->devices_map);
+  vcDevice_DestroyMap(hal->devices_map);
 
   if(hal->ports)
   {
@@ -426,13 +414,13 @@ void TeardownHal (vCHdmiCec_hal_t* hal)
   
 }
 
-vComponent_HdmiCec_t* vComponent_HdmiCec_Initialize( void )
+vcHdmiCec_t* vcHdmiCec_Initialize( void )
 {
-  vCHdmiCec_t *result = NULL;
-  result = (vCHdmiCec_t*)malloc(sizeof(vCHdmiCec_t));
+  vcHdmiCec_internal_t *result = NULL;
+  result = (vcHdmiCec_internal_t*)malloc(sizeof(vcHdmiCec_internal_t));
   if(result == NULL)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Out of memory");
+    VC_LOG_ERROR("vcHdmiCec_Initialize: Out of memory");
     return NULL;
   }
   result->profile_instance = ut_kvp_createInstance();
@@ -441,176 +429,142 @@ vComponent_HdmiCec_t* vComponent_HdmiCec_Initialize( void )
   result->bOpened = false;
   result->cp_instance = NULL;
 
-  gVCHdmiCec = result;
-  return (vComponent_HdmiCec_t *)result;
+  gvcHdmiCec = result;
+  return (vcHdmiCec_t *)result;
 }
 
-vComponent_HdmiCec_Status_t vComponent_HdmiCec_Open( vComponent_HdmiCec_t* pVCHdmiCec, char* pProfilePath, bool enableCPMsgs )
+vcHdmiCec_Status_t vcHdmiCec_Open( vcHdmiCec_t* pvcHdmiCec, char* pProfilePath, bool enableCPMsgs )
 {
 
   ut_kvp_status_t status;
-  vCHdmiCec_t* vCHdmiCec = (vCHdmiCec_t*)pVCHdmiCec;
+  vcHdmiCec_internal_t* vcHdmiCec = (vcHdmiCec_internal_t*)pvcHdmiCec;
 
-  if(vCHdmiCec == NULL)
+  if(vcHdmiCec == NULL || vcHdmiCec != gvcHdmiCec)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle param");
-    return VC_HDMICEC_STATUS_INVALID_PARAM;
-  }
-  if(gVCHdmiCec == NULL)
-  {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Already Deinitialized");
-    return VC_HDMICEC_STATUS_NOT_INITIALIZED;
-  }
-  if(vCHdmiCec != gVCHdmiCec)
-  {
-    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Invalid handle");
+    VC_LOG_ERROR("vcHdmiCec_Open: Invalid handle");
     return VC_HDMICEC_STATUS_INVALID_HANDLE;
   }
 
-  if(vCHdmiCec->bOpened)
+  if(vcHdmiCec->bOpened)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Already Opened");
-    return VC_HDMICEC_STATUS_ALREADY_OPENED;
+    VC_LOG_ERROR("vcHdmiCec_Open: Already Opened");
+    return VC_HDMICEC_STATUS_SUCCESS;
   }
   
 if(pProfilePath == NULL)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Invalid Profile path");
+    VC_LOG_ERROR("vcHdmiCec_Open: Invalid Profile path");
     return VC_HDMICEC_STATUS_INVALID_PARAM;
   }
 
-  status = ut_kvp_open(vCHdmiCec->profile_instance, pProfilePath);
+  status = ut_kvp_open(vcHdmiCec->profile_instance, pProfilePath);
   if(status != UT_KVP_STATUS_SUCCESS)
   {
     VC_LOG_ERROR("ut_kvp_open: status: %d", status);
     assert(status == UT_KVP_STATUS_SUCCESS);
     return VC_HDMICEC_STATUS_PROFILE_READ_ERROR;
   }
-  vCHdmiCec->bOpened = false;
+  vcHdmiCec->bOpened = false;
 
   if(enableCPMsgs)
   {
-    vCHdmiCec->cp_instance = UT_ControlPlane_Init(CONTROL_PLANE_PORT);
-    assert(vCHdmiCec->cp_instance != NULL);
-    UT_ControlPlane_RegisterCallbackOnMessage(gVCHdmiCec->cp_instance, "hdmicec/command", &ProcessMsg, (void*) vCHdmiCec);
-    UT_ControlPlane_Start(vCHdmiCec->cp_instance);
+    vcHdmiCec->cp_instance = UT_ControlPlane_Init(CONTROL_PLANE_PORT);
+    assert(vcHdmiCec->cp_instance != NULL);
+    UT_ControlPlane_RegisterCallbackOnMessage(gvcHdmiCec->cp_instance, "hdmicec/command", &ProcessMsg, (void*) vcHdmiCec);
+    UT_ControlPlane_Start(vcHdmiCec->cp_instance);
   }
-  vCHdmiCec->bOpened = true;
+  vcHdmiCec->bOpened = true;
   return VC_HDMICEC_STATUS_SUCCESS;
 }
 
-vComponent_HdmiCec_Status_t vComponent_HdmiCec_Close( vComponent_HdmiCec_t* pVCHdmiCec )
+vcHdmiCec_Status_t vcHdmiCec_Close( vcHdmiCec_t* pvcHdmiCec )
 {
-  vCHdmiCec_t* vCHdmiCec = (vCHdmiCec_t*)pVCHdmiCec;
+  vcHdmiCec_internal_t* vcHdmiCec = (vcHdmiCec_internal_t*)pvcHdmiCec;
 
-  if(vCHdmiCec == NULL)
+  if(vcHdmiCec == NULL || vcHdmiCec != gvcHdmiCec)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle param");
-    return VC_HDMICEC_STATUS_INVALID_PARAM;
-  }
-
-  if(vCHdmiCec != gVCHdmiCec)
-  {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle");
+    VC_LOG_ERROR("vcHdmiCec_Close: Invalid handle");
     return VC_HDMICEC_STATUS_INVALID_HANDLE;
   }
 
-  if(gVCHdmiCec == NULL)
+  if(!vcHdmiCec->bOpened)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Already Deinitialized");
-    return VC_HDMICEC_STATUS_NOT_INITIALIZED;
-  }
-
-  if(!vCHdmiCec->bOpened)
-  {
-    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Not Opened");
+    VC_LOG_ERROR("vcHdmiCec_Close: Not Opened");
     return VC_HDMICEC_STATUS_NOT_OPENED;
   }
 
   //Should we enforce HdmiCecClose to be called before?
-  if(vCHdmiCec->cec_hal != NULL && vCHdmiCec->cec_hal->state != HAL_STATE_CLOSED)
+  if(vcHdmiCec->cec_hal != NULL && vcHdmiCec->cec_hal->state != HAL_STATE_CLOSED)
   {
-    vComponent_HdmiCec_Close(pVCHdmiCec);
+    vcHdmiCec_Close(pvcHdmiCec);
   }
-  vCHdmiCec->bOpened = false;
+  vcHdmiCec->bOpened = false;
 
   return VC_HDMICEC_STATUS_SUCCESS;
 }
 
 
-vComponent_HdmiCec_Status_t vComponent_HdmiCec_Deinitialize(vComponent_HdmiCec_t *pVCHdmiCec)
+vcHdmiCec_Status_t vcHdmiCec_Deinitialize(vcHdmiCec_t *pvcHdmiCec)
 {
-  vCHdmiCec_t* vCHdmiCec = (vCHdmiCec_t*)pVCHdmiCec;
+  vcHdmiCec_internal_t* vcHdmiCec = (vcHdmiCec_internal_t*)pvcHdmiCec;
 
-  if(vCHdmiCec == NULL)
+  if(vcHdmiCec == NULL || vcHdmiCec != gvcHdmiCec)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle param");
-    return VC_HDMICEC_STATUS_INVALID_PARAM;
-  }
-
-  if(vCHdmiCec != gVCHdmiCec)
-  {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle");
+    VC_LOG_ERROR("vcHdmiCec_Deinitialize: Invalid handle Handle");
     return VC_HDMICEC_STATUS_INVALID_HANDLE;
   }
 
-  if(gVCHdmiCec == NULL)
+  if(vcHdmiCec->bOpened)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Already Deinitialized");
-    return VC_HDMICEC_STATUS_NOT_INITIALIZED;
+    vcHdmiCec_Close(pvcHdmiCec);
   }
-
-  if(vCHdmiCec->bOpened)
+  if(vcHdmiCec->cp_instance != NULL)
   {
-    vComponent_HdmiCec_Close(pVCHdmiCec);
+    UT_ControlPlane_Exit(vcHdmiCec->cp_instance);
   }
-  if(vCHdmiCec->cp_instance != NULL)
-  {
-    UT_ControlPlane_Exit(vCHdmiCec->cp_instance);
-  }
-  ut_kvp_destroyInstance(vCHdmiCec->profile_instance);
-  free(vCHdmiCec);
-  gVCHdmiCec = NULL;
+  ut_kvp_destroyInstance(vcHdmiCec->profile_instance);
+  free(vcHdmiCec);
+  gvcHdmiCec = NULL;
   return VC_HDMICEC_STATUS_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 {
   char emulated_device[MAX_OSD_NAME_LENGTH];
-  vCHdmiCec_hal_t* cec;
+  vcHdmiCec_hal_t* cec;
   ut_kvp_instance_t *profile_instance;
-  vCHdmiCec_port_info_t* ports;
+  vcHdmiCec_port_info_t* ports;
 
   if(handle == NULL)
   {
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
-  if(gVCHdmiCec == NULL)
+  if(gvcHdmiCec == NULL)
   {
     return HDMI_CEC_IO_NOT_OPENED;
   }
 
-  if(gVCHdmiCec->cec_hal != NULL)
+  if(gvcHdmiCec->cec_hal != NULL)
   {
     return HDMI_CEC_IO_ALREADY_OPEN;
   }
 
-  cec = (vCHdmiCec_hal_t*)malloc(sizeof(vCHdmiCec_hal_t));
+  cec = (vcHdmiCec_hal_t*)malloc(sizeof(vcHdmiCec_hal_t));
   if(cec == NULL) 
   {
     VC_LOG_ERROR( "HdmiCecOpen: Out of Memory" );
     return HDMI_CEC_IO_GENERAL_ERROR;
   }
-  memset(cec, 0, sizeof(vCHdmiCec_hal_t));
+  memset(cec, 0, sizeof(vcHdmiCec_hal_t));
 
-  profile_instance = gVCHdmiCec->profile_instance;
+  profile_instance = gvcHdmiCec->profile_instance;
   assert(profile_instance != NULL);
   
   ut_kvp_getStringField(profile_instance, "hdmicec/emulated_device", emulated_device, MAX_OSD_NAME_LENGTH);
 
   cec->num_ports = ut_kvp_getUInt32Field(profile_instance, "hdmicec/number_ports");
-  ports = (vCHdmiCec_port_info_t*) malloc(sizeof(vCHdmiCec_port_info_t) * cec->num_ports);
+  ports = (vcHdmiCec_port_info_t*) malloc(sizeof(vcHdmiCec_port_info_t) * cec->num_ports);
   assert(ports != NULL);
 
   LoadPortsInfo(profile_instance, ports, cec->num_ports);
@@ -626,8 +580,8 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
   //Device Discovery and Network Topology
   cec->num_devices = ut_kvp_getUInt32Field(profile_instance, "hdmicec/number_devices");
 
-  cec->devices_map = vCHdmiCec_Device_CreateMapFromProfile(profile_instance, "hdmicec/device_map/0");
-  cec->emulated_device = vCHdmiCec_Device_Get(cec->devices_map, emulated_device);
+  cec->devices_map = vcDevice_CreateMapFromProfile(profile_instance, "hdmicec/device_map/0");
+  cec->emulated_device = vcDevice_Get(cec->devices_map, emulated_device);
 
   if(cec->num_devices < 1)
   {
@@ -647,8 +601,8 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
     TeardownHal(cec);
     return HDMI_CEC_IO_GENERAL_ERROR;
   }
-  vCHdmiCec_Device_InitLogicalAddressPool(&cec->address_pool);
-  vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(cec->devices_map, cec->emulated_device, &cec->address_pool);
+  vcDevice_InitLogicalAddressPool(&cec->address_pool);
+  vcDevice_AllocatePhysicalLogicalAddresses(cec->devices_map, cec->emulated_device, &cec->address_pool);
 
   if(cec->emulated_device->type == DEVICE_TYPE_TV)
   { 
@@ -668,11 +622,11 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
   VC_LOG("Number of devices in Network  : %d", cec->num_devices);
   VC_LOG("===========================");
 
-  vCHdmiCec_Device_PrintMap(cec->devices_map, 0);
+  vcDevice_PrintMap(cec->devices_map, 0);
   VC_LOG("=================================");
 
   *handle = (int) cec;
-  gVCHdmiCec->cec_hal = cec;
+  gvcHdmiCec->cec_hal = cec;
   cec->state = HAL_STATE_READY;
 
   return HDMI_CEC_IO_SUCCESS;
@@ -680,7 +634,7 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
 HDMI_CEC_STATUS HdmiCecClose(int handle)
 {
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecClose: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
@@ -692,8 +646,8 @@ HDMI_CEC_STATUS HdmiCecClose(int handle)
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
 
-  TeardownHal(gVCHdmiCec->cec_hal);
-  gVCHdmiCec->cec_hal = NULL;
+  TeardownHal(gvcHdmiCec->cec_hal);
+  gvcHdmiCec->cec_hal = NULL;
 
   return HDMI_CEC_IO_SUCCESS;
 }
@@ -701,178 +655,153 @@ HDMI_CEC_STATUS HdmiCecClose(int handle)
 
 HDMI_CEC_STATUS HdmiCecGetPhysicalAddress(int handle, unsigned int* physicalAddress)
 {
-
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecGetPhysicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecGetPhysicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
-
   if(physicalAddress == NULL)
   {
     VC_LOG_ERROR("HdmiCecGetPhysicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
-  *physicalAddress = gVCHdmiCec->cec_hal->emulated_device->physical_address;
+  *physicalAddress = gvcHdmiCec->cec_hal->emulated_device->physical_address;
   return HDMI_CEC_IO_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecAddLogicalAddress(int handle, int logicalAddresses)
 {
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecAddLogicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecAddLogicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
-
-  if(gVCHdmiCec->cec_hal->emulated_device->type != DEVICE_TYPE_TV || logicalAddresses != 0)
+  if(gvcHdmiCec->cec_hal->emulated_device->type != DEVICE_TYPE_TV || logicalAddresses != 0)
   {
     VC_LOG_ERROR("HdmiCecAddLogicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
-
   //ADD Logical Address only for Sink device
-  gVCHdmiCec->cec_hal->emulated_device->logical_address = logicalAddresses;
+  gvcHdmiCec->cec_hal->emulated_device->logical_address = logicalAddresses;
 
   return HDMI_CEC_IO_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
 {
-
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
-
   //Remove Logical Address only for Sink device
-  if(gVCHdmiCec->cec_hal->emulated_device->type != DEVICE_TYPE_TV || logicalAddresses != 0)
+  if(gvcHdmiCec->cec_hal->emulated_device->type != DEVICE_TYPE_TV || logicalAddresses != 0)
   {
     VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
-
-  if(gVCHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
+  if(gvcHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
   {
     //Looks like logical address is already removed. 
     return HDMI_CEC_IO_ALREADY_REMOVED;
   }
   //Reset back to 0x0F
-  gVCHdmiCec->cec_hal->emulated_device->logical_address = 0x0F;
+  gvcHdmiCec->cec_hal->emulated_device->logical_address = 0x0F;
 
   return HDMI_CEC_IO_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecGetLogicalAddress(int handle, int* logicalAddress)
 {
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecGetLogicalAddress: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecGetLogicalAddress: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
   if(logicalAddress == NULL)
   {
     VC_LOG_ERROR("HdmiCecGetLogicalAddress: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
-
-  *logicalAddress = gVCHdmiCec->cec_hal->emulated_device->logical_address;
+  *logicalAddress = gvcHdmiCec->cec_hal->emulated_device->logical_address;
 
   return HDMI_CEC_IO_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, void* data)
 {
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecSetRxCallback: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecSetRxCallback: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
-
-  gVCHdmiCec->cec_hal->callbacks.rx_cb_func = cbfunc;
-  gVCHdmiCec->cec_hal->callbacks.rx_cb_data = data;
+  gvcHdmiCec->cec_hal->callbacks.rx_cb_func = cbfunc;
+  gvcHdmiCec->cec_hal->callbacks.rx_cb_data = data;
 
   return HDMI_CEC_IO_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, void* data)
 {
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecSetTxCallback: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecSetTxCallback: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
-  gVCHdmiCec->cec_hal->callbacks.tx_cb_func = cbfunc;
-  gVCHdmiCec->cec_hal->callbacks.tx_cb_data = data;
+  gvcHdmiCec->cec_hal->callbacks.tx_cb_func = cbfunc;
+  gvcHdmiCec->cec_hal->callbacks.tx_cb_data = data;
   return HDMI_CEC_IO_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* result)
 {
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecTx: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecTx: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
-
   if(buf == NULL || len <= 0 || result == NULL)
   {
     VC_LOG_ERROR("HdmiCecTx: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
-
-  if(gVCHdmiCec->cec_hal->emulated_device->type == DEVICE_TYPE_TV && gVCHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
+  if(gvcHdmiCec->cec_hal->emulated_device->type == DEVICE_TYPE_TV && gvcHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
   {
     //If Logical Address is not set for a sink device, we cannot transmit
     VC_LOG_ERROR("HdmiCecTx: Send failed");
@@ -887,33 +816,29 @@ HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* re
   VC_LOG("==========================");
   *result = HDMI_CEC_IO_SENT_BUT_NOT_ACKD;
 
-  
   return HDMI_CEC_IO_SUCCESS;
 }
 
 HDMI_CEC_STATUS HdmiCecTxAsync(int handle, const unsigned char* buf, int len)
 {
-  if(gVCHdmiCec == NULL || gVCHdmiCec->cec_hal == NULL)
+  if(gvcHdmiCec == NULL || gvcHdmiCec->cec_hal == NULL)
   {
     VC_LOG_ERROR("HdmiCecTxAsync: Not Opened");
     return HDMI_CEC_IO_NOT_OPENED;
   }
-
   if(handle == 0)
   {
     VC_LOG_ERROR("HdmiCecTxAsync: Invalid handle");
     return HDMI_CEC_IO_INVALID_HANDLE;
   }
-
-
   if(buf == NULL || len <= 0)
   {
     VC_LOG_ERROR("HdmiCecTxAsync: Invalid Argument");
     return HDMI_CEC_IO_INVALID_ARGUMENT;
   }
 
-  if((gVCHdmiCec->cec_hal->emulated_device->type == DEVICE_TYPE_TV && gVCHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
-            || gVCHdmiCec->cec_hal->callbacks.tx_cb_func == NULL)
+  if((gvcHdmiCec->cec_hal->emulated_device->type == DEVICE_TYPE_TV && gvcHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
+            || gvcHdmiCec->cec_hal->callbacks.tx_cb_func == NULL)
   {
     //If Logical Address is not set for a sink device, we cannot transmit
     VC_LOG_ERROR("HdmiCecTxAsync: Send failed");

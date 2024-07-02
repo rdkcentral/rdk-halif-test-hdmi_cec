@@ -17,12 +17,12 @@
  * limitations under the License.
 */
 
-#ifndef __VCHDMICEC_COMMAND_H
-#define __VCHDMICEC_COMMAND_H
+#ifndef __VCCOMMAND_H
+#define __VCCOMMAND_H
 
 #include "stdint.h"
 
-#define VCHDMICEC_MAX_DATA_SIZE 64
+#define VCCOMMAND_MAX_DATA_SIZE 64
 
 #define CEC_MSG_PREFIX "hdmicec"
 
@@ -49,6 +49,7 @@
 #define CMD_REPORT_DEVICE_POWER_STATUS "ReportDevicePowerStatus"
 #define CMD_INACTIVE_SOURCE "InactiveSource"
 
+#define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
 typedef enum
 {
@@ -59,7 +60,7 @@ typedef enum
   CEC_ACTIVE_SOURCE = 0x82,
   CEC_REQUEST_ACTIVE_SOURCE = 0x85,
   CEC_INACTIVE_SOURCE = 0x9D,
-} vCHdmiCec_opcode_t;
+} vcCommand_opcode_t;
 
 typedef enum
 {
@@ -68,7 +69,7 @@ typedef enum
   CEC_POWER_STATUS_IN_TRANSITION_STANDBY_TO_ON = 0x02,
   CEC_POWER_STATUS_IN_TRANSITION_ON_TO_STANDBY = 0x03,
   CEC_POWER_STATUS_UNKNOWN                     = 0x99
-} vCHdmiCec_power_status;
+} vcCommand_power_status_t;
 
 typedef enum
 {
@@ -81,7 +82,7 @@ typedef enum
   DEVICE_TYPE_FREEUSE,
   DEVICE_TYPE_UNREGISTERED,
   DEVICE_TYPE_UNKNOWN
-} vCHdmiCec_device_type_t;
+} vcCommand_device_type_t;
 
 typedef enum
 {
@@ -103,7 +104,7 @@ typedef enum
   LOGICAL_ADDRESS_FREEUSE          = 14,
   LOGICAL_ADDRESS_UNREGISTERED     = 15,
   LOGICAL_ADDRESS_BROADCAST        = 15,
-} vCHdmiCec_logical_address_t;
+} vcCommand_logical_address_t;
 
 typedef enum
 {
@@ -114,22 +115,7 @@ typedef enum
   CEC_VERSION_1_3A = 4,
   CEC_VERSION_1_4 = 5,
   CEC_VERSION_2_0 = 6
-} vCHdmiCec_version_t;
-
-typedef enum
-{
-  PORT_TYPE_INPUT = 0,
-  PORT_TYPE_OUTPUT,
-  PORT_TYPE_UNKNOWN
-} vCHdmiCec_port_type_t;
-
-typedef enum
-{
-  POWER_STATUS_ON = 0,
-  POWER_STATUS_STANDBY,
-  POWER_STATUS_OFF,
-  POWER_STATUS_UNKNOWN
-} vCHdmiCec_power_status_t;
+} vcCommand_version_t;
 
 typedef enum
 {
@@ -161,84 +147,115 @@ typedef enum
   VENDOR_CODE_BENQ = 0x8065E9,
   VENDOR_CODE_HARMAN_KARDON = 0x9C645E,
   VENDOR_CODE_UNKNOWN = 0
-} vCHdmiCec_vendor_code_t;
+} vcCommand_vendor_code_t;
 
 
 typedef struct
 {
-  vCHdmiCec_logical_address_t initiator;
-  vCHdmiCec_logical_address_t destination;
-  vCHdmiCec_opcode_t opcode;
+  vcCommand_logical_address_t initiator;
+  vcCommand_logical_address_t destination;
+  vcCommand_opcode_t opcode;
   bool opcode_set;
-  uint8_t parameter_data[VCHDMICEC_MAX_DATA_SIZE]; 
+  uint8_t parameter_data[VCCOMMAND_MAX_DATA_SIZE]; 
   uint32_t parameter_size;
-}vCHdmiCec_command_t;
+}vcCommand_t;
 
+typedef struct
+{
+  char* str;
+  int val;
+} vcCommand_strVal_t;
 
 /**
  * @brief Clears the specified HDMI CEC command.
  *
  * Resets the command structure to its initial state.
  *
- * @param cmd Pointer to the vCHdmiCec_command_t structure to be cleared.
+ * @param cmd Pointer to the vcCommand_t structure to be cleared.
  */
-void vCHdmiCec_Command_Clear(vCHdmiCec_command_t* cmd);
+void vcCommand_Clear(vcCommand_t* cmd);
 
 /**
  * @brief Formats an HDMI CEC command.
  *
  * Sets the initiator, destination, and opcode of the specified command.
  *
- * @param cmd Pointer to the vCHdmiCec_command_t structure to be formatted.
+ * @param cmd Pointer to the vcCommand_command_t structure to be formatted.
  * @param initiator The logical address of the initiator.
  * @param destination The logical address of the destination.
  * @param opcode The opcode of the command.
  */
-void vCHdmiCec_Command_Format(vCHdmiCec_command_t* cmd,
-                                vCHdmiCec_logical_address_t initiator,
-                                vCHdmiCec_logical_address_t destination,
-                                vCHdmiCec_opcode_t opcode);
+void vcCommand_Format(vcCommand_t* cmd,
+                                vcCommand_logical_address_t initiator,
+                                vcCommand_logical_address_t destination,
+                                vcCommand_opcode_t opcode);
 
 /**
  * @brief Appends a byte of data to the HDMI CEC command.
  *
  * Adds the specified byte to the end of the command's data payload.
  *
- * @param cmd Pointer to the vCHdmiCec_command_t structure.
+ * @param cmd Pointer to the vcCommand_t structure.
  * @param data The byte of data to be appended.
  */
-void vCHdmiCec_Command_PushBackByte(vCHdmiCec_command_t* cmd, uint8_t data);
+void vcCommand_PushBackByte(vcCommand_t* cmd, uint8_t data);
 
 /**
  * @brief Appends an array of data to the HDMI CEC command.
  *
  * Adds the specified array of bytes to the end of the command's data payload.
  *
- * @param cmd Pointer to the vCHdmiCec_command_t structure.
+ * @param cmd Pointer to the vcCommand_t structure.
  * @param data Pointer to the array of data to be appended.
  * @param len The length of the array.
  */
-void vCHdmiCec_Command_PushBackArray(vCHdmiCec_command_t* cmd, uint8_t* data, uint32_t len);
+void vcCommand_PushBackArray(vcCommand_t* cmd, uint8_t* data, uint32_t len);
 
 /**
  * @brief Retrieves the raw bytes of the HDMI CEC command.
  *
  * Copies the command's data payload into the provided buffer.
  *
- * @param cmd Pointer to the vCHdmiCec_command_t structure.
+ * @param cmd Pointer to the vcCommand_t structure.
  * @param data Pointer to the buffer where the data will be copied.
  * @param len The maximum number of bytes to copy.
  * @return The number of bytes copied.
  */
-uint32_t vCHdmiCec_Command_GetRawBytes(vCHdmiCec_command_t* cmd, uint8_t* data, uint32_t len);
+uint32_t vcCommand_GetRawBytes(vcCommand_t* cmd, uint8_t* data, uint32_t len);
 
 /**
  * @brief Converts a string representation of an opcode to its corresponding value.
  *
  * @param codeStr The string representation of the opcode.
- * @return The corresponding vCHdmiCec_opcode_t value.
+ * @return The corresponding vcCommand_opcode_t value.
  */
-vCHdmiCec_opcode_t vCHdmiCec_Command_GetOpCode(char* codeStr);
+vcCommand_opcode_t vcCommand_GetOpCode(char* codeStr);
+
+/**
+ * @brief Gets the value (int - enum) associated with the string from the provided array of strVal_t.
+ *
+ * If no match is found in the array, default_val is returned.
+ *
+ * @param map Pointer to the array of strVal_t.
+ * @param length Length of the array.
+ * @param str The string to be matched.
+ * @param default_val The default value to be returned if no match is found.
+ * @return The value associated with the string, or default_val if no match is found.
+ */
+int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, char* str, int default_val);
+
+/**
+ * @brief Gets the string associated with the value (int - enum) from the provided array of strVal_t.
+ *
+ * If no match is found for the value, NULL is returned.
+ *
+ * @param map Pointer to the array of strVal_t.
+ * @param length Length of the array.
+ * @param val The value to be matched.
+ * @return The string associated with the value, or NULL if no match is found.
+ */
+char* vcCommand_GetString(const vcCommand_strVal_t *map, int length, int val);
 
 
-#endif //__VCHDMICEC_COMMAND_H
+
+#endif //__vcCommand_COMMAND_H

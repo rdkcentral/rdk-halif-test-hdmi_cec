@@ -66,18 +66,6 @@ KCFLAGS = -DVCOMPONENT
 export KCFLAGS
 endif
 
-ifeq ($(TARGET),vcomponent)
-HAL_LIB_DIR := $(ROOT_DIR)/libs
-TARGET=linux
-#YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)  -lpthread -lrt
-SRC_DIRS += $(ROOT_DIR)/vcomponent/src
-INC_DIRS += $(ROOT_DIR)/vcomponent/include $(ROOT_DIR)/ut-core/include $(ROOT_DIR)/ut-core/framework/ut-control/include
-KCFLAGS = -DVCOMPONENT
-export KCFLAGS
-endif
-
-
-
 .PHONY: clean list all
 
 export YLDFLAGS

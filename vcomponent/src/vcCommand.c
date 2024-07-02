@@ -24,19 +24,16 @@
 #include "vcCommand.h"
 #include "vcDevice.h"
 
-const static strVal_t gOpCodeStrVal [] = {
+const static vcCommand_strVal_t gOpCodeStrVal [] = {
   { CMD_IMAGE_VIEW_ON, (int) CEC_IMAGE_VIEW_ON },
   { CMD_TEXT_VIEW_ON, (int) CEC_TEXT_VIEW_ON },
   { CMD_STANDBY , (int) CEC_STANDBY },
   { CMD_ACTIVE_SOURCE, (int) CEC_ACTIVE_SOURCE },
-  { CMD_REPORT_PHYSICAL_ADDRESS, (int) CEC_REPORT_PHYSICAL_ADDRESS },
   { CMD_REQUEST_ACTIVE_SOURCE,  (int) CEC_REQUEST_ACTIVE_SOURCE },
-  { CMD_GIVE_DEVICE_POWER_STATUS, (int) CEC_GIVE_DEVICE_POWER_STATUS },
-  { CMD_REPORT_DEVICE_POWER_STATUS, (int) CEC_REPORT_DEVICE_POWER_STATUS },
   { CMD_INACTIVE_SOURCE, (int) CEC_INACTIVE_SOURCE }
 };
 
-void vCHdmiCec_Command_Clear(vCHdmiCec_command_t* cmd)
+void vcCommand_Clear(vcCommand_t* cmd)
 {
   if (cmd == NULL)
   {
@@ -47,20 +44,20 @@ void vCHdmiCec_Command_Clear(vCHdmiCec_command_t* cmd)
   cmd->destination = LOGICAL_ADDRESS_UNKNOWN;
   cmd->opcode = CEC_OPCODE_UNKNOWN;
   cmd->opcode_set = false;
-  memset(cmd->parameter_data, 0, VCHDMICEC_MAX_DATA_SIZE);
+  memset(cmd->parameter_data, 0, VCCOMMAND_MAX_DATA_SIZE);
   cmd->parameter_size = 0;
 }
 
-void vCHdmiCec_Command_Format(vCHdmiCec_command_t* cmd,
-                                vCHdmiCec_logical_address_t initiator,
-                                vCHdmiCec_logical_address_t destination,
-                                vCHdmiCec_opcode_t opcode)
+void vcCommand_Format(vcCommand_t* cmd,
+                                vcCommand_logical_address_t initiator,
+                                vcCommand_logical_address_t destination,
+                                vcCommand_opcode_t opcode)
 {
   if (cmd == NULL)
   {
     return;
   }
-  vCHdmiCec_Command_Clear(cmd);
+  vcCommand_Clear(cmd);
   cmd->initiator = initiator;
   cmd->destination = destination;
   if(opcode != CEC_OPCODE_UNKNOWN)
@@ -70,7 +67,7 @@ void vCHdmiCec_Command_Format(vCHdmiCec_command_t* cmd,
   }
 }
 
-void vCHdmiCec_Command_PushBackByte(vCHdmiCec_command_t* cmd, uint8_t data)
+void vcCommand_PushBackByte(vcCommand_t* cmd, uint8_t data)
 {
   if (cmd == NULL)
   {
@@ -79,35 +76,35 @@ void vCHdmiCec_Command_PushBackByte(vCHdmiCec_command_t* cmd, uint8_t data)
 /*
   if (cmd->initiator == LOGICAL_ADDRESS_UNKNOWN && cmd->destination == LOGICAL_ADDRESS_UNKNOWN)
   {
-    cmd->initiator   = (vCHdmiCec_logical_address_t) (data >> 4);
-    cmd->destination = (vCHdmiCec_logical_address_t) (data & 0xF);
+    cmd->initiator   = (vcCommand_logical_address_t) (data >> 4);
+    cmd->destination = (vcCommand_logical_address_t) (data & 0xF);
   }
   else if (!cmd->opcode_set)
   {  
     cmd->opcode_set = true;
-    cmd->opcode = (vCHdmiCec_opcode_t) data;
+    cmd->opcode = (vcCommand_opcode_t) data;
   }
   else */
-  if(cmd->parameter_size < VCHDMICEC_MAX_DATA_SIZE)
+  if(cmd->parameter_size < VCCOMMAND_MAX_DATA_SIZE)
   {
     cmd->parameter_data[cmd->parameter_size++] = data;
   }
 }
 
-void vCHdmiCec_Command_PushBackArray(vCHdmiCec_command_t* cmd, uint8_t* data, uint32_t len)
+void vcCommand_PushBackArray(vcCommand_t* cmd, uint8_t* data, uint32_t len)
 {  
   int i = 0;
-  if (cmd == NULL || data == NULL || len > VCHDMICEC_MAX_DATA_SIZE)
+  if (cmd == NULL || data == NULL || len > VCCOMMAND_MAX_DATA_SIZE)
   {
     return;
   }
   for (i = 0; i < len; i++)
   {
-    vCHdmiCec_Command_PushBackByte(cmd, data[i]);
+    vcCommand_PushBackByte(cmd, data[i]);
   }
 }
 
-uint32_t vCHdmiCec_Command_GetRawBytes(vCHdmiCec_command_t* cmd, uint8_t* buf, uint32_t buf_len)
+uint32_t vcCommand_GetRawBytes(vcCommand_t* cmd, uint8_t* buf, uint32_t buf_len)
 {
   uint32_t frame_ptr = 0;
   uint32_t frame_size = cmd->parameter_size + 2;
@@ -136,11 +133,52 @@ uint32_t vCHdmiCec_Command_GetRawBytes(vCHdmiCec_command_t* cmd, uint8_t* buf, u
   return frame_size;
 }
 
-vCHdmiCec_opcode_t vCHdmiCec_Command_GetOpCode(char* codeStr)
+int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, char* str, int default_val)
+{
+  int result = default_val;
+  
+  if(map == NULL || length <= 0 || str == NULL)
+  {
+    return result;
+  }
+
+  for (int i = 0;  i < length;  ++i)
+  {
+    if (!strcmp(str, map[i].str))
+    {
+        result = map[i].val;
+        break;
+    }
+  }
+  return result;
+}
+
+char* vcCommand_GetString(const vcCommand_strVal_t *map, int length, int val)
+{
+  char* result = NULL;
+  
+  if(map == NULL || length <= 0)
+  {
+    return NULL;
+  }
+
+  for (int i = 0;  i < length;  ++i)
+  {
+    if (val == (int)map[i].val)
+    {
+        result = map[i].str;
+        break;
+    }
+  }
+  return result;
+}
+
+vcCommand_opcode_t vcCommand_GetOpCode(char* codeStr)
 {
   if (codeStr == NULL)
   {
     return CEC_OPCODE_UNKNOWN;
   }
-  return ((vCHdmiCec_opcode_t) vCHdmiCec_GetValue(gOpCodeStrVal, sizeof(gOpCodeStrVal)/sizeof(strVal_t), codeStr, CEC_OPCODE_UNKNOWN));
+  return ((vcCommand_opcode_t) vcCommand_GetValue(gOpCodeStrVal, COUNT_OF(gOpCodeStrVal), codeStr, CEC_OPCODE_UNKNOWN));
 }
+
