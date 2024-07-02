@@ -21,7 +21,7 @@
 #define __VCHDMICEC_DEVICE_H
 
 #include "vcomponent_hdmi_cec.h"
-#include "vcomponent_hdmi_cec_command.h"
+#include "vcCommand.h"
 #include "ut_kvp.h"
 
 #define MAX_OSD_NAME_LENGTH 16
