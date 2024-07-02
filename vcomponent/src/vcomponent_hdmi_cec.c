@@ -25,7 +25,7 @@
 
 #include "vcomponent_hdmi_cec.h"
 #include "hdmi_cec_driver.h"
-#include "vcomponent_hdmi_cec_device.h"
+#include "vchdmicec_device.h"
 #include "vcomponent_hdmi_cec_command.h"
 #include "ut_kvp_profile.h"
 #include "ut_control_plane.h"
@@ -103,6 +103,14 @@ typedef struct
 
 
 /*Global variables*/
+
+/* TODO:
+ * HdmiCec hal functions are taking in a int handle which is a problem in 64bit platforms like in Linux PCs.
+ * When HdmiCecOpen provides a handle, the handle is lost in translation due to this explicit conversion of
+ * pointer to int. Hence the subsequent HdmiCec functions dont have a reliable way to associate the integer
+ * handle to a memory instance of the driver struct.
+ * when the  int handle is upgraded to support a void * in the future. We should re-review if we want to use a Singleton or not at that time. 
+ */
 static vCHdmiCec_t* gVCHdmiCec = NULL;
 
 const static strVal_t gPortStrVal [] = {
@@ -110,7 +118,6 @@ const static strVal_t gPortStrVal [] = {
   { "out", (int)PORT_TYPE_OUTPUT },
   { "unknown", (int)PORT_TYPE_UNKNOWN }
 };
-
 
 static void EnqueueMessage(vCHdmiCec_message_t *msg, vCHdmiCec_hal_t *hal );
 static vCHdmiCec_message_t* DequeueMessage(vCHdmiCec_hal_t *hal);
@@ -362,7 +369,7 @@ void LoadPortsInfo (ut_kvp_instance_t* instance, vCHdmiCec_port_info_t* ports, u
 
   if (instance == NULL || ports == NULL || nPorts <= 0)
   {
-    return;
+    //TODO Open Control Plane
   }
 
   for (int i = 0; i < nPorts; ++i)
@@ -446,7 +453,7 @@ vComponent_HdmiCec_Status_t vComponent_HdmiCec_Open( vComponent_HdmiCec_t* pVCHd
 
   if(vCHdmiCec == NULL)
   {
-    VC_LOG_ERROR("vComponent_HdmiCec_Initialize: Invalid handle param");
+    VC_LOG_ERROR("vComponent_HdmiCec_Deinitialize: Invalid handle param");
     return VC_HDMICEC_STATUS_INVALID_PARAM;
   }
   if(gVCHdmiCec == NULL)
@@ -479,6 +486,7 @@ if(pProfilePath == NULL)
     assert(status == UT_KVP_STATUS_SUCCESS);
     return VC_HDMICEC_STATUS_PROFILE_READ_ERROR;
   }
+  vCHdmiCec->bOpened = false;
 
   if(enableCPMsgs)
   {
@@ -522,7 +530,7 @@ vComponent_HdmiCec_Status_t vComponent_HdmiCec_Close( vComponent_HdmiCec_t* pVCH
   //Should we enforce HdmiCecClose to be called before?
   if(vCHdmiCec->cec_hal != NULL && vCHdmiCec->cec_hal->state != HAL_STATE_CLOSED)
   {
-    HdmiCecClose((int)vCHdmiCec->cec_hal);
+    vComponent_HdmiCec_Close(pVCHdmiCec);
   }
   vCHdmiCec->bOpened = false;
 
@@ -594,7 +602,6 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
     VC_LOG_ERROR( "HdmiCecOpen: Out of Memory" );
     return HDMI_CEC_IO_GENERAL_ERROR;
   }
-
   memset(cec, 0, sizeof(vCHdmiCec_hal_t));
 
   profile_instance = gVCHdmiCec->profile_instance;
@@ -621,6 +628,18 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
 
   cec->devices_map = vCHdmiCec_Device_CreateMapFromProfile(profile_instance, "hdmicec/device_map/0");
   cec->emulated_device = vCHdmiCec_Device_Get(cec->devices_map, emulated_device);
+
+  if(cec->num_devices < 1)
+  {
+    VC_LOG_ERROR( "HdmiCecOpen: number of devices < 1" );
+    assert(cec->num_devices >= 1);
+  }
+  if(cec->devices_map == NULL)
+  {
+    VC_LOG_ERROR( "HdmiCecOpen: device_map = NULL" );
+    assert(cec->devices_map != NULL);
+  }
+
   if(cec->emulated_device == NULL)
   {
     VC_LOG_ERROR("HdmiCecOpen: Couldnt load emulated device info");
@@ -759,8 +778,7 @@ HDMI_CEC_STATUS HdmiCecRemoveLogicalAddress(int handle, int logicalAddresses)
   if(gVCHdmiCec->cec_hal->emulated_device->logical_address == 0x0F)
   {
     //Looks like logical address is already removed. 
-    VC_LOG_ERROR("HdmiCecRemoveLogicalAddress: Logical Address not added");
-    return HDMI_CEC_IO_NOT_ADDED;
+    return HDMI_CEC_IO_ALREADY_REMOVED;
   }
   //Reset back to 0x0F
   gVCHdmiCec->cec_hal->emulated_device->logical_address = 0x0F;
