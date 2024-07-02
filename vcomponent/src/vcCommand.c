@@ -21,8 +21,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "vcomponent_hdmi_cec_command.h"
-#include "vcomponent_hdmi_cec_device.h"
+#include "vcCommand.h"
+#include "vcDevice.h"
 
 const static strVal_t gOpCodeStrVal [] = {
   { CMD_IMAGE_VIEW_ON, (int) CEC_IMAGE_VIEW_ON },

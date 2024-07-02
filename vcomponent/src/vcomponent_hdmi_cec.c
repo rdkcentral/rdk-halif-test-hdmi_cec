@@ -25,8 +25,8 @@
 
 #include "vcomponent_hdmi_cec.h"
 #include "hdmi_cec_driver.h"
-#include "vchdmicec_device.h"
-#include "vcomponent_hdmi_cec_command.h"
+#include "vcDevice.h"
+#include "vcCommand.h"
 #include "ut_kvp_profile.h"
 #include "ut_control_plane.h"
 

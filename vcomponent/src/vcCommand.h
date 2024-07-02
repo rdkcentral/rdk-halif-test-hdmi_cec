@@ -20,7 +20,6 @@
 #ifndef __VCHDMICEC_COMMAND_H
 #define __VCHDMICEC_COMMAND_H
 
-#include "vcomponent_hdmi_cec_command.h"
 #include "stdint.h"
 
 #define VCHDMICEC_MAX_DATA_SIZE 64

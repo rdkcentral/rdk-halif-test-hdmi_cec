@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#include "vchdmicec_device.h"
+#include "vcDevice.h"
 
 
 const static strVal_t gDIStrVal [] = {
@@ -294,7 +294,7 @@ struct vCHdmiCec_device_info_t* vCHdmiCec_Device_Get(struct vCHdmiCec_device_inf
 void vCHdmiCec_Device_InitLogicalAddressPool(vCHdmiCec_logical_address_pool_t *pool)
 {
   assert(pool != NULL);
-  for (int i = 0; i < LOGICAL_ADDRESS_MAX; i++) {
+  for (int i = 0; i <= LOGICAL_ADDRESS_BROADCAST; i++) {
       pool->allocated[i] = false;
   }
 }
@@ -350,7 +350,7 @@ void vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(struct vCHdmiCec_device_i
 
 vCHdmiCec_logical_address_t vCHdmiCec_Device_AllocateLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_device_type_t device_type)
 {
-  vCHdmiCec_logical_address_t possible_addresses[LOGICAL_ADDRESS_MAX];
+  vCHdmiCec_logical_address_t possible_addresses[LOGICAL_ADDRESS_BROADCAST];
   int num_possible_addresses = 0;
 
   assert(pool != NULL);
@@ -414,7 +414,7 @@ vCHdmiCec_logical_address_t vCHdmiCec_Device_AllocateLogicalAddress(vCHdmiCec_lo
 void vCHdmiCec_Device_ReleaseLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_logical_address_t address)
 {
   assert(pool != NULL);
-  if (address >= 0 && address <= LOGICAL_ADDRESS_MAX)
+  if (address >= 0 && address <= LOGICAL_ADDRESS_BROADCAST)
   {
     pool->allocated[address] = false;
   }
