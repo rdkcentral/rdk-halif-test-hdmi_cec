@@ -43,11 +43,10 @@
 #define CMD_TEXT_VIEW_ON "TextViewOn"
 #define CMD_STANDBY "StandBy"
 #define CMD_ACTIVE_SOURCE "ActiveSource"
-#define CMD_REPORT_PHYSICAL_ADDRESS "ReportPhysicalAddress"
 #define CMD_REQUEST_ACTIVE_SOURCE "ActiveSource"
-#define CMD_GIVE_DEVICE_POWER_STATUS "PowerStatus"
-#define CMD_REPORT_DEVICE_POWER_STATUS "ReportDevicePowerStatus"
 #define CMD_INACTIVE_SOURCE "InactiveSource"
+#define CMD_SET_OSD_NAME "SetOSDName"
+#define CMD_DATA_OSD_NAME "osd_name"
 
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
@@ -57,6 +56,7 @@ typedef enum
   CEC_IMAGE_VIEW_ON = 0x04,
   CEC_TEXT_VIEW_ON = 0x0D,
   CEC_STANDBY = 0x36,
+  CEC_SET_OSD_NAME = 0x49,
   CEC_ACTIVE_SOURCE = 0x82,
   CEC_REQUEST_ACTIVE_SOURCE = 0x85,
   CEC_INACTIVE_SOURCE = 0x9D,

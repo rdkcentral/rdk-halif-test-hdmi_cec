@@ -48,11 +48,11 @@ struct vcDevice_info_t
   /*Device Information*/
   vcCommand_device_type_t type;
   vcCommand_version_t version;
-  unsigned int physical_address;
-  unsigned int logical_address;
+  uint16_t physical_address;
+  uint8_t logical_address;
   bool active_source;
-  unsigned int vendor_id;
-  unsigned short parent_port_id;
+  uint32_t vendor_id;
+  uint16_t parent_port_id;
   vcCommand_power_status_t power_status;
   char osd_name[MAX_OSD_NAME_LENGTH];
 } vcDevice_info_t;

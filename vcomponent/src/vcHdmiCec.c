@@ -154,6 +154,7 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
   vcCommand_opcode_t opcode = CEC_OPCODE_UNKNOWN;
   struct vcDevice_info_t *src, *dest;
   vcCommand_logical_address_t la;
+  uint32_t len;
 
   if(cec_cmd == NULL)
   {
@@ -161,6 +162,7 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
   }
 
   vcCommand_Clear(cec_cmd);
+  printf("YAML: [%s]", cmd);
   ut_kvp_instance_t *kvpInstance = KVPInstanceOpen(cmd, size);
   ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_MSG_COMMAND, str, UT_KVP_MAX_ELEMENT_SIZE);
   opcode = vcCommand_GetOpCode(str);
@@ -207,12 +209,17 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
     case CEC_ACTIVE_SOURCE:
     case CEC_INACTIVE_SOURCE:
     {
-      uint8_t buf[4];
-      buf[0] = (src->physical_address >> 12) & 0x0F;
-      buf[1] = (src->physical_address >> 8) & 0x0F;
-      buf[2] = (src->physical_address >> 4) & 0x0F;
-      buf[3] = src->physical_address & 0x0F;
+      uint8_t buf[2];
+      buf[0] = (src->physical_address >> 8) & 0xFF;
+      buf[1] = src->physical_address & 0xFF;
       vcCommand_PushBackArray(cec_cmd, buf, sizeof(buf));
+    }
+    break;
+
+    case CEC_SET_OSD_NAME:
+    {
+      ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CMD_DATA_OSD_NAME, str, UT_KVP_MAX_ELEMENT_SIZE);
+      vcCommand_PushBackArray(cec_cmd, str, strlen(str));
     }
     break;
 
@@ -227,6 +234,7 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
 
 static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
 {
+  VC_LOG("ProcessMsg: [%s]", key);
   vcHdmiCec_message_t msg;
   vcHdmiCec_internal_t *vc = (vcHdmiCec_internal_t*) user_data;
 
@@ -355,7 +363,7 @@ static void* MessageHandler(void *data)
 void LoadPortsInfo (ut_kvp_instance_t* instance, vcHdmiCec_port_info_t* ports, unsigned int nPorts)
 {
   char *prefix = "hdmicec/ports/";
-  char tmp[256];
+  char tmp[UT_KVP_MAX_ELEMENT_SIZE];
   
   assert(instance != NULL);
   assert(ports != NULL);

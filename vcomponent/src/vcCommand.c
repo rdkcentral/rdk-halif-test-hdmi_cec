@@ -27,6 +27,7 @@
 const static vcCommand_strVal_t gOpCodeStrVal [] = {
   { CMD_IMAGE_VIEW_ON, (int) CEC_IMAGE_VIEW_ON },
   { CMD_TEXT_VIEW_ON, (int) CEC_TEXT_VIEW_ON },
+  { CMD_SET_OSD_NAME, (int) CEC_SET_OSD_NAME },
   { CMD_STANDBY , (int) CEC_STANDBY },
   { CMD_ACTIVE_SOURCE, (int) CEC_ACTIVE_SOURCE },
   { CMD_REQUEST_ACTIVE_SOURCE,  (int) CEC_REQUEST_ACTIVE_SOURCE },
