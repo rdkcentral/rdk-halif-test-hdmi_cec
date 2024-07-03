@@ -1,0 +1,4 @@
+hdmicec:
+  command: ActiveSource
+  initiator: SONY PS3
+  destination: TVPanel
