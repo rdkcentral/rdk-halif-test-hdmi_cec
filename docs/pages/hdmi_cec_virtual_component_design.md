@@ -373,12 +373,12 @@ With the above setup, user trigger messages shall be as in the table below.
 
 | User Trigger | Yaml Message | RX Callback Data | Action |
 | :--- | :--- | :--- | :--- |
-| ImageViewOn | <pre lang="yaml">\---  <br>hdmicec:  <br>  command: ImageViewOn  <br>  initiator: SONY PS3  <br>  destination: TVPanel</pre> | 40:04 | TV Powers On and enters display state |
-| SetOSDName | <pre lang="yaml">\---  <br>hdmicec:  <br>  command: SetOSDName  <br>  initiator: IPSTB  <br>  destination: TVPanel <br>  osd_name: osd_name: IPSTB</pre> | 80:04:49:50:53:54:42 | TV Powers On and enters display state |
-| ActiveSource | <pre lang="yaml">\---  <br>hdmicec:  <br>  command: ActiveSource  <br>  initiator: IPSTB  <br>  destination: TVPanel</pre> | 80:47:12:00 | Switches to relevant HDMI port |
-| Standby | <pre lang="yaml">\---  <br>hdmicec:  <br>  command: Standby  <br>  initiator: TVPanel  <br>  destination: Broadcast</pre> | 0F:36 | Broadcasts all devices to go to standby |
-| Hotplug | <pre lang="yaml">\---  <br>hdmicec:  <br>  command: hotplug  <br>  port: 1  <br>  connected: false</pre> | None | Reset logical address and change power state |
-| Give Physical address | <pre lang="yaml">\---  <br>hdmicec:  <br>  command: GivePhysicalAddress  <br>  initiator: Sony HomeTheatre  <br>  destination: IPSTB</pre> | 54:83 | HdmiCecTx should be triggered with ReportPhysicalAddress |
+| ImageViewOn | <pre lang="yaml">\---  &#13;hdmicec:  &#13;  command: ImageViewOn  &#13;  initiator: SONY PS3  &#13;  destination: TVPanel</pre> | 40:04 | TV Powers On and enters display state |
+| SetOSDName | <pre lang="yaml">\---  &#13;hdmicec:  &#13;  command: SetOSDName  &#13;  initiator: IPSTB  &#13;  destination: TVPanel &#13;  osd_name: osd_name: IPSTB</pre> | 80:04:49:50:53:54:42 | TV Powers On and enters display state |
+| ActiveSource | <pre lang="yaml">\---  &#13;hdmicec:  &#13;  command: ActiveSource  &#13;  initiator: IPSTB  &#13;  destination: TVPanel</pre> | 80:47:12:00 | Switches to relevant HDMI port |
+| Standby | <pre lang="yaml">\---  &#13;hdmicec:  &#13;  command: Standby  &#13;  initiator: TVPanel  &#13;  destination: Broadcast</pre> | 0F:36 | Broadcasts all devices to go to standby |
+| Hotplug | <pre lang="yaml">\---  &#13;hdmicec:  &#13;  command: hotplug  &#13;  port: 1  &#13;  connected: false</pre> | None | Reset logical address and change power state |
+| Give Physical address | <pre lang="yaml">\---  &#13;hdmicec:  &#13;  command: GivePhysicalAddress  &#13;  initiator: Sony HomeTheatre  &#13;  destination: IPSTB</pre> | 54:83 | HdmiCecTx should be triggered with ReportPhysicalAddress |
 
 ## One Touch Play Feature
 
@@ -445,7 +445,7 @@ hdmicec:
       parameters:
         size: 2
         data: [20, 0] # Physical address 2.0.0.0
-	SetOSDName:
+  SetOSDName:
      input:
       initiator: IPSTB
       destination: TVPanel
