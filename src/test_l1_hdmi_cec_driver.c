@@ -79,7 +79,6 @@
 */
 #define DEFAULT_LOGICAL_ADDRESS_STB 3
 
-#define TEST_UTIL_DEVICE_TYPE_SIZE     8
 #define TEST_UTIL_TYPE_SOURCE_VALUE     "source"
 #define TEST_UTIL_TYPE_SINK_VALUE       "sink"
 
@@ -2240,22 +2239,22 @@ static UT_test_suite_t *pSuite_panel = NULL;
 int test_hdmicec_hal_l1_register( void )
 {
     ut_kvp_status_t status;
-    char    deviceType[TEST_UTIL_DEVICE_TYPE_SIZE];
+    char    deviceType[UT_KVP_MAX_ELEMENT_SIZE];
     // Reading Extended enum support form profile file
-    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
+    extendedEnumsSupported = UT_KVP_PROFILE_GET_BOOL("hdmicec/features/extendedEnumsSupported");
     // Getting device type from profile.
-    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/Type", deviceType, TEST_UTIL_DEVICE_TYPE_SIZE);
+    status = UT_KVP_PROFILE_GET_STRING("hdmicec/Type",deviceType);
     if (status != UT_KVP_STATUS_SUCCESS ) {
         UT_LOG_ERROR("Failed to get the platform type");
         return -1;
     }
     pSuiteCommon = UT_add_suite("[L1 HDMICEC Common TestCase]", NULL, NULL);
     //Checking if the HAL under test is source device HAL
-    if (!strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
+    if (!strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
         pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
     }
     //Checking if the HAL under test is sink device HAL
-    else if(!strncmp(deviceType, TEST_UTIL_TYPE_SINK_VALUE, TEST_UTIL_DEVICE_TYPE_SIZE)) {
+    else if(!strncmp(deviceType, TEST_UTIL_TYPE_SINK_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
         pSuite_panel = UT_add_suite("[L1 HDMICEC PANEL TestCase]", NULL, NULL);
     }
     else {

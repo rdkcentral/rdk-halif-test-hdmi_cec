@@ -70,7 +70,7 @@ extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
 
 #ifdef VCOMPONENT
-extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+extern int register_vcomponent_tests ( char* profile );
 #endif
 
 int main(int argc, char** argv)
@@ -81,42 +81,27 @@ int main(int argc, char** argv)
 #ifdef VCOMPONENT
     int opt;
     char* pProfilePath = NULL;
-    unsigned short cpPort = 8888;
-    char* pUrl = NULL;
-    ut_kvp_status_t status;
-    char    deviceType[TEST_UTIL_DEVICE_TYPE_SIZE];
-    char    deviceName[TEST_UTIL_DEVICE_NAME_SIZE];
 
-
-    while ((opt = getopt(argc, argv, "p:c:u:")) != -1)
+    while ((opt = getopt(argc, argv, "u:")) != -1)
     {
         switch(opt)
         {
-            case 'p':
+            case 'u':
                 UT_LOG ("Setting Profile path [%s]\n",optarg);
                 pProfilePath = malloc(strlen(optarg) + 1);
                 strcpy(pProfilePath, optarg);
                 pProfilePath[strlen(optarg) + 1] = '\0';
                 break;
-            case 'c':
-                cpPort = atoi(optarg);
-                UT_LOG ("Setting control plane port [%d]\n",cpPort);
-                break;
 
-            case 'u':
-                UT_LOG ("Setting control plane path [%s]\n",optarg);
-                pUrl = malloc(strlen(optarg) + 1);
-                strcpy(pUrl, optarg);
-                pUrl[strlen(optarg) + 1] = '\0';
-                break;
             case '?':
             case ':':
                 UT_LOG("unknown option: %c\n", optopt);
                 break;
         }
     }
-#endif
 
+    optind = 1; //Reset argv[] element pointer for further processing
+#endif
 
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
@@ -140,7 +125,7 @@ int main(int argc, char** argv)
         register_hdmicec_hal_sink_l2_tests ();
     }
 #ifdef VCOMPONENT
-    register_vcomponent_tests(pProfilePath, cpPort, pUrl);
+    register_vcomponent_tests(pProfilePath);
 #endif
 
     UT_run_tests();
@@ -149,11 +134,6 @@ int main(int argc, char** argv)
     if(pProfilePath != NULL)
     {
         free(pProfilePath);
-    }
-
-    if(pUrl != NULL)
-    {
-        free(pUrl);
     }
 #endif
 }

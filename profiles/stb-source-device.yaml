@@ -1,6 +1,6 @@
 ---
 hdmicec:
-    emulated_device: SKY XiOne
+    emulated_device: IPSTB
     number_ports: 1
     ports:
       - id: 1
@@ -36,11 +36,11 @@ hdmicec:
               pwr_status: off
               port_id: 1
               number_children: 0
-            - name: SKY XiOne
+            - name: IPSTB
               type: PlaybackDevice
               version: 4
               active_source: true
-              vendor: SKY
+              vendor: TEST_VENDOR
               pwr_status: on
               port_id: 2
               number_children: 0
