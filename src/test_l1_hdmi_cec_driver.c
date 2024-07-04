@@ -2243,7 +2243,7 @@ int test_hdmicec_hal_l1_register( void )
     // Reading Extended enum support form profile file
     extendedEnumsSupported = UT_KVP_PROFILE_GET_BOOL("hdmicec/features/extendedEnumsSupported");
     // Getting device type from profile.
-    UT_KVP_PROFILE_GET_STRING("hdmicec/Type",deviceType);
+    UT_KVP_PROFILE_GET_STRING("hdmicec/yype",deviceType);
     if (status != UT_KVP_STATUS_SUCCESS ) {
         UT_LOG_ERROR("Failed to get the platform type");
         return -1;
