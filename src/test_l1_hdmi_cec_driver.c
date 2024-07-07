@@ -2230,6 +2230,58 @@ void test_hdmicec_hal_l1_portDisconnected_source( void )
 static UT_test_suite_t *pSuiteCommon = NULL;
 static UT_test_suite_t *pSuite_stb = NULL;
 static UT_test_suite_t *pSuite_panel = NULL;
+/**
+ * @brief Register source tests
+ * 
+ * @return int - 0 on success, otherwise failure
+ */
+
+static int test_hdmidec_hal_l1_register_source_tests(void)
+{
+    pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
+    if (NULL == pSuite_stb)
+    {
+        return -1;
+    }
+    UT_add_test( pSuite_stb, "getLogicalAddressSource_Positive", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive);
+    UT_add_test( pSuite_stb, "getLogicalAddressSource_negative", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
+    UT_add_test( pSuite_stb, "TxAsyncSource_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive);
+    UT_add_test( pSuite_stb, "TxAsyncSource_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative);
+    UT_add_test( pSuite_stb, "TxSource_Positive", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive);
+    UT_add_test( pSuite_stb, "TxSource_negative", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative);
+    //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
+    //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
+    return 0;
+}
+
+/**
+ * @brief Register sink tests
+ * 
+ * @return int - 0 on success, otherwise failure
+ */
+
+static int test_hdmidec_hal_l1_register_sink_tests(void)
+{
+    pSuite_panel = UT_add_suite("[L1 HDMICEC PANEL TestCase]", NULL, NULL);
+    if (NULL == pSuite_panel)
+    {
+        return -1;
+    }
+    UT_add_test( pSuite_panel, "addLogicalAddressSink_Positive", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive);
+    UT_add_test( pSuite_panel, "addLogicalAddressSink_negative", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative);
+    UT_add_test( pSuite_panel, "removeLogicalAddressSink_Positive", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_positive);
+    UT_add_test( pSuite_panel, "removeLogicalAddressSink_negative", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative);
+    UT_add_test( pSuite_panel, "getLogicalAddressSink_Positive", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive);
+    UT_add_test( pSuite_panel, "getLogicalAddressSink_negative", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative);
+    UT_add_test( pSuite_panel, "TxSink_Positive", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive);
+    UT_add_test( pSuite_panel, "TxSink_negative", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative);
+    UT_add_test( pSuite_panel, "TxAsyncSink_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive);
+    UT_add_test( pSuite_panel, "TxAsyncSink_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative);
+    //UT_add_test( pSuite_panel, "addLogicalAddressWithAddressInUseSink", test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice);
+    //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSink", test_hdmicec_hal_l1_portDisconnected_sink);
+    return 0;
+}
+
 
 /**
  * @brief Register the main tests for this module
@@ -2240,27 +2292,16 @@ int test_hdmicec_hal_l1_register( void )
 {
     ut_kvp_status_t status = UT_KVP_STATUS_SUCCESS;
     char    deviceType[UT_KVP_MAX_ELEMENT_SIZE];
+    int ret = 0;
     // Reading Extended enum support form profile file
     extendedEnumsSupported = UT_KVP_PROFILE_GET_BOOL("hdmicec/features/extendedEnumsSupported");
     // Getting device type from profile.
-    UT_KVP_PROFILE_GET_STRING("hdmicec/yype",deviceType);
+    UT_KVP_PROFILE_GET_STRING("hdmicec/type",deviceType);
     if (status != UT_KVP_STATUS_SUCCESS ) {
         UT_LOG_ERROR("Failed to get the platform type");
         return -1;
     }
     pSuiteCommon = UT_add_suite("[L1 HDMICEC Common TestCase]", NULL, NULL);
-    //Checking if the HAL under test is source device HAL
-    if (!strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
-        pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
-    }
-    //Checking if the HAL under test is sink device HAL
-    else if(!strncmp(deviceType, TEST_UTIL_TYPE_SINK_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
-        pSuite_panel = UT_add_suite("[L1 HDMICEC PANEL TestCase]", NULL, NULL);
-    }
-    else {
-        UT_LOG_ERROR("Platform type: %s", deviceType);
-    }
-
     if ((NULL == pSuiteCommon))
     {
         return -1;
@@ -2275,33 +2316,21 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteCommon, "setRxCallback_negative", test_hdmicec_hal_l1_setRxCallback_negative);
     UT_add_test( pSuiteCommon, "setTxCallback_Positive", test_hdmicec_hal_l1_setTxCallback_positive);
     UT_add_test( pSuiteCommon, "setTxCallback_negative", test_hdmicec_hal_l1_setTxCallback_negative);
-    //Add Source related tests to suite only if it is an STB HAL
-    if (NULL != pSuite_stb) {
-        UT_add_test( pSuite_stb, "getLogicalAddressSource_Positive", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive);
-        UT_add_test( pSuite_stb, "getLogicalAddressSource_negative", test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative);
-        UT_add_test( pSuite_stb, "TxAsyncSource_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive);
-        UT_add_test( pSuite_stb, "TxAsyncSource_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative);
-        UT_add_test( pSuite_stb, "TxSource_Positive", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive);
-        UT_add_test( pSuite_stb, "TxSource_negative", test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative);
-        //UT_add_test( pSuite_stb, "open_logical_address_unavailable_source", test_hdmicec_hal_l1_open_logical_address_unavailable_source);
-        //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSource", test_hdmicec_hal_l1_portDisconnected_source);
+    //Checking if the HAL under test is source device HAL
+    if (!strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
+        ret = test_hdmidec_hal_l1_register_source_tests();
     }
-    // Add Sink related tests to suite if it is an Panle HAL
-    if(NULL != pSuite_panel) {
-        UT_add_test( pSuite_panel, "addLogicalAddressSink_Positive", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_positive);
-        UT_add_test( pSuite_panel, "addLogicalAddressSink_negative", test_hdmicec_hal_l1_addLogicalAddress_sinkDevice_negative);
-        UT_add_test( pSuite_panel, "removeLogicalAddressSink_Positive", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_positive);
-        UT_add_test( pSuite_panel, "removeLogicalAddressSink_negative", test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative);
-        UT_add_test( pSuite_panel, "getLogicalAddressSink_Positive", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive);
-        UT_add_test( pSuite_panel, "getLogicalAddressSink_negative", test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative);
-        UT_add_test( pSuite_panel, "TxSink_Positive", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive);
-        UT_add_test( pSuite_panel, "TxSink_negative", test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative);
-        UT_add_test( pSuite_panel, "TxAsyncSink_Positive", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive);
-        UT_add_test( pSuite_panel, "TxAsyncSink_negative", test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative);
-        //UT_add_test( pSuite_panel, "addLogicalAddressWithAddressInUseSink", test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice);
-        //UT_add_test( pSuiteHdmiDisConnected, "portDisconnectedSink", test_hdmicec_hal_l1_portDisconnected_sink);
+    //Checking if the HAL under test is sink device HAL
+    else if(!strncmp(deviceType, TEST_UTIL_TYPE_SINK_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
+        ret = test_hdmidec_hal_l1_register_sink_tests ();
     }
-    return 0;
+    else {
+        UT_LOG_ERROR("Platform type: %s", deviceType);
+    }
+    if(ret <0 )
+        return -1;
+    else
+        return 0;
 }
 
 /** @} */ // End of HDMI CEC HAL Tests L1 File
