@@ -2238,6 +2238,7 @@ static UT_test_suite_t *pSuite_panel = NULL;
 
 static int test_hdmidec_hal_l1_register_source_tests(void)
 {
+    if (!strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
     pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
     if (NULL == pSuite_stb)
     {
@@ -2317,7 +2318,6 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteCommon, "setTxCallback_Positive", test_hdmicec_hal_l1_setTxCallback_positive);
     UT_add_test( pSuiteCommon, "setTxCallback_negative", test_hdmicec_hal_l1_setTxCallback_negative);
     //Checking if the HAL under test is source device HAL
-    if (!strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, UT_KVP_MAX_ELEMENT_SIZE)) {
         ret = test_hdmidec_hal_l1_register_source_tests();
     }
     //Checking if the HAL under test is sink device HAL
