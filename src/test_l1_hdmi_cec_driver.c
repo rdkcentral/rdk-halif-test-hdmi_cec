@@ -2238,6 +2238,7 @@ static UT_test_suite_t *pSuite_panel = NULL;
 
 static int test_hdmidec_hal_l1_register_source_tests(void)
 {
+    ut_kvp_status_t status = UT_KVP_STATUS_SUCCESS;
     char    deviceType[UT_KVP_MAX_ELEMENT_SIZE];
     UT_KVP_PROFILE_GET_STRING("hdmicec/type",deviceType);
     if (status != UT_KVP_STATUS_SUCCESS ) {
@@ -2275,6 +2276,7 @@ static int test_hdmidec_hal_l1_register_source_tests(void)
 static int test_hdmidec_hal_l1_register_sink_tests(void)
 {
     char    deviceType[UT_KVP_MAX_ELEMENT_SIZE];
+    ut_kvp_status_t status = UT_KVP_STATUS_SUCCESS;
     UT_KVP_PROFILE_GET_STRING("hdmicec/type",deviceType);
     if (status != UT_KVP_STATUS_SUCCESS ) {
         UT_LOG_ERROR("Failed to get the platform type");
