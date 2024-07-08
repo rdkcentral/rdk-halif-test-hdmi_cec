@@ -85,12 +85,6 @@
 /// Set the CEC sink (Display device) logical address here
 #define DEFAULT_LOGICAL_ADDRESS_PANEL 0
 
-typedef enum _eCecDeviceType {
-    cecDeviceNone     = 0,
-    cecDeviceSink     = 1,
-    cecDevicesSource  = 2,
-}eCecDeviceType_t;
-
 static int gTestGroup = 1;
 static int gTestID = 1;
 static bool extendedEnumsSupported=false;
