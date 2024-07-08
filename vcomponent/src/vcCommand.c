@@ -134,7 +134,7 @@ uint32_t vcCommand_GetRawBytes(vcCommand_t* cmd, uint8_t* buf, uint32_t buf_len)
   return frame_size;
 }
 
-int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, char* str, int default_val)
+int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, const char* str, int default_val)
 {
   int result = default_val;
   
@@ -154,7 +154,7 @@ int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, char* str, int
   return result;
 }
 
-char* vcCommand_GetString(const vcCommand_strVal_t *map, int length, int val)
+const char* vcCommand_GetString(const vcCommand_strVal_t *map, int length, int val)
 {
   char* result = NULL;
   

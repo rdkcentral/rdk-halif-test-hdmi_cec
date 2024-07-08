@@ -35,7 +35,8 @@
 
 typedef enum
 {
-  CEC_MSG_TYPE_COMMAND = 0,
+  CEC_MSG_TYPE_NONE = 0,
+  CEC_MSG_TYPE_COMMAND,
   CEC_MSG_TYPE_EVENT,
   CEC_MSG_TYPE_CONFIG,
   CEC_MSG_TYPE_EXIT_REQUESTED
@@ -120,10 +121,14 @@ const static vcCommand_strVal_t gPortStrVal [] = {
 };
 
 static void TeardownHal (vcHdmiCec_hal_t* hal);
-static void EnqueueMessage(vcHdmiCec_message_t *msg, vcHdmiCec_hal_t *hal );
-static vcHdmiCec_message_t* DequeueMessage(vcHdmiCec_hal_t *hal);
+static void EnqueueMessage(vcHdmiCec_hal_t *hal, vcHdmiCec_message_t *msg);
+static void DequeueMessage(vcHdmiCec_hal_t *hal, vcHdmiCec_message_t* out_msg);
 static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data);
 static void* MessageHandler(void *data);
+static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size);
+static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t *cec_cmd);
+static void LoadPortsInfo (ut_kvp_instance_t* instance, vcHdmiCec_port_info_t* ports, unsigned int nPorts);
+static void ResetMessage(vcHdmiCec_message_t *msg);
 
 
 static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size)
@@ -138,6 +143,9 @@ static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size)
 
   kvpInstance = ut_kvp_createInstance();
   assert(kvpInstance != NULL);
+  //ut_kvp_openMemory expects msg to be malloc'ed.
+  // The ownership of the msg is transferred to ut_kvp_openMemory.
+  // ut_kvp_destroyInstance will take care of freeing the msg.
   status = ut_kvp_openMemory(kvpInstance, msg, size);
   if (status != UT_KVP_STATUS_SUCCESS)
   {
@@ -162,7 +170,6 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
   }
 
   vcCommand_Clear(cec_cmd);
-  printf("YAML: [%s]", cmd);
   ut_kvp_instance_t *kvpInstance = KVPInstanceOpen(cmd, size);
   ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_MSG_COMMAND, str, UT_KVP_MAX_ELEMENT_SIZE);
   opcode = vcCommand_GetOpCode(str);
@@ -234,8 +241,8 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
 
 static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
 {
-  VC_LOG("ProcessMsg: [%s]", key);
   vcHdmiCec_message_t msg;
+  char *message;
   vcHdmiCec_internal_t *vc = (vcHdmiCec_internal_t*) user_data;
 
   if(vc == NULL || vc->cec_hal == NULL || vc->cec_hal->state != HAL_STATE_READY)
@@ -260,13 +267,18 @@ static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
     VC_LOG_ERROR("ProcessMsg: Unknown Message Type [%s]", key);
     return;
   }
-
-  msg.message = ut_kvp_getData(instance);
-  msg.size = strlen(msg.message);
-  EnqueueMessage(&msg, vc->cec_hal);
+  if(msg.type != CEC_MSG_TYPE_EXIT_REQUESTED)
+  {
+    message = ut_kvp_getData(instance);
+    msg.message = strdup(message);
+    //ut_kvp_openMemory expects msg to be malloc'ed.
+    //The ownership of the string is transferred to ut_kvp_openMemory. Do not free the string
+    msg.size = strlen(msg.message);
+  }
+  EnqueueMessage(vc->cec_hal, &msg);
 }
 
-static void EnqueueMessage(vcHdmiCec_message_t *msg, vcHdmiCec_hal_t *hal )
+static void EnqueueMessage(vcHdmiCec_hal_t *hal, vcHdmiCec_message_t *msg)
 {
     pthread_mutex_lock(&hal->msg_queue_mutex);
     if (hal->msg_count < MAX_QUEUE_SIZE)
@@ -280,16 +292,17 @@ static void EnqueueMessage(vcHdmiCec_message_t *msg, vcHdmiCec_hal_t *hal )
     pthread_mutex_unlock(&hal->msg_queue_mutex);
 }
 
-static vcHdmiCec_message_t* DequeueMessage(vcHdmiCec_hal_t *hal)
+static void DequeueMessage(vcHdmiCec_hal_t *hal, vcHdmiCec_message_t* out_msg)
 {
-    vcHdmiCec_message_t *msg;
-
     pthread_mutex_lock(&hal->msg_queue_mutex);
     while (hal->msg_count == 0)
     {
         pthread_cond_wait(&hal->msg_queue_condition, &hal->msg_queue_mutex);
     }
-    msg = &hal->msg_queue[0]; //Get the top
+    *out_msg = hal->msg_queue[0]; //Copy the data in top element to out var.
+    //Reset the Top
+    ResetMessage(&hal->msg_queue[0]);
+
     //Adjust the queue
     for (int i = 0; i < hal->msg_count - 1; i++)
     {
@@ -297,13 +310,22 @@ static vcHdmiCec_message_t* DequeueMessage(vcHdmiCec_hal_t *hal)
     }
     hal->msg_count--;
     pthread_mutex_unlock(&hal->msg_queue_mutex);
-    return msg;
+}
+
+static void ResetMessage(vcHdmiCec_message_t *msg)
+{
+  assert(msg != NULL);
+  //ut_kvp_openMemory expects msg to be malloc'ed. The ownership of the string is transferred to ut_kvp_openMemory.
+  // Do not free msg->message
+  msg->message = NULL;
+  msg->size = 0;
+  msg->type = CEC_MSG_TYPE_NONE;
 }
 
 static void* MessageHandler(void *data)
 {
   vcHdmiCec_hal_t *hal = (vcHdmiCec_hal_t *)data;
-  vcHdmiCec_message_t *msg;
+  vcHdmiCec_message_t msg;
 
   if (hal == NULL)
   {
@@ -312,9 +334,9 @@ static void* MessageHandler(void *data)
 
   while (!hal->exit_request)
   {
-    msg = DequeueMessage(hal);
+    DequeueMessage(hal, &msg);
 
-    switch (msg->type)
+    switch (msg.type)
     {
       case CEC_MSG_TYPE_EXIT_REQUESTED:
       {
@@ -328,7 +350,7 @@ static void* MessageHandler(void *data)
         vcCommand_t cmd;
         uint32_t len;
         uint8_t cec_data[VCCOMMAND_MAX_DATA_SIZE];
-        ParseCommand(hal, msg->message, msg->size, &cmd);
+        ParseCommand(hal, msg.message, msg.size, &cmd);
         len = vcCommand_GetRawBytes(&cmd, cec_data, VCCOMMAND_MAX_DATA_SIZE);
         if(hal->callbacks.rx_cb_func != NULL)
         {
@@ -355,12 +377,12 @@ static void* MessageHandler(void *data)
       }
       break;
     }
-    //ResetMessage(msg);
+    ResetMessage(&msg);
   }
   return NULL;
 }
 
-void LoadPortsInfo (ut_kvp_instance_t* instance, vcHdmiCec_port_info_t* ports, unsigned int nPorts)
+static void LoadPortsInfo (ut_kvp_instance_t* instance, vcHdmiCec_port_info_t* ports, unsigned int nPorts)
 {
   char *prefix = "hdmicec/ports/";
   char tmp[UT_KVP_MAX_ELEMENT_SIZE];
@@ -403,7 +425,7 @@ static void TeardownHal (vcHdmiCec_hal_t* hal)
   {
     memset(&msg, 0, sizeof(msg));
     msg.type = CEC_MSG_TYPE_EXIT_REQUESTED;
-    EnqueueMessage(&msg, hal);
+    EnqueueMessage(hal, &msg);
     if (pthread_join(hal->msg_handler_thread, NULL) != 0)
     {
       VC_LOG_ERROR("Failed to join msg_handler_thread from instance\n");
@@ -583,6 +605,7 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
   pthread_mutex_init( &cec->msg_queue_mutex, NULL );
   pthread_cond_init( &cec->msg_queue_condition, NULL );
   pthread_create(&cec->msg_handler_thread, NULL, MessageHandler, (void*) cec );
+  memset(&cec->msg_queue, 0, sizeof(vcHdmiCec_message_t) * MAX_QUEUE_SIZE);
 
 
   //Device Discovery and Network Topology

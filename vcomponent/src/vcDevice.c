@@ -73,6 +73,8 @@ const static vcCommand_strVal_t gPSStrVal [] = {
   { "unknown", (int)CEC_POWER_STATUS_UNKNOWN }
 };
 
+static void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vcDevice_info_t* device);
+
 /* Load the device info into the passed in vcDevice_info_t*
 * prefix can be 
 *   "hdmicec/device_map/0"
@@ -80,7 +82,7 @@ const static vcCommand_strVal_t gPSStrVal [] = {
 *   "hdmicec/device_map/0/children/1"
 *   "hdmicec/device_map/0/children/1/children/0"
 */
-void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vcDevice_info_t* device)
+static void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vcDevice_info_t* device)
 {
   char tmp[strlen(prefix) + 64];
   char type[32];

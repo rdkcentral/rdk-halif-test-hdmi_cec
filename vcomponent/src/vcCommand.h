@@ -242,7 +242,7 @@ vcCommand_opcode_t vcCommand_GetOpCode(char* codeStr);
  * @param default_val The default value to be returned if no match is found.
  * @return The value associated with the string, or default_val if no match is found.
  */
-int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, char* str, int default_val);
+int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, const char* str, int default_val);
 
 /**
  * @brief Gets the string associated with the value (int - enum) from the provided array of strVal_t.
@@ -254,7 +254,7 @@ int vcCommand_GetValue(const vcCommand_strVal_t *map, int length, char* str, int
  * @param val The value to be matched.
  * @return The string associated with the value, or NULL if no match is found.
  */
-char* vcCommand_GetString(const vcCommand_strVal_t *map, int length, int val);
+const char* vcCommand_GetString(const vcCommand_strVal_t *map, int length, int val);
 
 
 
