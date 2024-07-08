@@ -65,7 +65,9 @@
 #include <ut_log.h>
 #include <ut_kvp_profile.h>
 
-extern int register_hdmicec_hal_l1_tests( void );
+extern int register_hdmicec_hal_common_l1_tests( void );
+extern int register_hdmicec_hal_source_l1_tests( void );
+extern int register_hdmicec_hal_sink_l1_tests( void );
 extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
 
@@ -115,13 +117,15 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    register_hdmicec_hal_l1_tests ();
+    register_hdmicec_hal_common_l1_tests();
 
     if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+        register_hdmicec_hal_source_l1_tests ();
         register_hdmicec_hal_source_l2_tests ();
     }
 
     if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+        register_hdmicec_hal_sink_l1_tests ();
         register_hdmicec_hal_sink_l2_tests ();
     }
 #ifdef VCOMPONENT

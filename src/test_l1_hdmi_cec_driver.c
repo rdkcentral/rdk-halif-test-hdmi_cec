@@ -2236,21 +2236,8 @@ static UT_test_suite_t *pSuite_panel = NULL;
  * @return int - 0 on success, otherwise failure
  */
 
-static int test_hdmidec_hal_l1_register_source_tests(void)
+int test_hdmidec_hal_l1_register_source_tests(void)
 {
-    ut_kvp_status_t status = UT_KVP_STATUS_SUCCESS;
-    char    deviceType[UT_KVP_MAX_ELEMENT_SIZE];
-    UT_KVP_PROFILE_GET_STRING("hdmicec/type",deviceType);
-    if (status != UT_KVP_STATUS_SUCCESS ) {
-        UT_LOG_ERROR("Failed to get the platform type");
-        return -1;
-    }
-    UT_LOG("Platform type %s",deviceType);
-    //Check if the device is Source device
-    if (strncmp(deviceType, TEST_UTIL_TYPE_SOURCE_VALUE, UT_KVP_MAX_ELEMENT_SIZE))
-    {
-        return -1;
-    }
     pSuite_stb = UT_add_suite("[L1 HDMICEC STB TestCase]", NULL, NULL);
     if (NULL == pSuite_stb)
     {
@@ -2273,21 +2260,8 @@ static int test_hdmidec_hal_l1_register_source_tests(void)
  * @return int - 0 on success, otherwise failure
  */
 
-static int test_hdmidec_hal_l1_register_sink_tests(void)
+int test_hdmidec_hal_l1_register_sink_tests(void)
 {
-    char    deviceType[UT_KVP_MAX_ELEMENT_SIZE];
-    ut_kvp_status_t status = UT_KVP_STATUS_SUCCESS;
-    UT_KVP_PROFILE_GET_STRING("hdmicec/type",deviceType);
-    if (status != UT_KVP_STATUS_SUCCESS ) {
-        UT_LOG_ERROR("Failed to get the platform type");
-        return -1;
-    }
-    UT_LOG("Platform type %s",deviceType);
-    //Check if the device is Sink device.
-    if(strncmp(deviceType, TEST_UTIL_TYPE_SINK_VALUE, UT_KVP_MAX_ELEMENT_SIZE))
-    {
-        return -1;
-    }
     pSuite_panel = UT_add_suite("[L1 HDMICEC PANEL TestCase]", NULL, NULL);
     if (NULL == pSuite_panel)
     {
@@ -2314,10 +2288,8 @@ static int test_hdmidec_hal_l1_register_sink_tests(void)
  *
  * @return int - 0 on success, otherwise failure
  */
-int test_hdmicec_hal_l1_register( void )
+int test_hdmicec_hal_l1_register_common_tests( void )
 {
-    ut_kvp_status_t status = UT_KVP_STATUS_SUCCESS;
-    int ret = 0;
     // Reading Extended enum support form profile file
     extendedEnumsSupported = UT_KVP_PROFILE_GET_BOOL("hdmicec/features/extendedEnumsSupported");
     // Getting device type from profile.
@@ -2337,17 +2309,6 @@ int test_hdmicec_hal_l1_register( void )
     UT_add_test( pSuiteCommon, "setTxCallback_Positive", test_hdmicec_hal_l1_setTxCallback_positive);
     UT_add_test( pSuiteCommon, "setTxCallback_negative", test_hdmicec_hal_l1_setTxCallback_negative);
     //Adding source tests
-    ret = test_hdmidec_hal_l1_register_source_tests();
-    if(ret <0 )
-    {
-        UT_LOG_ERROR("Source test register fialed.");
-    }
-    //Adding Sink tests
-    ret = test_hdmidec_hal_l1_register_sink_tests ();
-    if(ret <0 )
-    {
-        UT_LOG_ERROR("Sink test register fialed.");
-    }
     return 0;
 }
 
