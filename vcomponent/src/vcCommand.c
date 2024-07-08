@@ -38,6 +38,7 @@ void vcCommand_Clear(vcCommand_t* cmd)
 {
   if (cmd == NULL)
   {
+    VC_LOG("vcCommand_Clear: cmd NULL");
     return;
   }
 
@@ -56,6 +57,7 @@ void vcCommand_Format(vcCommand_t* cmd,
 {
   if (cmd == NULL)
   {
+    VC_LOG("vcCommand_Format: cmd NULL");
     return;
   }
   vcCommand_Clear(cmd);
@@ -72,6 +74,7 @@ void vcCommand_PushBackByte(vcCommand_t* cmd, uint8_t data)
 {
   if (cmd == NULL)
   {
+    VC_LOG("vcCommand_PushBackByte: cmd NULL");
     return;
   }
 /*
@@ -95,8 +98,13 @@ void vcCommand_PushBackByte(vcCommand_t* cmd, uint8_t data)
 void vcCommand_PushBackArray(vcCommand_t* cmd, uint8_t* data, uint32_t len)
 {  
   int i = 0;
-  if (cmd == NULL || data == NULL || len > VCCOMMAND_MAX_DATA_SIZE)
+  if (cmd == NULL)
   {
+    VC_LOG("vcCommand_PushBackArray: cmd NULL");
+  }
+  if(data == NULL || len > VCCOMMAND_MAX_DATA_SIZE)
+  {
+    VC_LOG("vcCommand_PushBackArray: data invalid");
     return;
   }
   for (i = 0; i < len; i++)
@@ -112,6 +120,7 @@ uint32_t vcCommand_GetRawBytes(vcCommand_t* cmd, uint8_t* buf, uint32_t buf_len)
 
   if ( cmd == NULL )
   {
+    VC_LOG("vcCommand_GetRawBytes: cmd NULL");
     return 0;
   }
 

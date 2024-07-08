@@ -87,13 +87,10 @@ static void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vc
   char tmp[strlen(prefix) + 64];
   char type[32];
 
-  if (device == NULL || instance == NULL || prefix == NULL)
-  {
-    assert(device != NULL);
-    assert(instance != NULL);
-    assert(prefix != NULL);
-    return;
-  }
+  assert(device != NULL);
+  assert(instance != NULL);
+  assert(prefix != NULL);
+
   strcpy(tmp, prefix);
 
   strcpy(tmp + strlen(prefix), "/name");
@@ -127,10 +124,15 @@ static void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vc
 struct vcDevice_info_t* vcDevice_CreateMapFromProfile (ut_kvp_instance_t* instance, char* profile_prefix)
 {
   struct vcDevice_info_t *device;
-  if(instance == NULL || profile_prefix == NULL )
+  if(instance == NULL )
   {
-    assert(instance != NULL);
-    assert(profile_prefix != NULL);
+    VC_LOG("vcDevice_CreateMapFromProfile: instance NULL");
+    return NULL;
+  }
+
+  if(profile_prefix == NULL)
+  {
+    VC_LOG("vcDevice_CreateMapFromProfile: profile_prefix NULL");
     return NULL;
   }
 
@@ -140,7 +142,7 @@ struct vcDevice_info_t* vcDevice_CreateMapFromProfile (ut_kvp_instance_t* instan
   LoadDeviceInfo(instance, profile_prefix, device);
   for(int j=0; j < device->number_children; j++)
   {
-    char tmp[strlen(profile_prefix) + 128];
+    char tmp[UT_KVP_MAX_ELEMENT_SIZE];
     strcpy(tmp, profile_prefix);
     strcpy(tmp + strlen(profile_prefix), "/children/");
     int length = snprintf( NULL, 0, "%d", j );
@@ -194,8 +196,8 @@ void vcDevice_Reset(struct vcDevice_info_t* device)
 {
   if(device == NULL)
   {
+    VC_LOG("vcDevice_Reset: device NULL");
     assert(device != NULL);
-    return;
   }
   device->active_source = false;
   device->logical_address = 0x0F;
@@ -209,10 +211,14 @@ void vcDevice_Reset(struct vcDevice_info_t* device)
 
 void vcDevice_InsertChild(struct vcDevice_info_t* parent, struct vcDevice_info_t* child)
 {
-  if (parent == NULL || child == NULL)
+  if(parent == NULL)
   {
-    assert(parent != NULL);
-    assert(child != NULL);
+    VC_LOG("vcDevice_InsertChild: parent NULL");
+    return;
+  }
+  if(child == NULL)
+  {
+    VC_LOG("vcDevice_InsertChild: child NULL");
     return;
   }
 
@@ -233,12 +239,19 @@ void vcDevice_RemoveChild(struct vcDevice_info_t* map, char* name)
   struct vcDevice_info_t* tmp;
   struct vcDevice_info_t* prev;
 
-  if(map == NULL || name == NULL)
+  if(map == NULL)
   {
+    VC_LOG("vcDevice_RemoveChild: map NULL");
+    return;
+  }
+  if(name == NULL)
+  {
+    VC_LOG("vcDevice_RemoveChild: name NULL");
     return;
   }
   if(map->first_child == NULL)
   {
+    VC_LOG("vcDevice_RemoveChild: first_child NULL");
     return;
   }
 
@@ -275,8 +288,15 @@ void vcDevice_RemoveChild(struct vcDevice_info_t* map, char* name)
 struct vcDevice_info_t* vcDevice_Get(struct vcDevice_info_t* map, char* name)
 {
   struct vcDevice_info_t* device;
-  if(map == NULL || name == NULL)
+
+  if(map == NULL)
   {
+    VC_LOG("vcDevice_Get: map NULL");
+    return NULL;
+  }
+  if(name == NULL)
+  {
+    VC_LOG("vcDevice_Get: name NULL");
     return NULL;
   }
   if(strcmp(map->osd_name, name) == 0)
@@ -293,7 +313,12 @@ struct vcDevice_info_t* vcDevice_Get(struct vcDevice_info_t* map, char* name)
 
 void vcDevice_InitLogicalAddressPool(vcDevice_logical_address_pool_t *pool)
 {
-  assert(pool != NULL);
+  if(pool == NULL)
+  {
+    VC_LOG("vcDevice_InitLogicalAddressPool: pool NULL");
+    assert(pool != NULL);
+  }
+
   for (int i = 0; i <= LOGICAL_ADDRESS_BROADCAST; i++) {
       pool->allocated[i] = false;
   }
@@ -302,7 +327,17 @@ void vcDevice_InitLogicalAddressPool(vcDevice_logical_address_pool_t *pool)
 void vcDevice_AllocatePhysicalLogicalAddresses(struct vcDevice_info_t * map, struct vcDevice_info_t * emulated_device, vcDevice_logical_address_pool_t* pool)
 {
   unsigned char physicalAddress[4];
-  if(map == NULL || emulated_device == NULL || pool == NULL)
+  if(emulated_device == NULL)
+  {
+    VC_LOG("vcDevice_AllocatePhysicalLogicalAddresses: emulated_device NULL");
+    return;
+  }
+  if(pool == NULL)
+  {
+    VC_LOG("vcDevice_AllocatePhysicalLogicalAddresses: pool NULL");
+    assert(pool != NULL);
+  }
+  if(map == NULL)
   {
     return;
   }
