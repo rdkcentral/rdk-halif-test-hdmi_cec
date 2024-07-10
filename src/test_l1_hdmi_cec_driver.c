@@ -503,8 +503,8 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
 
-    unsigned int maxVal = (((0x04 &0xF0 ) << 20)|( (0x04 &0x0F ) << 16) |((0x04 & 0xF0) << 4)  | (0x04 & 0x0F));
-    //Max possible physical address is 4.4.4.4
+    unsigned int maxVal = (((0x0F &0xF0 ) << 20)|( (0x0F &0x0F ) << 16) |((0x0F & 0xF0) << 4)  | (0x0F & 0x0F));
+    //Max possible physical address is f.f.f.f
     if (physicalAddress>maxVal) {
         UT_FAIL ("physicalAddress miss match failed");
     }
@@ -847,7 +847,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_sinkDevice_negative( void )
     result = HdmiCecRemoveLogicalAddress( 0, logicalAddress );
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
     
-    result = HdmiCecRemoveLogicalAddress( handle, 0xF );
+    result = HdmiCecRemoveLogicalAddress( handle, 0x10 );
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
     result = HdmiCecRemoveLogicalAddress( handle,  -1 );
