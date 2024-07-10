@@ -1,0 +1,5 @@
+hdmicec:
+  command: SetOSDName
+  initiator: IPSTB
+  destination: TVPanel
+  osd_name: IPSTB                     

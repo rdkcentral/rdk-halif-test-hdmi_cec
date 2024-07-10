@@ -22,10 +22,9 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#include "vchdmicec_device.h"
+#include "vcDevice.h"
 
-
-const static strVal_t gDIStrVal [] = {
+const static vcCommand_strVal_t gDIStrVal [] = {
   { "TV", (int) DEVICE_TYPE_TV },
   { "PlaybackDevice", (int) DEVICE_TYPE_PLAYBACK },
   { "AudioSystem" , (int) DEVICE_TYPE_AUDIO_SYSTEM },
@@ -37,7 +36,7 @@ const static strVal_t gDIStrVal [] = {
   { "Unknown", (int) DEVICE_TYPE_UNKNOWN }
 };
 
-const static strVal_t gVCStrVal [] = {
+const static vcCommand_strVal_t gVCStrVal [] = {
   {"TOSHIBA", VENDOR_CODE_TOSHIBA},
   {"SAMSUNG", VENDOR_CODE_SAMSUNG},
   {"DENON", VENDOR_CODE_DENON},
@@ -68,32 +67,30 @@ const static strVal_t gVCStrVal [] = {
   {"UNKNOWN", VENDOR_CODE_UNKNOWN},
   };
 
-const static strVal_t gPSStrVal [] = {
-  { "on", (int)POWER_STATUS_ON  },
-  { "off", (int)POWER_STATUS_OFF  },
-  { "standby", (int)POWER_STATUS_STANDBY },
-  { "unknown", (int)POWER_STATUS_UNKNOWN }
+const static vcCommand_strVal_t gPSStrVal [] = {
+  { "on", (int)CEC_POWER_STATUS_ON  },
+  { "standby", (int)CEC_POWER_STATUS_STANDBY },
+  { "unknown", (int)CEC_POWER_STATUS_UNKNOWN }
 };
 
-/* Load the device info into the passed in vCHdmiCec_device_info_t*
+static void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vcDevice_info_t* device);
+
+/* Load the device info into the passed in vcDevice_info_t*
 * prefix can be 
 *   "hdmicec/device_map/0"
 *   "hdmicec/device_map/0/children/0"
 *   "hdmicec/device_map/0/children/1"
 *   "hdmicec/device_map/0/children/1/children/0"
 */
-void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vCHdmiCec_device_info_t* device)
+static void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vcDevice_info_t* device)
 {
   char tmp[strlen(prefix) + 64];
   char type[32];
 
-  if (device == NULL || instance == NULL || prefix == NULL)
-  {
-    assert(device != NULL);
-    assert(instance != NULL);
-    assert(prefix != NULL);
-    return;
-  }
+  assert(device != NULL);
+  assert(instance != NULL);
+  assert(prefix != NULL);
+
   strcpy(tmp, prefix);
 
   strcpy(tmp + strlen(prefix), "/name");
@@ -104,69 +101,74 @@ void LoadDeviceInfo (ut_kvp_instance_t* instance, char* prefix, struct vCHdmiCec
 
   strcpy(tmp + strlen(prefix), "/pwr_status");
   ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-  device->power_status = vCHdmiCec_GetValue(gPSStrVal, sizeof(gPSStrVal)/sizeof(strVal_t), type, (int)POWER_STATUS_UNKNOWN);
+  device->power_status = vcCommand_GetValue(gPSStrVal, COUNT_OF(gPSStrVal), type, (int)CEC_POWER_STATUS_UNKNOWN);
 
   strcpy(tmp + strlen(prefix), "/version");
-  device->version = (vCHdmiCec_version_t) ut_kvp_getUInt32Field(instance, tmp);
+  device->version = (vcCommand_version_t) ut_kvp_getUInt32Field(instance, tmp);
 
   strcpy(tmp + strlen(prefix), "/vendor");
   ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-  device->vendor_id = vCHdmiCec_GetValue(gVCStrVal, sizeof(gVCStrVal)/sizeof(strVal_t), type, (int)VENDOR_CODE_UNKNOWN);
+  device->vendor_id = vcCommand_GetValue(gVCStrVal, COUNT_OF(gVCStrVal), type, (int)VENDOR_CODE_UNKNOWN);
 
   strcpy(tmp + strlen(prefix), "/type");
   ut_kvp_getStringField(instance, tmp, type, sizeof(type));
-  device->type = vCHdmiCec_GetValue(gDIStrVal, sizeof(gDIStrVal)/sizeof(strVal_t), type, (int)DEVICE_TYPE_UNKNOWN);
+  device->type = vcCommand_GetValue(gDIStrVal, COUNT_OF(gDIStrVal), type, (int)DEVICE_TYPE_UNKNOWN);
 
   strcpy(tmp + strlen(prefix), "/port_id");
   device->parent_port_id = ut_kvp_getUInt32Field(instance, tmp);
 
   strcpy(tmp + strlen(prefix), "/number_children");
-  device->number_children = (vCHdmiCec_version_t) ut_kvp_getUInt32Field(instance, tmp);
+  device->number_children = (vcCommand_version_t) ut_kvp_getUInt32Field(instance, tmp);
 }
 
-struct vCHdmiCec_device_info_t* vCHdmiCec_Device_CreateMapFromProfile (ut_kvp_instance_t* instance, char* profile_prefix)
+struct vcDevice_info_t* vcDevice_CreateMapFromProfile (ut_kvp_instance_t* instance, char* profile_prefix)
 {
-  struct vCHdmiCec_device_info_t *device;
-  if(instance == NULL || profile_prefix == NULL )
+  struct vcDevice_info_t *device;
+  if(instance == NULL )
   {
-    assert(instance != NULL);
-    assert(profile_prefix != NULL);
+    VC_LOG("vcDevice_CreateMapFromProfile: instance NULL");
     return NULL;
   }
 
-  device = (struct vCHdmiCec_device_info_t *)malloc(sizeof(struct vCHdmiCec_device_info_t));
+  if(profile_prefix == NULL)
+  {
+    VC_LOG("vcDevice_CreateMapFromProfile: profile_prefix NULL");
+    return NULL;
+  }
+
+  device = (struct vcDevice_info_t *)malloc(sizeof(struct vcDevice_info_t));
   assert(device != NULL);
-  vCHdmiCec_Device_Reset(device);
+  vcDevice_Reset(device);
   LoadDeviceInfo(instance, profile_prefix, device);
   for(int j=0; j < device->number_children; j++)
   {
-    char tmp[strlen(profile_prefix) + 128];
+    char tmp[UT_KVP_MAX_ELEMENT_SIZE];
     strcpy(tmp, profile_prefix);
     strcpy(tmp + strlen(profile_prefix), "/children/");
     int length = snprintf( NULL, 0, "%d", j );
     snprintf( tmp + strlen(tmp) , length + 1, "%d", j );
 
-    struct vCHdmiCec_device_info_t *child = vCHdmiCec_Device_CreateMapFromProfile(instance, tmp);
+    struct vcDevice_info_t *child = vcDevice_CreateMapFromProfile(instance, tmp);
     assert(child != NULL);
-    vCHdmiCec_Device_InsertChild(device, child);
+    vcDevice_InsertChild(device, child);
   }
   return device;
 }
 
-void vCHdmiCec_Device_DestroyMap(struct vCHdmiCec_device_info_t* map)
+void vcDevice_DestroyMap(struct vcDevice_info_t* map)
 {
   if(map == NULL)
   {
     return;
   }
 
-  vCHdmiCec_Device_DestroyMap(map->first_child);
-  vCHdmiCec_Device_DestroyMap(map->next_sibling);
+  vcDevice_DestroyMap(map->first_child);
+  vcDevice_DestroyMap(map->next_sibling);
 
   free(map);
 }
 
-void vCHdmiCec_Device_PrintMap(struct vCHdmiCec_device_info_t* map, int level)
+void vcDevice_PrintMap(struct vcDevice_info_t* map, int level)
 {
   unsigned char physicalAddress[4];
   if(map == NULL)
@@ -180,22 +182,22 @@ void vCHdmiCec_Device_PrintMap(struct vCHdmiCec_device_info_t* map, int level)
 
   VC_LOG(">>>>>>>>>>>> >>>>>>>>>> >>>>> >>>> >>> >> >");
   VC_LOG("%*cDevice          : %s", level*4,' ', map->osd_name);
-  VC_LOG("%*cType            : %s", level*4,' ', vCHdmiCec_GetString(gDIStrVal, sizeof(gDIStrVal)/sizeof(strVal_t), map->type));
-  VC_LOG("%*cPwr Status      : %s", level*4,' ', vCHdmiCec_GetString(gPSStrVal, sizeof(gPSStrVal)/sizeof(strVal_t), map->power_status));
+  VC_LOG("%*cType            : %s", level*4,' ', vcCommand_GetString(gDIStrVal, COUNT_OF(gDIStrVal), map->type));
+  VC_LOG("%*cPwr Status      : %s", level*4,' ', vcCommand_GetString(gPSStrVal, COUNT_OF(gPSStrVal), map->power_status));
   VC_LOG("%*cPhysical Address: %d.%d.%d.%d", level*4,' ', physicalAddress[0], physicalAddress[1], physicalAddress[2], physicalAddress[3]);
   VC_LOG("%*cLogical Address : %d", level*4,' ',map->logical_address);
   VC_LOG("-------------------------------------------");
 
-  vCHdmiCec_Device_PrintMap(map->next_sibling, level);
-  vCHdmiCec_Device_PrintMap(map->first_child, level +1);
+  vcDevice_PrintMap(map->next_sibling, level);
+  vcDevice_PrintMap(map->first_child, level +1);
 }
 
-void vCHdmiCec_Device_Reset(struct vCHdmiCec_device_info_t* device)
+void vcDevice_Reset(struct vcDevice_info_t* device)
 {
   if(device == NULL)
   {
+    VC_LOG("vcDevice_Reset: device NULL");
     assert(device != NULL);
-    return;
   }
   device->active_source = false;
   device->logical_address = 0x0F;
@@ -207,12 +209,16 @@ void vCHdmiCec_Device_Reset(struct vCHdmiCec_device_info_t* device)
   device->number_children = 0;
 }
 
-void vCHdmiCec_Device_InsertChild(struct vCHdmiCec_device_info_t* parent, struct vCHdmiCec_device_info_t* child)
+void vcDevice_InsertChild(struct vcDevice_info_t* parent, struct vcDevice_info_t* child)
 {
-  if (parent == NULL || child == NULL)
+  if(parent == NULL)
   {
-    assert(parent != NULL);
-    assert(child != NULL);
+    VC_LOG("vcDevice_InsertChild: parent NULL");
+    return;
+  }
+  if(child == NULL)
+  {
+    VC_LOG("vcDevice_InsertChild: child NULL");
     return;
   }
 
@@ -228,17 +234,24 @@ void vCHdmiCec_Device_InsertChild(struct vCHdmiCec_device_info_t* parent, struct
   }
 }
 
-void vCHdmiCec_Device_RemoveChild(struct vCHdmiCec_device_info_t* map, char* name)
+void vcDevice_RemoveChild(struct vcDevice_info_t* map, char* name)
 {
-  struct vCHdmiCec_device_info_t* tmp;
-  struct vCHdmiCec_device_info_t* prev;
+  struct vcDevice_info_t* tmp;
+  struct vcDevice_info_t* prev;
 
-  if(map == NULL || name == NULL)
+  if(map == NULL)
   {
+    VC_LOG("vcDevice_RemoveChild: map NULL");
+    return;
+  }
+  if(name == NULL)
+  {
+    VC_LOG("vcDevice_RemoveChild: name NULL");
     return;
   }
   if(map->first_child == NULL)
   {
+    VC_LOG("vcDevice_RemoveChild: first_child NULL");
     return;
   }
 
@@ -269,40 +282,62 @@ void vCHdmiCec_Device_RemoveChild(struct vCHdmiCec_device_info_t* map, char* nam
     prev->next_sibling = tmp->next_sibling;
   }
   //Remove the entire tree under this device.
-  vCHdmiCec_Device_DestroyMap(tmp);
+  vcDevice_DestroyMap(tmp);
 }
 
-struct vCHdmiCec_device_info_t* vCHdmiCec_Device_Get(struct vCHdmiCec_device_info_t* map, char* name)
+struct vcDevice_info_t* vcDevice_Get(struct vcDevice_info_t* map, char* name)
 {
-  struct vCHdmiCec_device_info_t* device;
-  if(map == NULL || name == NULL)
+  struct vcDevice_info_t* device;
+
+  if(map == NULL)
   {
+    VC_LOG("vcDevice_Get: map NULL");
+    return NULL;
+  }
+  if(name == NULL)
+  {
+    VC_LOG("vcDevice_Get: name NULL");
     return NULL;
   }
   if(strcmp(map->osd_name, name) == 0)
   {
     return map;
   }
-  device = vCHdmiCec_Device_Get(map->first_child, name);
+  device = vcDevice_Get(map->first_child, name);
   if(device != NULL)
   {
     return device;
   }
-  return vCHdmiCec_Device_Get(map->next_sibling, name);
+  return vcDevice_Get(map->next_sibling, name);
 }
 
-void vCHdmiCec_Device_InitLogicalAddressPool(vCHdmiCec_logical_address_pool_t *pool)
+void vcDevice_InitLogicalAddressPool(vcDevice_logical_address_pool_t *pool)
 {
-  assert(pool != NULL);
-  for (int i = 0; i < LOGICAL_ADDRESS_MAX; i++) {
+  if(pool == NULL)
+  {
+    VC_LOG("vcDevice_InitLogicalAddressPool: pool NULL");
+    assert(pool != NULL);
+  }
+
+  for (int i = 0; i <= LOGICAL_ADDRESS_BROADCAST; i++) {
       pool->allocated[i] = false;
   }
 }
 
-void vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(struct vCHdmiCec_device_info_t * map, struct vCHdmiCec_device_info_t * emulated_device, vCHdmiCec_logical_address_pool_t* pool)
+void vcDevice_AllocatePhysicalLogicalAddresses(struct vcDevice_info_t * map, struct vcDevice_info_t * emulated_device, vcDevice_logical_address_pool_t* pool)
 {
   unsigned char physicalAddress[4];
-  if(map == NULL || emulated_device == NULL || pool == NULL)
+  if(emulated_device == NULL)
+  {
+    VC_LOG("vcDevice_AllocatePhysicalLogicalAddresses: emulated_device NULL");
+    return;
+  }
+  if(pool == NULL)
+  {
+    VC_LOG("vcDevice_AllocatePhysicalLogicalAddresses: pool NULL");
+    assert(pool != NULL);
+  }
+  if(map == NULL)
   {
     return;
   }
@@ -341,16 +376,16 @@ void vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(struct vCHdmiCec_device_i
   }
   else
   {
-      map->logical_address = vCHdmiCec_Device_AllocateLogicalAddress(pool, map->type);
+      map->logical_address = vcDevice_AllocateLogicalAddress(pool, map->type);
   }
 
-  vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(map->next_sibling, emulated_device, pool);
-  vCHdmiCec_Device_AllocatePhysicalLogicalAddresses(map->first_child, emulated_device, pool);
+  vcDevice_AllocatePhysicalLogicalAddresses(map->next_sibling, emulated_device, pool);
+  vcDevice_AllocatePhysicalLogicalAddresses(map->first_child, emulated_device, pool);
 }
 
-vCHdmiCec_logical_address_t vCHdmiCec_Device_AllocateLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_device_type_t device_type)
+vcCommand_logical_address_t vcDevice_AllocateLogicalAddress(vcDevice_logical_address_pool_t *pool, vcCommand_device_type_t device_type)
 {
-  vCHdmiCec_logical_address_t possible_addresses[LOGICAL_ADDRESS_MAX];
+  vcCommand_logical_address_t possible_addresses[LOGICAL_ADDRESS_BROADCAST];
   int num_possible_addresses = 0;
 
   assert(pool != NULL);
@@ -411,54 +446,15 @@ vCHdmiCec_logical_address_t vCHdmiCec_Device_AllocateLogicalAddress(vCHdmiCec_lo
   return DEVICE_TYPE_UNREGISTERED; // No available addresses for the given device type
 }
 
-void vCHdmiCec_Device_ReleaseLogicalAddress(vCHdmiCec_logical_address_pool_t *pool, vCHdmiCec_logical_address_t address)
+void vcDevice_ReleaseLogicalAddress(vcDevice_logical_address_pool_t *pool, vcCommand_logical_address_t address)
 {
   assert(pool != NULL);
-  if (address >= 0 && address <= LOGICAL_ADDRESS_MAX)
+  if (address >= 0 && address <= LOGICAL_ADDRESS_BROADCAST)
   {
     pool->allocated[address] = false;
   }
 }
 
-int vCHdmiCec_GetValue(const strVal_t *map, int length, char* str, int default_val)
-{
-  int result = default_val;
-  
-  if(map == NULL || length <= 0 || str == NULL)
-  {
-    return result;
-  }
-
-  for (int i = 0;  i < length;  ++i)
-  {
-    if (!strcmp(str, map[i].str))
-    {
-        result = map[i].val;
-        break;
-    }
-  }
-  return result;
-}
-
-char* vCHdmiCec_GetString(const strVal_t *map, int length, int val)
-{
-  char* result = NULL;
-  
-  if(map == NULL || length <= 0)
-  {
-    return NULL;
-  }
-
-  for (int i = 0;  i < length;  ++i)
-  {
-    if (val == (int)map[i].val)
-    {
-        result = map[i].str;
-        break;
-    }
-  }
-  return result;
-}
 
 
 
