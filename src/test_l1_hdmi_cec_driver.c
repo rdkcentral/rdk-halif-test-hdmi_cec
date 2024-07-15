@@ -1163,7 +1163,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
 
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
-    if(logicalAddress<0 || logicalAddress>0x0F)){
+    if(logicalAddress<0 || logicalAddress>0x0F){
 	    UT_FAIL("Invalid logicalAddress");
     }
 
