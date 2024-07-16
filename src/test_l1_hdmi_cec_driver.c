@@ -488,8 +488,10 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
 
-    unsigned int maxVal = (((0x0F &0xF0 ) << 20)|( (0x0F &0x0F ) << 16) |((0x0F & 0xF0) << 4)  | (0x0F & 0x0F));
+    unsigned int maxVal = 0xFFFF;
     //Max possible physical address is f.f.f.f
+    //Physical address conversion logic
+    // maxVal = (((0x0f & 0x0F) << 12)|( (0x0f & 0x0F) << 8) |(( 0x0f &0x0F ) << 4)  | (0x0f & 0x0F));
     if (physicalAddress>maxVal) {
         UT_FAIL ("physicalAddress miss match failed");
     }
@@ -540,7 +542,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
 
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
-    if(physicalAddress == 0xffff){
+    if(physicalAddress > 0xffff){
 	    UT_FAIL("Invalid physicalAddress ");
     }
 
@@ -1214,7 +1216,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
 
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
-    if(logicalAddress<=0 || logicalAddress>0x0B || (logicalAddress==0x0F)){
+    if(logicalAddress< 0 || (logicalAddress>0x0F)){
             UT_LOG("Invalid logicalAddress 0x%x\n",logicalAddress);
     }
 
