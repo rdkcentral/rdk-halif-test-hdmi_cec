@@ -175,8 +175,25 @@ Below are some of the commonly used categories of CEC commands:
 
 #### One Touch Play
 Commands in this category are used to turn on devices and switch them to the correct input automatically.
-- **ImageViewOn**: Turns on the TV and switches to the input associated with the device.
-- **SetTextViewOn**: Turns on the TV and switches to the input for text-based content.
+### One Touch Play
+
+| Command        | YAML Payload                                                                                                                              | Action                                                                                       | How to Trigger in Real Setup                                                |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `ImageViewOn`  | <pre lang="yaml">---&#13;hdmicec:&#13;  command: ImageViewOn&#13;  initiator: Sony HomeTheatre&#13;  destination: TV</pre>                | Turns on the TV and switches to the correct HDMI input                                       | Using a playback device like a Blu-ray player or streaming device.            |
+| `ActiveSource` | <pre lang="yaml">---&#13;hdmicec:&#13;  command: ActiveSource&#13;  initiator: IPSTB&#13;  destination: TV&#13;  parameters:&#13;    physical_address: 0x1000</pre> | Indicates which device is currently the active source                                        | Automatically triggered when a device becomes the active source             |
+| `TextViewOn`   | <pre lang="yaml">---&#13;hdmicec:&#13;  command: TextViewOn&#13;  initiator: TV&#13;  destination: Sony HomeTheatre</pre>                 | Turns on the TV with the text view                                                           | Using a TV remote control to turn on the TV and switch to text view mode    |
+
+#### One Touch Record
+
+Allows whatever is shown on the TV screen to be recorded on a selected Recording Device.
+
+| Command        | YAML Payload                                                                                                                              | Action                                                                                       | How to Trigger in Real Setup                                                |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `RecordOn`     | <pre lang="yaml">---&#13;hdmicec:&#13;  command: RecordOn&#13;  initiator: TV&#13;  destination: RecordingDevice1</pre>                    | Starts recording on the specified device                                                     | Using a TV remote control to start recording                                |
+| `RecordOff`    | <pre lang="yaml">---&#13;hdmicec:&#13;  command: RecordOff&#13;  initiator: TV&#13;  destination: RecordingDevice1</pre>                   | Stops recording on the specified device                                                      | Using a TV remote control to stop recording                                 |
+| `RecordStatus` | <pre lang="yaml">---&#13;hdmicec:&#13;  command: RecordStatus&#13;  initiator: TV&#13;  destination: RecordingDevice1&#13;  parameters:&#13;    record_status: Recording</pre> | Reports the recording status of the device                                                   | Automatically triggered when recording status changes                       |
+| `RecordTVScreen` | <pre lang="yaml">---&#13;hdmicec:&#13;  command: RecordTVScreen&#13;  initiator: TV&#13;  destination: RecordingDevice1</pre>             | Commands the recording device to record the current TV screen                                | Using a TV remote control to start recording the TV screen                  |
+
 
 #### Routing Control
 These commands manage the routing of signals between devices, ensuring the correct source is displayed on the TV.
@@ -192,10 +209,86 @@ Commands in this category are used to exchange information about devices, such a
 
 #### Deck Control
 These commands control the playback devices, such as recorders and players.
-- **DeckStatus**: Reports the deck status, such as Play, Stop, etc.
-- **RecordOn**: Initiates recording on a recording device.
-- **RecordOff**: Stops recording on a recording device.
-- **RecordStatus**: Reports the record status from a device.
+### Deck Control
+
+| Command          | YAML Payload                                                                                                                                         | Action                                                                                       | How to Trigger in Real Setup                                               |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| `DeckControl`    | <pre lang="yaml">---&#13;hdmicec:&#13;  command: DeckControl&#13;  initiator: TV&#13;  destination: PlaybackDevice1&#13;  parameters:&#13;    deck_info: Play</pre> | Controls deck functions such as play, pause, etc.                                            | Using a TV remote control to control playback functions                    |
+| `GiveDeckStatus` | <pre lang="yaml">---&#13;hdmicec:&#13;  command: GiveDeckStatus&#13;  initiator: TV&#13;  destination: PlaybackDevice1&#13;  parameters:&#13;    status_request: 1</pre> | Requests the current status of the playback device                                           | Automatically triggered by TV to get the status of the playback device     |
+| `Play`           | <pre lang="yaml">---&#13;hdmicec:&#13;  command: Play&#13;  initiator: TV&#13;  destination: PlaybackDevice1&#13;  parameters:&#13;    play_mode: PlayForward</pre> | Starts playback on the specified playback device                                             | Using a TV remote control to play content                                  |
+| `DeckStatus`     | <pre lang="yaml">---&#13;hdmicec:&#13;  command: DeckStatus&#13;  initiator: PlaybackDevice1&#13;  destination: TV&#13;  parameters:&#13;    deck_info: Play</pre> | Reports the current status of the playback device                                            | Automatically triggered by the playback device to inform its status       |
+
+#### Parameters for `DeckControl`
+
+| Parameter        | Description                               | Values                                                |
+|------------------|-------------------------------------------|-------------------------------------------------------|
+| `deck_info`      | Indicates the deck control mode           | `Play`, `Pause`, `Stop`, `Rewind`, `FastForward`, `Eject`, `Seek` |
+| `seek_time`      | Time to seek to in milliseconds           | `0` to `n` (where `n` is the duration of the content in ms) |
+
+#### Parameters for `GiveDeckStatus`
+
+| Parameter         | Description                               | Values                            |
+|-------------------|-------------------------------------------|-----------------------------------|
+| `status_request`  | Request type for deck status              | `0`, `1` (e.g., `1` for status)   |
+
+#### Parameters for `Play`
+
+| Parameter        | Description                               | Values                                 |
+|------------------|-------------------------------------------|----------------------------------------|
+| `play_mode`      | Indicates the play mode                   | `PlayForward`, `PlayReverse`, `Still`  |
+
+#### Parameters for `DeckStatus`
+
+| Parameter        | Description                               | Values                                                |
+|------------------|-------------------------------------------|-------------------------------------------------------|
+| `deck_info`      | Indicates the current status of the deck  | `Play`, `Pause`, `Stop`, `Rewind`, `FastForward`      |
+
+### Example YAML Payloads
+
+**Deck Control - Play Command:**
+<pre lang="yaml">
+---
+hdmicec:
+  command: DeckControl
+  initiator: TV
+  destination: PlaybackDevice1
+  parameters:
+    deck_info: Play
+</pre>
+
+**Give Deck Status Command:**
+<pre lang="yaml">
+---
+hdmicec:
+  command: GiveDeckStatus
+  initiator: TV
+  destination: PlaybackDevice1
+  parameters:
+    status_request: 1
+</pre>
+
+**Play Command:**
+<pre lang="yaml">
+---
+hdmicec:
+  command: Play
+  initiator: TV
+  destination: PlaybackDevice1
+  parameters:
+    play_mode: PlayForward
+</pre>
+
+**Deck Status - Playing:**
+<pre lang="yaml">
+---
+hdmicec:
+  command: DeckStatus
+  initiator: PlaybackDevice1
+  destination: TV
+  parameters:
+    deck_info: Play
+</pre>
+
 
 #### Tuner Control
 Commands that manage the tuner functions of a device, such as selecting channels or services.
