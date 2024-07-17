@@ -1,6 +1,16 @@
-## Control Plane Commands
-Hdmi Cec virtual component allows CEC commands to be triggered by a test user through the control plane. Below are the different types of control plane messages
-that can be triggered.
+## Overview of HDMI-CEC Virtual Component Control Plane Commands
+
+The HDMI-CEC virtual component enables comprehensive testing of HDMI-CEC functionalities through the control plane. Testers can interact with the virtual component using four primary types of commands, each serving a distinct purpose:
+
+**Command**: Directly trigger specific HDMI-CEC commands between devices, simulating real-world user interactions.
+
+**Event**: Simulate HDMI-CEC events like hotplug (device connection/disconnection) to test how devices react.
+
+**Config**: Modify the virtual CEC network configuration, changing device types, connections, and capabilities.
+
+**State**: Dynamically add or remove devices during testing and print the current status for debugging.
+
+Each command type is structured as a YAML payload, which is outlined in detail in the following sections. These payloads allow testers to precisely control the virtual HDMI-CEC environment, replicating various scenarios and edge cases.
 
 ### 1. **Command**
 HDMI Consumer Electronics Control (CEC) commands are designed to allow control of multiple devices through a single remote control and enable devices to communicate with each other. These commands are categorized based on their functionalities and the end-user features they support.
