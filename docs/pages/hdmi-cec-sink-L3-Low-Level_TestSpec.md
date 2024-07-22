@@ -24,14 +24,14 @@ CEC Adaptor: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter#
 
 
 ## Module Description
-Consumer Electronics Control (`CEC`) is a one-wire bidirectional bus within an HDMI system that enables interconnected products to communicate with each other. This module outlines a set of `HAL` `APIs` designed to support `HDMI` `CEC` functionality. The current document details the L3 test definitions and descriptions used to validate these `HDMI` `CEC` `APIs`, including the prerequisites that must be managed before testing and the external stimuli that need to be applied during the test.
+Consumer Electronics Control (`CEC`) is a one-wire bidirectional bus within an HDMI system that enables interconnected products to communicate. This module outlines a set of `HAL` `APIs` designed to support `HDMI` `CEC` functionality. The current document details the L3 test definitions and descriptions used to validate these `HDMI` `CEC` `APIs`, including the prerequisites that must be managed before testing and the external stimuli that need to be applied during the test.
 
 The present document describes the test scope for the Sink Device activities only.
 
 ### HDMI-CEC L3 Test Functionality
 The below pic depicts the HDMI CEC L3 Test Functionality Setup.  TV 2 marked as `DUT` is the Sink device under test.
 
-Note: All the devices used in the test setup should support `HDMI` `CEC` feature during the entire duration of the test.
+Note: All the devices used in the test setup should support `HDMI` `CEC` feature during the entire test duration.
 
 ```mermaid
 graph TB
@@ -39,6 +39,17 @@ A[STB] -->|HDMI| B[CEC Adaptor]
 B --> |HDMI| C[ TV]
 B -->|USB| C3[PC]
 ```
+
+### Pulse-8 CEC Adaptor tool:
+The Pulse-8 CEC Adapter will be utilized to frame and send commands to the DUT. This tool leverages libcec, which can be installed to facilitate CEC activities during testing. The cec-client tool will be employed extensively throughout the test. Additionally, RAFT can use this tool to automate the test cases.
+
+Reference to the tool: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter
+libcec tools: https://www.pulse-eight.com/Download/Get/51  
+
+**Commands used during the test:**
+To get the COM port of the `CEC` Tool adaptor: cec-client -l
+To find the devices connected (with their logical and physical address): echo scan | cec-client <Port> -s -d 1
+To Tx and Broadcast: echo tx <frames> | cec-client <Port> -s -d 1
 
 #### Logical Address Test
 1. Setting the logical address for the `DUT` with the same logical address of the already existing device on the network (STB)
@@ -74,7 +85,7 @@ B -->|USB| C3[PC]
 |Priority|High|
 
 **Pre-Conditions:**
-1. An STB device should be present in the network which is already acquired the Logical address before the test is performed.
+1. An STB device should be present in the network which is already acquired the Logical A before the test is performed.
 2. The HMDI CEC Adaptor should provide a way to read the acquired STB logical address.
 
 **Dependencies:**
@@ -82,6 +93,8 @@ Prerequisites should be met before starting this test.
 
 **User Interaction:**
 The user should be able to get the STB logical address and feed it for the test.
+`echo scan | cec-client <Port> -s -d 1` shall be used to get the logical address of all the devices connected on the network. 
+
 
 #### Test Procedure
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
@@ -116,6 +129,8 @@ Prerequisites should be met before starting this test.
 
 **User Interaction:**
 If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
+`echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Transmit the CEC Frames from `HDMI` `CEC` Adaptor. 
+RAFT can also use these commands or the Andriod libraries.
 
 #### Test Procedure 
 
@@ -154,6 +169,8 @@ Prerequisites should be met before starting this test.
 
 **User Interaction:**
 If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
+`echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
+RAFT can also use these commands or the Andriod libraries.
 
 #### Test Procedure 
 ## New Test Plan (Broadcast Commands)
@@ -192,6 +209,8 @@ Prerequisites should be met before starting this test.
 
 **User Interaction:**
 If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
+`echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
+RAFT can also use these commands or the Andriod libraries.
 
 #### Test Procedure
 | Variation / Steps | Description | Test Data | Expected Result | Notes |
@@ -213,7 +232,7 @@ Functionality:
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_hw_fault_test`            |
-| Description                   | Test for the return of proper error code when a hardware fault is introduced into the CEC line and trying to Tx the CEC data.                       |
+| Description                   | Test for the return of proper error code when a hardware fault is introduced into the CEC line and try to Tx the CEC data.                       |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 005                                              |
 | Priority                      | High                                             |
@@ -233,6 +252,6 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 01 | Open HDMI CEC HAL using `HdmiCecOpen` API | `handle` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 02 | Acquire a valid logical address `0x00` using `HdmiCecAddLogicalAddress` | `handle` = valid handle, `logicalAddress` = 0 | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 03 | Set the receive callback function using `HdmiCecSetRxCallback` | `handle` = valid handle, `cbfunc` = valid callback function pointer, `data` = pointer to the valid data buffer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
-| 04 | Wait for a manual command so that the user is ready to pull the `HDMI` `CEC` high high with the help of the fault inducer switch | N/A | N/A | Should be successful |
+| 04 | Wait for a manual command so that the user is ready to pull the `HDMI` `CEC` high with the help of the fault inducer switch | N/A | N/A | Should be successful |
 | 05 | Frame command to Tx Test OSD CEC command with full buffer size from the `DUT`  continuously for 10 times | handle= valid handle, `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} |HDMI_CEC_STATUS and HDMI_CEC_IO_SENT_FAILED | Should be successful |
 | 06 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
