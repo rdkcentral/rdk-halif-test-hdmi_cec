@@ -78,7 +78,7 @@ HDMI_CEC_STATUS HdmiCecSetRxCallback(int handle, HdmiCecRxCallback_t cbfunc, voi
   (void)data;
   return (int)0;
 }
-
+/** @note This API is deprecated*/
 HDMI_CEC_STATUS HdmiCecSetTxCallback(int handle, HdmiCecTxCallback_t cbfunc, void* data)
 {
   (void)handle;
@@ -95,7 +95,7 @@ HDMI_CEC_STATUS HdmiCecTx(int handle, const unsigned char* buf, int len, int* re
   (void)result;
   return (int)0;
 }
-
+/** @note This API is deprecated */
 HDMI_CEC_STATUS HdmiCecTxAsync(int handle, const unsigned char* buf, int len)
 {
   (void)handle;
