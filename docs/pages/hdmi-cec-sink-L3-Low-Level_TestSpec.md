@@ -31,7 +31,7 @@ The present document describes the test scope for the Sink Device activities onl
 ### HDMI-CEC L3 Test Functionality
 The below pic depicts the HDMI CEC L3 Test Functionality Setup.  TV 2 marked as `DUT` is the Sink device under test.
 
-Note: All the devices used in the test setup should be supporting CEC feature during the entire duration of the test.
+Note: All the devices used in the test setup should support `HDMI` `CEC` feature during the entire duration of the test.
 
 ```mermaid
 graph TB
@@ -41,48 +41,47 @@ B -->|USB| C3[PC]
 ```
 
 #### Logical Address Test
-1. Setting the logical address for the `DUT` with the same logical address of already existing device on the network (STB)
+1. Setting the logical address for the `DUT` with the same logical address of the already existing device on the network (STB)
 
 #### Message Transmission and Reception Test
 2. Transmitting HDMI CEC Command to receive a reply.
 3. Broadcasting a HDMI CEC Command to put the STB into Standby state.  
-4. Recieve a standby broadcasting command send by the CEC Adaptor
-5. Receving a simple HDMI CEC standby command from the CEC Adaptor 
-6. Receiving a HDMI OSD Command with a string of max length (14 bytes ) from CEC Adaptor.
+4. Recieve a standby broadcasting command sent by the CEC Adaptor
+5. Receiving an HDMI OSD Command with a string of max length (14 bytes ) from CEC Adaptor.
 
 #### Stress Test
-6. Receiving a HDMI OSD Command repeatedly for 10 times with a string of max length from CEC Adaptor.
+6. Receiving an HDMI OSD Command repeatedly for 10 times with a string of max length from CEC Adaptor.
 
 #### Hardware Fault Test
 7. Introducing a Fault on the HDMI line to test the Transmit functionality.
 
 
-# Test 1 : Logical Address Test
+# Test 1: Logical Address Test
 
 ### Functionality: 
-1. The `DUT` should attempt to acquire logical address which is already in use.
+1. The `DUT` should attempt to acquire a logical address that is already in use.
 
 ### Pre-requisites:
 1. First, set the STB to ON state to enable it to acquire a Logical address.
-2. HDMI CEC Adaptor should able to help in getting the STB logical address for further activities.
+2. HDMI CEC Adaptor should be able to help in getting the STB logical address for further activities.
 
 |Title|Details|
 |--|--|
 |Function Name|`test_l3_hdmi_cec_sink_hal_AcquireLogicalAddress`|
-|Description|This functions performs to acquire a Logical address which is already acquired by the STB. This should prove the capability of the HAL API HdmiCecAddLogicalAddress() where it shall fail to acquire a Logical address that is already been taken |
+|Description|This function performs to acquire a Logical address that is already acquired by the STB. This should prove the capability of the HAL API HdmiCecAddLogicalAddress() where it shall fail to acquire a Logical address that is already been taken |
 |Test Group|03|
 |Test Case ID|001|
 |Priority|High|
 
 **Pre-Conditions:**
-1. A STB device should be present in the network which is already acquired the Logical address before the test is performed.
-2. HMDI CEC Adaptor should provide a way to read the acquired STB logical address.
+1. An STB device should be present in the network which is already acquired the Logical address before the test is performed.
+2. The HMDI CEC Adaptor should provide a way to read the acquired STB logical address.
 
 **Dependencies:**
-Pre requisites should be met before starting this test.
+Prerequisites should be met before starting this test.
 
 **User Interaction:**
-User should able to get the STB logical address and feed it for the test.
+The user should be able to get the STB logical address and feed it for the test.
 
 #### Test Procedure
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
@@ -93,27 +92,27 @@ User should able to get the STB logical address and feed it for the test.
 | 04 | Close HDMI CEC HAL using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 
-# Test 2: Request, Receive and Respond for the basic CEC Commands 
+# Test 2: Request, Receive, and Respond to the basic CEC Commands 
 
 Functionality: 
-1. `DUT` shall request a CEC Version from the Source Device (STB).  It should receive a valid version and evaluated.
+1. `DUT` shall request a CEC Version from the Source Device (STB).  It should receive a valid version and be evaluated.
 2. `DUT` shall receive a standby command as a unicast command from the CEC Adaptor.
-3. `DUT` shall receive a OSD Command with max buffer size from the CEC Adaptor and respond to this command.
+3. `DUT` shall receive an OSD Command with max buffer size from the CEC Adaptor and respond to this command.
 
 
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_tx_rx_test`              |
-| Description                   | This test shall validate the Tx, and Rx CEC Commands between the `DUT`, STB and CEC Adaptor connected on a network |
+| Description                   | This test shall validate the Tx, and Rx CEC Commands between the `DUT`, STB, and CEC Adaptor connected on a network |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 002                                              |
 | Priority                      | High                                             |
 
 **Pre-Conditions:**
-The platforms are connected as shown in the picture above and STB and the CEC Adaptor are kept ready before start of the test.
+The platforms are connected as shown in the picture above and STB and the CEC Adaptor are kept ready before the start of the test.
 
 **Dependencies:**
-Pre requisites should be met before starting this test.
+Prerequisites should be met before starting this test.
 
 **User Interaction:**
 If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
@@ -133,7 +132,7 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 14 | Wait for a second to receive data from the CEC adapter on the RxCallback and set the `dataRx` flag to True. Validate the received data with "Hello, World!" and set the `dataRx` flag to False | Test data received should be `0x0F` | Read and validate this data. Data received should be "Hello, World!" | Should be successful |
 | 15 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 
-# Test 3: Request, Receive and Respond for the basic CEC Commands 
+# Test 3: Transmit and Receive CEC broadcast Commands 
 
 Functionality: 
 1. `DUT` shall broadcast a standby command to the connected devices and STB should receive and act upon the command. 
@@ -142,16 +141,16 @@ Functionality:
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_broadcast_test`              |
-| Description                   | This test shall validate the broadcast CEC Commands between the `DUT`, STB and CEC Adaptor connected on a network |
+| Description                   | This test shall validate the broadcast CEC Commands between the `DUT`, STB, and CEC Adaptor connected on a network |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 003                                              |
 | Priority                      | High                                             |
 
 **Pre-Conditions:**
-The platforms are connected as shown in the picture above and STB and the CEC Adaptor are kept ready before start of the test.
+The platforms are connected as shown in the picture above and STB and the CEC Adaptor are kept ready before the start of the test.
 
 **Dependencies:**
-Pre requisites should be met before starting this test.
+Prerequisites should be met before starting this test.
 
 **User Interaction:**
 If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
@@ -175,21 +174,21 @@ If the user chooses to run the test in interactive mode, then the test case has 
 # Test 4: Stress Test
 
 Functionality: 
-1. `DUT` shall respond to a CEC OSD command received from the CEC Adaptor repeatedly for 10 times.  Adaptor will be used for a better control from the automation tool.
+1. `DUT` shall respond to a CEC OSD command received from the CEC Adaptor repeatedly for 10 times.  The adaptor will be used for better control from the automation tool.
 
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_respond_osd_command_from_adaptor_repeatedly`              |
-| Description                   | Receive and respond for the CEC OSD Command with buffer data continesouly for 10 time to prove the robustness of this API.                       |
+| Description                   | Receive and respond to the CEC OSD Command with buffer data continuously for 10 times to prove the robustness of this API.                       |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 004                                              |
 | Priority                      | High                                             |
 
 **Pre-Conditions:**
-TV 1 and the STB are already ON before the start of the Test and they have acquired the physical and logical addresses. TV1 and STB should be good enough to support the basic CEC Commands like get CEC Version. 
+TV 1 and the STB are already ON before the start of the Test and they have acquired the physical and logical addresses. TV1 and STB should be good enough to support the basic CEC Commands like getting the `CEC` Version. 
 
 **Dependencies:**
-Pre requisites should be met before starting this test.
+Prerequisites should be met before starting this test.
 
 **User Interaction:**
 If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
@@ -200,8 +199,8 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 01 | Open HDMI CEC HAL using `HdmiCecOpen` API | `handle` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 02 | Acquire a valid logical address `0x00` using `HdmiCecAddLogicalAddress` | `handle` = valid handle, `logicalAddress` = 0 | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 03 | Set the receive callback function using `HdmiCecSetRxCallback` | `handle` = valid handle, `cbfunc` = valid callback function pointer, `data` = pointer to the valid data buffer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
-| 04 | Wait for a manual command so that CEC Adaptor can send a CEC OSD Command continuously for 10 times | N/A | N/A | Should be successful |
-| 05 | Frame a command to Tx Test OSD CEC command with full buffer size from the HDMI CEC adaptor continuously for 10 times | `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} | N/A | Should be successful |
+| 04 | Wait for a manual command so that CEC Adaptor can send a CEC OSD Command continuously 10 times | N/A | N/A | Should be successful |
+| 05 | Frame command to Tx Test OSD CEC command with full buffer size from the HDMI CEC adaptor continuously for 10 times | `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} | N/A | Should be successful |
 | 06 | Validate the data received from the DUT when the `dataRx` flag in RxCall back function is set to true for 10 times | Compare the received data with predefined buffer | `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} | Should be successful |
 | 07 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 
@@ -214,16 +213,16 @@ Functionality:
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_hw_fault_test`            |
-| Description                   | Test for the return of proper error code when an hardware fault is introduced into the cec line and trying to Tx the CEC data.                       |
+| Description                   | Test for the return of proper error code when a hardware fault is introduced into the CEC line and trying to Tx the CEC data.                       |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 005                                              |
 | Priority                      | High                                             |
 
 **Pre-Conditions:**
-Conntect a HW fault inducer which can pull the HDMI CEC line to high and to normal through a switch.
+Connect an HW fault inducer which can pull the HDMI CEC line to high and to normal through a switch.
 
 **Dependencies:**
-Pre requisites should be met before starting this test.
+Prerequisites should be met before starting this test.
 
 **User Interaction:**
 If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
@@ -234,6 +233,6 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | 01 | Open HDMI CEC HAL using `HdmiCecOpen` API | `handle` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 02 | Acquire a valid logical address `0x00` using `HdmiCecAddLogicalAddress` | `handle` = valid handle, `logicalAddress` = 0 | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 03 | Set the receive callback function using `HdmiCecSetRxCallback` | `handle` = valid handle, `cbfunc` = valid callback function pointer, `data` = pointer to the valid data buffer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
-| 04 | Wait for a manual command so that the user is ready to pull the hdmi CEC high high with the help of the fault inducer switch | N/A | N/A | Should be successful |
-| 05 | Frame a command to Tx Test OSD CEC command with full buffer size from the `DUT`  continuously for 10 times | handle= valid handle, `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} |HDMI_CEC_STATUS and HDMI_CEC_IO_SENT_FAILED | Should be successful |
+| 04 | Wait for a manual command so that the user is ready to pull the `HDMI` `CEC` high high with the help of the fault inducer switch | N/A | N/A | Should be successful |
+| 05 | Frame command to Tx Test OSD CEC command with full buffer size from the `DUT`  continuously for 10 times | handle= valid handle, `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} |HDMI_CEC_STATUS and HDMI_CEC_IO_SENT_FAILED | Should be successful |
 | 06 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
