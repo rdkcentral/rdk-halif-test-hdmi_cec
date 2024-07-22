@@ -35,7 +35,7 @@ Note: All the devices used in the test setup should support `HDMI` `CEC` feature
 
 ```mermaid
 graph TB
-A[STB] -->|HDMI| B[CEC Adaptor]
+A[STB] -->|HDMI| B[Pulse-8 CEC Adaptor]
 B --> |HDMI| C[ TV]
 B -->|USB| C3[PC]
 ```
@@ -47,18 +47,19 @@ Reference to the tool: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter
 libcec tools: https://www.pulse-eight.com/Download/Get/51  
 
 **Commands used during the test:**
-To get the COM port of the `CEC` Tool adaptor: cec-client -l
-To find the devices connected (with their logical and physical address): echo scan | cec-client <Port> -s -d 1
-To Tx and Broadcast: echo tx <frames> | cec-client <Port> -s -d 1
+- To get the COM port of the `CEC` Tool adaptor: ```cec-client -l``` 
+- To find the devices connected (with their logical and physical address): ```echo scan | cec-client <Port> -s -d 1```
+- To Tx and Broadcast: ```echo tx <frames> | cec-client <Port> -s -d 1```
 
+## Test Functionalities
 #### Logical Address Test
 1. Setting the logical address for the `DUT` with the same logical address of the already existing device on the network (STB)
 
 #### Message Transmission and Reception Test
-2. Transmitting HDMI CEC Command to receive a reply.
-3. Broadcasting a HDMI CEC Command to put the STB into Standby state.  
-4. Recieve a standby broadcasting command sent by the CEC Adaptor
-5. Receiving an HDMI OSD Command with a string of max length (14 bytes ) from CEC Adaptor.
+2. Transmitting HDMI CEC basic command (GetCECVersion) from the `DUT` to receive a reply from the connected device
+3. Broadcasting an HDMI CEC Command from the `DUT` to put the STB into the standby state 
+4. Recieve a standby broadcasting command on the `DUT` sent by the CEC Adaptor
+5. Receiving an HDMI OSD Command with a string of max length (14 bytes ) from the CEC Adaptor
 
 #### Stress Test
 6. Receiving an HDMI OSD Command repeatedly for 10 times with a string of max length from CEC Adaptor.
@@ -92,8 +93,8 @@ To Tx and Broadcast: echo tx <frames> | cec-client <Port> -s -d 1
 Prerequisites should be met before starting this test.
 
 **User Interaction:**
-The user should be able to get the STB logical address and feed it for the test.
-`echo scan | cec-client <Port> -s -d 1` shall be used to get the logical address of all the devices connected on the network. 
+- The user should be able to get the STB logical address and feed it for the test.
+- `echo scan | cec-client <Port> -s -d 1` shall be used to get the logical address of all the devices connected to the network. 
 
 
 #### Test Procedure
@@ -109,8 +110,7 @@ The user should be able to get the STB logical address and feed it for the test.
 
 Functionality: 
 1. `DUT` shall request a CEC Version from the Source Device (STB).  It should receive a valid version and be evaluated.
-2. `DUT` shall receive a standby command as a unicast command from the CEC Adaptor.
-3. `DUT` shall receive an OSD Command with max buffer size from the CEC Adaptor and respond to this command.
+2. `DUT` shall receive an OSD Command with max buffer size from the CEC Adaptor and respond to this command.
 
 
 | Title                         | Details                                          |
@@ -128,8 +128,8 @@ The platforms are connected as shown in the picture above and STB and the CEC Ad
 Prerequisites should be met before starting this test.
 
 **User Interaction:**
-If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
-`echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Transmit the CEC Frames from `HDMI` `CEC` Adaptor. 
+- If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
+- `echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Transmit the CEC Frames from `HDMI` `CEC` Adaptor. 
 RAFT can also use these commands or the Andriod libraries.
 
 #### Test Procedure 
@@ -142,10 +142,10 @@ RAFT can also use these commands or the Andriod libraries.
 | 04 | Get the connected device (STB) logical address manually. Wait until this data is entered | N/A | N/A | Enter the logical address of the STB as read on the CEC adapter |
 | 05 | Frame a command to transmit CEC frames to get the CEC version of the connected STB using `HdmiCecTx` | `handle` = valid handle, `buf` = {0x47, 0x9F}, `len` = sizeof(buf), `result` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 06 | Wait for a second and validate a response from the STB on the RxCallback and set the `dataRx` flag to True. Validate the received data and set the `dataRx` flag to False | Test data received from STB | Read and validate this data. Rx data should be a valid CEC version | Should be successful |
-| 12 | Frame and send a CEC OSD command with full buffer data with `DUT` logical address from CEC adapter | `buffer` = {0x02, 0x64, "Hello, World!"} | N/A | User to set this data through CEC adapter |
-| 13 | Wait for the user to signal when the CEC command is sent in step 12 | User to press `y` to move | N/A | User to signal once the CEC command is sent |
-| 14 | Wait for a second to receive data from the CEC adapter on the RxCallback and set the `dataRx` flag to True. Validate the received data with "Hello, World!" and set the `dataRx` flag to False | Test data received should be `0x0F` | Read and validate this data. Data received should be "Hello, World!" | Should be successful |
-| 15 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
+| 07 | Frame and send a CEC OSD command with full buffer data with `DUT` logical address from CEC adapter | `buffer` = {0x02, 0x64, "Hello, World!"} | N/A | User to set this data through CEC adapter |
+| 08 | Wait for the user to signal when the CEC command is sent in step 12 | User to press `y` to move | N/A | User to signal once the CEC command is sent |
+| 09 | Wait for a second to receive data from the CEC adapter on the RxCallback and set the `dataRx` flag to True. Validate the received data with "Hello, World!" and set the `dataRx` flag to False | Test data received should be `0x0F` | Read and validate this data. Data received should be "Hello, World!" | Should be successful |
+| 10 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 
 # Test 3: Transmit and Receive CEC broadcast Commands 
 
@@ -168,8 +168,8 @@ The platforms are connected as shown in the picture above and STB and the CEC Ad
 Prerequisites should be met before starting this test.
 
 **User Interaction:**
-If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
-`echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
+- If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
+- `echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
 RAFT can also use these commands or the Andriod libraries.
 
 #### Test Procedure 
@@ -208,8 +208,8 @@ TV 1 and the STB are already ON before the start of the Test and they have acqui
 Prerequisites should be met before starting this test.
 
 **User Interaction:**
-If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
-`echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
+- If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
+- `echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
 RAFT can also use these commands or the Andriod libraries.
 
 #### Test Procedure
