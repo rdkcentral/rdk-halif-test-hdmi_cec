@@ -73,6 +73,7 @@ extern int register_hdmicec_hal_sink_l2_tests( void );
 
 #ifdef VCOMPONENT
 extern int register_vcomponent_tests ( char* profile );
+extern int test_l3_hdmi_cec_driver_register ( char* pValidationProfilePath );
 #endif
 
 int main(int argc, char** argv)
@@ -83,8 +84,9 @@ int main(int argc, char** argv)
 #ifdef VCOMPONENT
     int opt;
     char* pProfilePath = NULL;
+    char* pValidationProfilePath = NULL;
 
-    while ((opt = getopt(argc, argv, "u:")) != -1)
+    while ((opt = getopt(argc, argv, "u:v:")) != -1)
     {
         switch(opt)
         {
@@ -94,6 +96,12 @@ int main(int argc, char** argv)
                 strcpy(pProfilePath, optarg);
                 pProfilePath[strlen(optarg) + 1] = '\0';
                 break;
+            case 'v':
+                UT_LOG ("Setting Validation Profile path [%s]\n",optarg);
+                pValidationProfilePath = malloc(strlen(optarg) + 1);
+                strcpy(pValidationProfilePath, optarg);
+                pValidationProfilePath[strlen(optarg) + 1] = '\0';
+                break;
 
             case '?':
             case ':':
@@ -101,10 +109,9 @@ int main(int argc, char** argv)
                 break;
         }
     }
-
     optind = 1; //Reset argv[] element pointer for further processing
 #endif
-
+    
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
 
@@ -118,6 +125,10 @@ int main(int argc, char** argv)
     }
 
     register_hdmicec_hal_common_l1_tests();
+#ifdef VCOMPONENT
+    register_vcomponent_tests(pProfilePath);
+    test_l3_hdmi_cec_driver_register (pValidationProfilePath);
+#endif
 
     if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
         register_hdmicec_hal_source_l1_tests ();
@@ -128,9 +139,6 @@ int main(int argc, char** argv)
         register_hdmicec_hal_sink_l1_tests ();
         register_hdmicec_hal_sink_l2_tests ();
     }
-#ifdef VCOMPONENT
-    register_vcomponent_tests(pProfilePath);
-#endif
 
     UT_run_tests();
 
@@ -138,6 +146,10 @@ int main(int argc, char** argv)
     if(pProfilePath != NULL)
     {
         free(pProfilePath);
+    }
+    if(pValidationProfilePath != NULL)
+    {
+        free(pValidationProfilePath);
     }
 #endif
 }

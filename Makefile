@@ -76,7 +76,7 @@ export TARGET
 export TOP_DIR
 export HAL_LIB_DIR
 
-.PHONY: clean list build vcomponent
+.PHONY: clean list build skeleton vcomponent
 
 build: $(SETUP_SKELETON_LIBS)
 	echo "SETUP_SKELETON_LIBS $(SETUP_SKELETON_LIBS)"

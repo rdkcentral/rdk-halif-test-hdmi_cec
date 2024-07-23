@@ -1,0 +1,4 @@
+hdmicec:
+  command: ImageViewOn
+  initiator: SONY PS3
+  destination: TVPanel

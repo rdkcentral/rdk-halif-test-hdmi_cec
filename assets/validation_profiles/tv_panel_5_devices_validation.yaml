@@ -1,0 +1,55 @@
+hdmicec:
+  ActiveSource:
+    input:
+      initiator: SONY PS3
+      destination: TVPanel
+    result:
+      initiator: 4
+      destination: 0
+      opcode: 0x82   #Opcode as defined in HDMI CEC Specification
+      parameters:
+        size: 2
+        data: [0x20,0x00] #Physical address 2.0.0.0
+  InactiveSource:
+    input:
+      initiator: SONY PS3
+      destination: TVPanel
+    result:
+      initiator: 4
+      destination: 0
+      opcode: 0x9D   #Opcode as defined in HDMI CEC Specification
+      parameters:
+        size: 2
+        data: [0x20,0x00] #Physical address 2.0.0.0
+  SetOSDName:
+    input:
+      initiator: IPSTB
+      destination: TVPanel
+      osd_name: IPSTB
+    result:
+      initiator: 8
+      destination: 0
+      opcode: 0x49
+      parameters:
+        size: 5
+        data: [0x49,0x50,0x53,0x54,0x42] # "IPSTB" in hex ascii
+  ImageViewOn:
+    input:
+      initiator: SONY PS3
+      destination: TVPanel
+    result:
+      initiator: 4
+      destination: 0
+      opcode: 0x04
+      parameters:
+        size: 0
+  TextViewOn:
+    input:
+      initiator: IPSTB
+      destination: TVPanel
+    result:
+      initiator: 8
+      destination: 0
+      opcode: 0x0D
+      parameters:
+        size: 0
