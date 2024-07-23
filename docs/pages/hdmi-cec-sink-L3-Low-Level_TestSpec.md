@@ -31,13 +31,14 @@ The present document describes the test scope for the Sink Device activities onl
 ### HDMI-CEC L3 Test Functionality
 The below pic depicts the HDMI CEC L3 Test Functionality Setup.  TV 2 marked as `DUT` is the Sink device under test.
 
-Note: All the devices used in the test setup should support `HDMI` `CEC` feature during the entire test duration.
+Note: The below-shown prerequisites should be met before starting the test on the platforms. 
+- All the devices used in the test setup should support the `HDMI` `CEC` feature during the entire test duration.
+- HDMI drivers should be up and running on the platform before running this test.
 
 ```mermaid
 graph TB
-A[STB] -->|HDMI| B[Pulse-8 CEC Adaptor]
-B --> |HDMI| C[ TV]
-B -->|USB| C3[PC]
+C[PC] <--> A
+A[Pulse-8 - 1] <--> |HDMI| B[TV]  
 ```
 
 ### Pulse-8 CEC Adaptor tool:
@@ -51,72 +52,40 @@ libcec tools: https://www.pulse-eight.com/Download/Get/51
 - To find the devices connected (with their logical and physical address): ```echo scan | cec-client <Port> -s -d 1```
 - To Tx and Broadcast: ```echo tx <frames> | cec-client <Port> -s -d 1```
 
+**Libraries and tools required for RAFT**
+- python-cec will be used to control the `CEC` adaptor.
+- https://pypi.org/project/cec/ will provide more information on how to use this library.
+
+**Prerequisite Test to make sure all the CEC Adaptors are connected**
+1. Make sure to read the physical address of the CEC Adaptor allocated based on the port it has been connected to, using libCEC on RAFT.
+2. The physical and logical addresses allocated to the CEC adaptor shall be read and validated on RAFT.
+
 ## Test Functionalities
-#### Logical Address Test
-1. Setting the logical address for the `DUT` with the same logical address of the already existing device on the network (STB)
 
 #### Message Transmission and Reception Test
-2. Transmitting HDMI CEC basic command (GetCECVersion) from the `DUT` to receive a reply from the connected device
-3. Broadcasting an HDMI CEC Command from the `DUT` to put the STB into the standby state 
-4. Recieve a standby broadcasting command on the `DUT` sent by the CEC Adaptor
-5. Receiving an HDMI OSD Command with a string of max length (14 bytes ) from the CEC Adaptor
+- Transmit an HDMI CEC basic command (GetCECVersion) from the DUT to receive a reply from the connected CEC Adaptor.
+- Broadcast an HDMI CEC Command from the DUT and verify that this command has been received on the CEC Adaptor.
+- Receive a standby broadcasting command on the DUT sent by the CEC Adaptor and validate it.
+- Receive an HDMI OSD Command with a string of maximum length (14 bytes) from the CEC Adaptor.
+- The CEC Adaptor sends a standby command to a device with a logical address other than the DUT logical address and ensures no callback is received.
 
 #### Stress Test
-6. Receiving an HDMI OSD Command repeatedly for 10 times with a string of max length from CEC Adaptor.
+- Receiving an HDMI OSD Command repeatedly for 10 times with a different string of max length from CEC Adaptor.
 
 #### Hardware Fault Test
-7. Introducing a Fault on the HDMI line to test the Transmit functionality.
+- Introducing a Fault on the HDMI line to test the Transmit functionality.
 
 
-# Test 1: Logical Address Test
-
-### Functionality: 
-1. The `DUT` should attempt to acquire a logical address that is already in use.
-
-### Pre-requisites:
-1. First, set the STB to ON state to enable it to acquire a Logical address.
-2. HDMI CEC Adaptor should be able to help in getting the STB logical address for further activities.
-
-|Title|Details|
-|--|--|
-|Function Name|`test_l3_hdmi_cec_sink_hal_AcquireLogicalAddress`|
-|Description|This function performs to acquire a Logical address that is already acquired by the STB. This should prove the capability of the HAL API HdmiCecAddLogicalAddress() where it shall fail to acquire a Logical address that is already been taken |
-|Test Group|03|
-|Test Case ID|001|
-|Priority|High|
-
-**Pre-Conditions:**
-1. An STB device should be present in the network which is already acquired the Logical A before the test is performed.
-2. The HMDI CEC Adaptor should provide a way to read the acquired STB logical address.
-
-**Dependencies:**
-Prerequisites should be met before starting this test.
-
-**User Interaction:**
-- The user should be able to get the STB logical address and feed it for the test.
-- `echo scan | cec-client <Port> -s -d 1` shall be used to get the logical address of all the devices connected to the network. 
-
-
-#### Test Procedure
-| Variation / Steps | Description | Test Data | Expected Result | Notes|
-| -- | --------- | ---------- | -------------- | ----- |
-| 01 | Open HDMI CEC HAL using HdmiCecOpen API | handle = valid pointer | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 02 | Wait to enter the STB logical address | NA | NA | Feed the logical Address of the STB manually |
-| 03 | Try acquiring the STB logical address using HdmiCecAddLogicalAddress()| handle = valid handle, logicalAddress = STB logical address | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should be successful |
-| 04 | Close HDMI CEC HAL using HdmiCecClose API | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
-
-
-# Test 2: Request, Receive, and Respond to the basic CEC Commands 
+# Test 1: Message Transmission and Reception Test - Unicast messages
 
 Functionality: 
-1. `DUT` shall request a CEC Version from the Source Device (STB).  It should receive a valid version and be evaluated.
-2. `DUT` shall receive an OSD Command with max buffer size from the CEC Adaptor and respond to this command.
-
+1. `DUT` shall request a CEC Version from the CEC adaptor connected.  It should receive a valid version and be evaluated.
+2. `DUT` shall receive an OSD Command with max buffer size from the CEC Adaptor and respond to this command.  
 
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_tx_rx_test`              |
-| Description                   | This test shall validate the Tx, and Rx CEC Commands between the `DUT`, STB, and CEC Adaptor connected on a network |
+| Description                   | This test shall validate the Tx, and Rx CEC Commands between the `DUT`and CEC Adaptor connected on a network |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 002                                              |
 | Priority                      | High                                             |
