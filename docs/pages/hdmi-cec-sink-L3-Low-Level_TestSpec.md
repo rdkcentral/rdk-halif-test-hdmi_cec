@@ -41,8 +41,8 @@ C[PC] <--> A
 A[Pulse-8 - 1] <--> |HDMI| B[TV]  
 ```
 
-### Pulse-8 CEC Adaptor tool:
-The Pulse-8 CEC Adapter will be utilized to frame and send commands to the DUT. This tool leverages libcec, which can be installed to facilitate CEC activities during testing. The cec-client tool will be employed extensively throughout the test. Additionally, RAFT can use this tool to automate the test cases.
+### Pulse Eight CEC Adaptor tool:
+The Pulse-Eight CEC Adapter will be utilized to frame and send commands to the DUT. This tool leverages libcec, which can be installed to facilitate CEC activities during testing. The cec-client tool will be employed extensively throughout the test. Additionally, RAFT can use this tool to automate the test cases.
 
 Reference to the tool: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter
 libcec tools: https://www.pulse-eight.com/Download/Get/51  
@@ -53,6 +53,7 @@ libcec tools: https://www.pulse-eight.com/Download/Get/51
 - To Tx and Broadcast: ```echo tx <frames> | cec-client <Port> -s -d 1```
 
 **Libraries and tools required for RAFT**
+- libcec should be installed on the PC where the Pulse-Eight CEC Adaptor is connected.
 - python-cec will be used to control the `CEC` adaptor.
 - https://pypi.org/project/cec/ will provide more information on how to use this library.
 
@@ -63,7 +64,9 @@ libcec tools: https://www.pulse-eight.com/Download/Get/51
 ## Test Functionalities
 
 #### Message Transmission and Reception Test
-- Transmit an HDMI CEC basic command (GetCECVersion) from the DUT to receive a reply from the connected CEC Adaptor.
+Note: All the below tests should be carried out on all the available HMDI ports.
+
+- Transmit an HDMI CEC basic command (GetCECVersion) from the DUT to receive a reply from the connected CEC Adaptor. 
 - Broadcast an HDMI CEC Command from the DUT and verify that this command has been received on the CEC Adaptor.
 - Receive a standby broadcasting command on the DUT sent by the CEC Adaptor and validate it.
 - Receive an HDMI OSD Command with a string of maximum length (14 bytes) from the CEC Adaptor.
@@ -91,7 +94,8 @@ Functionality:
 | Priority                      | High                                             |
 
 **Pre-Conditions:**
-The platforms are connected as shown in the picture above and STB and the CEC Adaptor are kept ready before the start of the test.
+- The platforms are connected as shown in the picture above and STB and the CEC Adaptor are kept ready before the start of the test.
+- libcec is installed on the PC where the PulseEight tool is connected. libcec will respond to all the basic CEC Commands received from `DUT`
 
 **Dependencies:**
 Prerequisites should be met before starting this test.
@@ -99,7 +103,7 @@ Prerequisites should be met before starting this test.
 **User Interaction:**
 - If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
 - `echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Transmit the CEC Frames from `HDMI` `CEC` Adaptor. 
-RAFT can also use these commands or the Andriod libraries.
+
 
 #### Test Procedure 
 
