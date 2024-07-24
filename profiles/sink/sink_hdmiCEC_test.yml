@@ -1,20 +1,6 @@
 hdmicec:
   config:
     number_ports: 3
-    ports:
-      - id: 1
-        type: in
-        cec_supported: true
-        cec_version: 02
-      - id: 2
-        type: in
-        cec_supported: true
-        cec_version: 02
-      - id: 3
-        type: in
-        cec_supported: true
-        cec_version: 02
-
     test:
     tx:
       #CEC GET Version command
