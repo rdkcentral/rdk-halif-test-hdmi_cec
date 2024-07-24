@@ -7,7 +7,7 @@
   - [Initialization and Startup]
 
 ## Overview
-This document provides an overview of the L3 testing requirements for the module `HDMI CEC` source device. It outlines the scope of testing, objectives, External devices, specific test requirements,  expected deliverables and approaches to satisfy the L3 Test requirement.  
+This document provides an overview of the L3 testing requirements for the module `HDMI CEC` source device. It outlines the scope of testing, objectives, External devices, specific test requirements,  expected deliverables, and approaches to satisfy the L3 Test requirement.  
 
 ## Acronyms, Terms and Abbreviations
 - `CEC`    -  Consumer Electronics Control
@@ -21,8 +21,8 @@ This document provides an overview of the L3 testing requirements for the module
 
 
 ## References
-CEC Adaptor: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter#
-`HAL` interface file: https://github.com/rdkcentral/rdk-halif-hdmi_cec/blob/main/include/hdmi_cec_driver.h
+- CEC Adaptor: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter#
+- `HAL` interface file: https://github.com/rdkcentral/rdk-halif-hdmi_cec/blob/main/include/hdmi_cec_driver.h
 
 
 ## Module Description
@@ -43,16 +43,11 @@ C[PC] <--> A
 A[Pulse-8 - 1] <--> |HDMI| B[TV]  
 ```
 
-### Pulse Eight CEC Adaptor tool:
+### Pulse-Eight CEC Adaptor tool:
 The Pulse-Eight CEC Adapter will be utilized to frame and send commands to the DUT. This tool leverages libcec, which can be installed to facilitate CEC activities during testing. The cec-client tool will be employed extensively throughout the test. Additionally, RAFT can use this tool to automate the test cases.
 
-Reference to the tool: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter
-libcec tools: https://www.pulse-eight.com/Download/Get/51  
-
-**Commands used during the test:**
-- To get the COM port of the `CEC` Tool adaptor: ```cec-client -l``` 
-- To find the devices connected (with their logical and physical address): ```echo scan | cec-client <Port> -s -d 1```
-- To Tx and Broadcast: ```echo tx <frames> | cec-client <Port> -s -d 1```
+- Reference to the tool: https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter
+- libcec tools: https://www.pulse-eight.com/Download/Get/51  
 
 **Libraries and tools required for RAFT**
 - libcec should be installed on the PC where the Pulse-Eight CEC Adaptor is connected.
