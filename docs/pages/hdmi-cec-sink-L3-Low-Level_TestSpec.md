@@ -12,10 +12,12 @@ This document provides an overview of the L3 testing requirements for the module
 ## Acronyms, Terms and Abbreviations
 - `CEC`    -  Consumer Electronics Control
 - `HAL`    -  Hardware Abstraction layer
-- `HDMI`  -  High Definition Multimedia Interface
+- `HDMI`   -  High Definition Multimedia Interface
 - `API`    -  Application Program Interface
 - `SoC`    -  System on Chip
-- `DUT`    -  Device Under Test.
+- `DUT`    -  Device Under Test
+- `LA`     -  Logical Address 
+- `PA`     -  Physical Address
 
 
 ## References
@@ -70,7 +72,7 @@ Note: All the below tests should be carried out on all the available HMDI ports.
 - Broadcast an HDMI CEC Command from the DUT and verify that this command has been received on the CEC Adaptor.
 - Receive a standby broadcasting command on the DUT sent by the CEC Adaptor and validate it.
 - Receive an HDMI OSD Command with a string of maximum length (14 bytes) from the CEC Adaptor.
-- The CEC Adaptor sends a standby command to a device with a logical address other than the DUT logical address and ensures no callback is received.
+- The CEC Adaptor sends a standby command to a device with a logical address other than the DUT logical address, ensuring no callback is received.
 
 #### Stress Test
 - Receiving an HDMI OSD Command repeatedly for 10 times with a different string of max length from CEC Adaptor.
@@ -83,7 +85,8 @@ Note: All the below tests should be carried out on all the available HMDI ports.
 
 Functionality: 
 1. `DUT` shall request a CEC Version from the CEC adaptor connected.  It should receive a valid version and be evaluated.
-2. `DUT` shall receive an OSD Command with max buffer size from the CEC Adaptor and respond to this command.  
+2. `DUT` shall receive an OSD Command with max buffer size from the CEC Adaptor and respond to this command.
+3. `DUT` shall receive a "getCECVersion" command with a different `LA` which should not generate any callback.
 
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
@@ -102,8 +105,32 @@ Prerequisites should be met before starting this test.
 
 **User Interaction:**
 - If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
-- `echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Transmit the CEC Frames from `HDMI` `CEC` Adaptor. 
+- RAFT will replace the human to run the test, but still, the RAFT should provide an option for the user to change the HMDI ports and start the test again.
 
+**RAFT Requirements:**
+- RAFT shall initiate the test by reading and validating the LA and PA.
+- RAFT shall initiate the commands to send the CEC OSD command with the string data as read from the hdmicec_sinktest.yml file.
+- RAFT shall provide a means to enter the LA for the test and any other data required during the test. 
+  
+**Sequence Diagram**
+```mermaid
+sequenceDiagram
+    participant DUT
+    participant CEC Adaptor
+    participant RAFT
+    RAFT->>CEC Adaptor: Read and validate LA and PA 
+    RAFT->>DUT: Start the HAL test
+    DUT->>DUT: Add Logical Address
+    DUT->>DUT: Set receive Callback
+    DUT->>CEC Adaptor: Send "GetCECVersion"
+    CEC Adaptor->>DUT: Send the "CEC Version"
+    DUT->>DUT: Validate CEC Version
+    RAFT->>CEC Adaptor: Command to send CEC OSD Command
+    CEC Adaptor->>DUT: Send CEC OSD Command
+    DUT-->>DUT: Validate the received command
+    CEC Adaptor->>DUT: Send "GetCECVersion" to a LA other than `DUT`
+    DUT-->>DUT: No RxCallaback is received.
+```
 
 #### Test Procedure 
 
@@ -112,24 +139,27 @@ Prerequisites should be met before starting this test.
 | 01 | Open HDMI CEC HAL using `HdmiCecOpen` API | `handle` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 02 | Acquire a valid logical address `0x00` using `HdmiCecAddLogicalAddress` | `handle` = valid handle, `logicalAddress` = 0 | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 03 | Set the receive callback function using `HdmiCecSetRxCallback` | `handle` = valid handle, `cbfunc` = RxCallback, `data` = buffer pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
-| 04 | Get the connected device (STB) logical address manually. Wait until this data is entered | N/A | N/A | Enter the logical address of the STB as read on the CEC adapter |
-| 05 | Frame a command to transmit CEC frames to get the CEC version of the connected STB using `HdmiCecTx` | `handle` = valid handle, `buf` = {0x47, 0x9F}, `len` = sizeof(buf), `result` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
-| 06 | Wait for a second and validate a response from the STB on the RxCallback and set the `dataRx` flag to True. Validate the received data and set the `dataRx` flag to False | Test data received from STB | Read and validate this data. Rx data should be a valid CEC version | Should be successful |
-| 07 | Frame and send a CEC OSD command with full buffer data with `DUT` logical address from CEC adapter | `buffer` = {0x02, 0x64, "Hello, World!"} | N/A | User to set this data through CEC adapter |
-| 08 | Wait for the user to signal when the CEC command is sent in step 12 | User to press `y` to move | N/A | User to signal once the CEC command is sent |
-| 09 | Wait for a second to receive data from the CEC adapter on the RxCallback and set the `dataRx` flag to True. Validate the received data with "Hello, World!" and set the `dataRx` flag to False | Test data received should be `0x0F` | Read and validate this data. Data received should be "Hello, World!" | Should be successful |
-| 10 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
+| 04 | Wait to get the connected device (CEC Adaptor) logical address from RAFT.| N/A | N/A | RAFT to enter the LA address of the CEC Adaptor |
+| 05 | Frame a getCECVersion command using the "getcecVersion" command from the test yaml file and send it using using `HdmiCecTx` | `handle` = valid handle, `buf` = cec buffer with LA and command, `len` = sizeof(buf), `result` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
+| 06 | Wait for a second and validate a response from the CEC Adaptor on the RxCallback and validate | Test data received from CEC Adaptor | Read and validate this data. Rx data should be a valid CEC version | Should be successful |
+| 07 | Frame and send a CEC OSD command based on "setosd" on the test yaml file and transmit this data to `DUT`.  | `buffer` = LA, Command and data from test yaml | N/A | RAFT to set this data through CEC adapter |
+| 08 | Wait for the RAFT to signal when the CEC command is sent in step 7  | NA  | N/A | RAFT to signal once the CEC command is sent |
+| 09 | Validate the data received on `DUT` with the "setosd" command data on the test yaml file| Test data received shall match with the data in yaml | Read and validate this data| Should be successful |
+| 10 | Frame and send a CEC command based on "getcecVersion" on the test yaml file and transmit this data to the LA address other than `DUT`.  | `buffer` = LA of non existing device and <br> data read from test yaml  | N/A | RAFT to set this data through CEC adapter |
+| 11 | Wait for the RAFT to signal when the CEC command is sent in step 11  | NA  | N/A | RAFT to signal once the CEC command is sent |
+| 12 | Validate the data received on CEC with the "setosd" command on the test yaml file| Test data received should match with the data in yaml | Read and validate this data| Should be successful |
+| 13 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 
 # Test 3: Transmit and Receive CEC broadcast Commands 
 
 Functionality: 
-1. `DUT` shall broadcast a standby command to the connected devices and STB should receive and act upon the command. 
-2. `DUT` shall receive a standby command as a broadcast command from the CEC Adaptor.
+1. `DUT` shall broadcast a standby command to the connected devices and RAFT should validate this received command on the CEC Adaptor. 
+2. `DUT` shall receive a standby command as a broadcast command from the CEC Adaptor. RAFT to initiate and command the Test.
 
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_broadcast_test`              |
-| Description                   | This test shall validate the broadcast CEC Commands between the `DUT`, STB, and CEC Adaptor connected on a network |
+| Description                   | This test shall validate the broadcast CEC Commands between the `DUT`, and the CEC Adaptor connected on a network |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 003                                              |
 | Priority                      | High                                             |
@@ -142,8 +172,28 @@ Prerequisites should be met before starting this test.
 
 **User Interaction:**
 - If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
-- `echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
-RAFT can also use these commands or the Andriod libraries.
+- RAFT will replace the human to run the test, but still, the RAFT should provide an option for the user to change the HMDI ports and start the test again.
+
+**RAFT Requirements:**
+- RAFT shall initiate the commands to broadcast the standby CEC command with the string data as read from the hdmicec_sinktest.yml file.
+- RAFT provides an interface for the user to change the HMDI port and start the test again.
+  
+**Sequence Diagram**
+```mermaid
+sequenceDiagram
+    participant DUT
+    participant CEC Adaptor
+    participant RAFT
+    RAFT->>CEC Adaptor: Read and validate LA and PA 
+    RAFT->>DUT: Start the HAL test
+    DUT->>DUT: Add Logical Address
+    DUT->>DUT: Set receive Callback
+    DUT->>CEC Adaptor: Broadcast "standby"
+    RAFT->>CEC Adaptor: Validate the CEC Command received on the `CEC` adaptor
+    RAFT->>CEC Adaptor: Board "standby" command"
+    CEC Adaptor->> DUT: Receive the standby command 
+    DUT-->>DUT: Validate the received command
+```
 
 #### Test Procedure 
 ## New Test Plan (Broadcast Commands)
@@ -153,37 +203,56 @@ RAFT can also use these commands or the Andriod libraries.
 | 01 | Open HDMI CEC HAL using `HdmiCecOpen` API | `handle` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 02 | Acquire a valid logical address `0x00` using `HdmiCecAddLogicalAddress` | `handle` = valid handle, `logicalAddress` = 0 | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 03 | Set the receive callback function using `HdmiCecSetRxCallback` | `handle` = valid handle, `cbfunc` = RxCallback, `data` = buffer pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
-| 04 | Frame a command to broadcast CEC frames to put the connected STB into standby state using `HdmiCecTx` | `handle` = valid handle, `buf` = {0x0F, 0x36}, `len` = sizeof(buf), `result` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful.<br>Buffer data may change based on STB logical address |
-| 05 | Wait for the user to respond indicating test pass or fail | `1` for pass and `0` for fail | N/A | User to enter the result |
-| 06 | Frame and send a CEC command to broadcast standby command from CEC adapter | `buffer` = {0x2F, 0x36} | N/A | User to set this data through CEC adapter |
-| 07 | Wait for the user to signal when the CEC broadcast is sent in step 6 | User to press `y` to move | N/A | User to signal once the CEC broadcast is set |
-| 08 | Wait for a second to receive data from the CEC adapter on the RxCallback and set the `dataRx` flag to True. Validate the received data with `0x36` and set the `dataRx` flag to False | Test data received should be `0x0F` | Read and validate this data. Data received should be `0x36` (standby data) | Should be successful |
+| 04 | Frame a standby command to broadcast from `DUT` to all the connected devices using `HdmiCecTx`. Test command and data shall be read from test yaml | `handle` = valid handle, `buf` = as read from yaml file, `len` = sizeof(buf), `result` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful|
+| 05 | RAFT should receive this data and validate the command received. The test should wait for the RAFT to enter the test result based on the validation | NA| N/A | RAFT to provide the result |
+| 06 | RAFT to command CEC adaptor to frame and broadcast the standby CEC command. Test data should be read from test yaml file | `buffer` = test yaml file data | N/A | RAFT to set this data through CEC adapter |
+| 07 | Wait for the RAFT to signal when the CEC broadcast is sent in step 6 | RAFT to provide `y` to move | N/A | RAFT to signal once the CEC broadcast is set |
+| 08 | Received data from the CEC adapter on the RxCallback shall be validated. Received data shall be validated against the test yaml file | Test data received should be as mentioned in the test yaml file | Read and validate this data | Should be successful |
 | 09 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 
 
 # Test 4: Stress Test
 
 Functionality: 
-1. `DUT` shall respond to a CEC OSD command received from the CEC Adaptor repeatedly for 10 times.  The adaptor will be used for better control from the automation tool.
+1. `DUT` shall respond to a CEC OSD command received from the CEC Adaptor continuously 10 times with different strings and validate.
 
 | Title                         | Details                                          |
 |-------------------------------|--------------------------------------------------|
 | Function Name                 | `test_l3_hdmi_cec_sink_respond_osd_command_from_adaptor_repeatedly`              |
-| Description                   | Receive and respond to the CEC OSD Command with buffer data continuously for 10 times to prove the robustness of this API.                       |
+| Description                   | Receive and respond to the CEC OSD Command with buffer data continuously 10 times to prove the robustness of this API.                       |
 | Test Group                    | 03                                               |
 | Test Case ID                  | 004                                              |
 | Priority                      | High                                             |
 
 **Pre-Conditions:**
-TV 1 and the STB are already ON before the start of the Test and they have acquired the physical and logical addresses. TV1 and STB should be good enough to support the basic CEC Commands like getting the `CEC` Version. 
+- The platforms are connected as shown in the picture above and STB and the CEC Adaptor are kept ready before the start of the test.
+- libcec is installed on the PC where the PulseEight tool is connected. libcec will respond to all the basic CEC Commands received from `DUT`
 
 **Dependencies:**
 Prerequisites should be met before starting this test.
 
 **User Interaction:**
 - If the user chooses to run the test in interactive mode, then the test case has to be selected via the console.
-- `echo tx <frames> | cec-client <Port> -s -d 1` shall be used to Broadcast the CEC Frames from `HDMI` `CEC` Adaptor. 
-RAFT can also use these commands or the Andriod libraries.
+- RAFT will replace the human to run the test, but still, the RAFT should provide an option for the user to change the HMDI ports and start the test again.
+
+**RAFT Requirements:**
+- RAFT shall initiate the test by reading and validating the LA and PA.
+- RAFT shall initiate the commands to send the CEC OSD command with the string data as read from the hdmicec_sinktest.yml file.
+  
+**Sequence Diagram**
+```mermaid
+sequenceDiagram
+    participant DUT
+    participant CEC Adaptor
+    participant RAFT
+    RAFT->>CEC Adaptor: Read and validate LA and PA 
+    RAFT->>DUT: Start the HAL test
+    DUT->>DUT: Add Logical Address
+    DUT->>DUT: Set receive Callback
+    RAFT->>CEC Adaptor: Command to send CEC OSD Command for 10 times
+    CEC Adaptor->>DUT: Send CEC OSD Command for 10 times
+    DUT-->>DUT: Validate the received command for 10 times
+```
 
 #### Test Procedure
 | Variation / Steps | Description | Test Data | Expected Result | Notes |
@@ -191,9 +260,8 @@ RAFT can also use these commands or the Andriod libraries.
 | 01 | Open HDMI CEC HAL using `HdmiCecOpen` API | `handle` = valid pointer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 02 | Acquire a valid logical address `0x00` using `HdmiCecAddLogicalAddress` | `handle` = valid handle, `logicalAddress` = 0 | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 | 03 | Set the receive callback function using `HdmiCecSetRxCallback` | `handle` = valid handle, `cbfunc` = valid callback function pointer, `data` = pointer to the valid data buffer | `HDMI_CEC_IO_SUCCESS` | Should be successful |
-| 04 | Wait for a manual command so that CEC Adaptor can send a CEC OSD Command continuously 10 times | N/A | N/A | Should be successful |
-| 05 | Frame command to Tx Test OSD CEC command with full buffer size from the HDMI CEC adaptor continuously for 10 times | `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} | N/A | Should be successful |
-| 06 | Validate the data received from the DUT when the `dataRx` flag in RxCall back function is set to true for 10 times | Compare the received data with predefined buffer | `buf` = {0x05, 0x64, 0x00, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21} | Should be successful |
+| 04 | RAFT shall wait for a signal from `DUT`so that it can signal the CEC Adaptor to send a CEC OSD Command continuously 10 times with different data available in test yaml file | N/A | N/A | Should be successful |
+| 05 | Validate the data received on the DUT and compare the data with the data from "setosd/data" on test yaml file  | Compare the received data with "setosd/data" on test yaml  | NA | Should be successful |
 | 07 | Close HDMI CEC HAL using `HdmiCecClose` API | `handle` = valid handle | `HDMI_CEC_IO_SUCCESS` | Should be successful |
 
 
