@@ -20,7 +20,7 @@ HDMI Consumer Electronics Control (CEC) commands are designed to allow control o
 ```yaml
 ---
 hdmicec:
-  command: SetOSDName
+  command: SetOsdName
   initiator: Sony HomeTheatre
   destination: IPSTB
   parameters:
@@ -132,12 +132,12 @@ These YAML commands closely follow the CEC specifications but are more descripti
 ```yaml
 ---
 hdmicec:
-  command: # The CEC command to be executed (e.g., SetOSDName, ActiveSource, UserControlPressed, etc.)
+  command: # The CEC command to be executed (e.g., SetOsdName, ActiveSource, UserControlPressed, etc.)
   initiator: # The device sending the command (e.g., Sony HomeTheatre, IPSTB, TV, etc.)
   destination: # The device receiving the command (e.g., TV, IPSTB, Broadcast, etc.)
   parameters: # Optional: Additional parameters required for the command
     # Add specific parameters below as needed for the command
-    osd_name: # Example: OSD name to be set (for SetOSDName command)
+    osd_name: # Example: OSD name to be set (for SetOsdName command)
     device_name: # Example: Physical address of the device (for ActiveSource or ReportPhysicalAddress commands)
     ui_command: # Example: User interface command (for UserControlPressed command)
     device_type: # Example: Device type (for ReportPhysicalAddress command)
@@ -154,7 +154,7 @@ The root element of the YAML file, indicating that this is a CEC command.
 #### Command:
 
 The command key specifies the CEC command to be executed.
-Example: SetOSDName is the command to set the On-Screen Display name of a device.
+Example: SetOsdName is the command to set the On-Screen Display name of a device.
 
 #### Initiator:
 
@@ -171,20 +171,20 @@ Example: IPSTB is the device receiving the command.
 #### Parameters:
 
 The parameters key holds a dictionary of additional data required for the command.
-Example: For the SetOSDName command, the parameters section includes an osd_name key with the value IPSTB.
+Example: For the SetOsdName command, the parameters section includes an osd_name key with the value IPSTB.
 
 ### Using the Parameters Section in Different CEC Commands
 
 The `parameters` section in the YAML CEC command is used to provide additional data required for executing specific CEC commands. The parameters vary depending on the command being issued. Below are examples and descriptions of how the `parameters` section can be used in different CEC commands.
 
-#### Example 1: SetOSDName
+#### Example 1: SetOsdName
 
-The `SetOSDName` command sets the On-Screen Display (OSD) name for a device. This command requires an `osd_name` parameter to specify the name to be set.
+The `SetOsdName` command sets the On-Screen Display (OSD) name for a device. This command requires an `osd_name` parameter to specify the name to be set.
 
 ```yaml
 ---
 hdmicec:
-  command: SetOSDName
+  command: SetOsdName
   initiator: Sony HomeTheatre
   destination: IPSTB
   parameters:
@@ -473,8 +473,8 @@ These commands manage the On-Screen Display settings and information.
 
 | Command       | YAML Payload                                                                                                            | Action                                                      | How to Trigger in Real Setup                                      |
 |---------------|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------------|
-| `SetOSDString` | <pre lang="yaml">---&#13;hdmicec:&#13;  command: "SetOSDString"&#13;  initiator: "PlaybackDevice1"&#13;  destination: "TV"&#13;  parameters:&#13;    osd_string: "IPSTB"</pre> | Sets the OSD (On-Screen Display) string on the TV           | Automatically triggered when the playback device sets the OSD string |
-| `SetOSDName`   | <pre lang="yaml">---&#13;hdmicec:&#13;  command: "SetOSDName"&#13;  initiator: "TV"&#13;  destination: "Broadcast"&#13;  parameters:&#13;    osd_name: "IPSTB"</pre>     | Sets the OSD (On-Screen Display) name on all devices       | Automatically triggered when the TV sets the OSD name               |
+| `SetOsdString` | <pre lang="yaml">---&#13;hdmicec:&#13;  command: "SetOsdString"&#13;  initiator: "PlaybackDevice1"&#13;  destination: "TV"&#13;  parameters:&#13;    osd_string: "IPSTB"</pre> | Sets the OSD (On-Screen Display) string on the TV           | Automatically triggered when the playback device sets the OSD string |
+| `SetOsdName`   | <pre lang="yaml">---&#13;hdmicec:&#13;  command: "SetOsdName"&#13;  initiator: "TV"&#13;  destination: "Broadcast"&#13;  parameters:&#13;    osd_name: "IPSTB"</pre>     | Sets the OSD (On-Screen Display) name on all devices       | Automatically triggered when the TV sets the OSD name               |
 | `GiveOSDName`  | <pre lang="yaml">---&#13;hdmicec:&#13;  command: "GiveOSDName"&#13;  initiator: "TV"&#13;  destination: "Broadcast"</pre> | Requests the OSD (On-Screen Display) name from all devices | Using a TV remote control to request OSD name from all devices      |
 
 #### Example YAML Payloads
@@ -483,7 +483,7 @@ These commands manage the On-Screen Display settings and information.
 <pre lang="yaml">
 ---
 hdmicec:
-  command: "SetOSDString"
+  command: "SetOsdString"
   initiator: "PlaybackDevice1"
   destination: "TV"
   parameters:
@@ -494,7 +494,7 @@ hdmicec:
 <pre lang="yaml">
 ---
 hdmicec:
-  command: "SetOSDName"
+  command: "SetOsdName"
   initiator: "TV"
   destination: "Broadcast"
   parameters:

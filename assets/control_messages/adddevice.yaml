@@ -1,0 +1,12 @@
+hdmicec:
+  state: AddDevice
+  parameters:
+    parent: TVPanel
+    name: TestDevice
+    type: PlaybackDevice
+    version: 4
+    active_source: false
+    vendor: TEST_VENDOR
+    pwr_status: on
+    port_id: 3
+    number_children: 0

@@ -49,7 +49,7 @@ struct vcDevice_info_t
   vcCommand_device_type_t type;
   vcCommand_version_t version;
   uint16_t physical_address;
-  uint8_t logical_address;
+  vcCommand_logical_address_t logical_address;
   bool active_source;
   uint32_t vendor_id;
   uint16_t parent_port_id;

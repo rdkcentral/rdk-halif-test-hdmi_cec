@@ -29,9 +29,15 @@
 #define CEC_MSG_EVENT "event"
 #define CEC_MSG_COMMAND "command"
 #define CEC_MSG_CONFIG "config"
+#define CEC_MSG_STATE "state"
+
+#define CEC_MSG_STATE_ADD_DEVICE "AddDevice"
+#define CEC_MSG_STATE_REMOVE_DEVICE "RemoveDevice"
+#define CEC_MSG_STATE_PRINT_STATUS "PrintStatus"
 
 #define CEC_CMD_INITIATOR "initiator"
 #define CEC_CMD_DESTINATION "destination"
+#define CEC_CMD_PARAMETERS "parameters"
 
 #define CEC_BROADCAST "broadcast"
 
@@ -39,28 +45,128 @@
 #define CMD_HOTPLUG "HotPlug"
 
 /*CEC Commands*/
-#define CMD_IMAGE_VIEW_ON "ImageViewOn"
-#define CMD_TEXT_VIEW_ON "TextViewOn"
-#define CMD_STANDBY "StandBy"
-#define CMD_ACTIVE_SOURCE "ActiveSource"
-#define CMD_REQUEST_ACTIVE_SOURCE "ActiveSource"
-#define CMD_INACTIVE_SOURCE "InactiveSource"
-#define CMD_SET_OSD_NAME "SetOSDName"
+#define CMD_FEATURE_ABORT                  "FeatureAbort"
+#define CMD_IMAGE_VIEW_ON                  "ImageViewOn"
+#define CMD_TUNER_STEP_INCREMENT           "TunerStepIncrement"
+#define CMD_TUNER_STEP_DECREMENT           "TunerStepDecrement"
+#define CMD_TUNER_DEVICE_STATUS            "TunerDeviceStatus"
+#define CMD_GIVE_TUNER_DEVICE_STATUS       "GiveTunerDeviceStatus"
+#define CMD_RECORD_ON                      "RecordOn"
+#define CMD_RECORD_STATUS                  "RecordStatus"
+#define CMD_RECORD_OFF                     "RecordOff"
+#define CMD_TEXT_VIEW_ON                   "TextViewOn"
+#define CMD_RECORD_TV_SCREEN               "RecordTvScreen"
+#define CMD_GIVE_DECK_STATUS               "GiveDeckStatus"
+#define CMD_DECK_STATUS                    "DeckStatus"
+#define CMD_DECK_CONTROL                   "DeckControl"
+#define CMD_PLAY                           "Play"
+#define CMD_TUNE_DIGITAL_SERVICE           "TuneDigitalService"
+#define CMD_TUNE_ANALOG_SERVICE            "TuneAnalogService"
+#define CMD_TUNE_SOURCE                    "TuneSource"
+#define CMD_TUNE_CHANNEL                   "TuneChannel"
+#define CMD_GIVE_PHYSICAL_ADDRESS          "GivePhysicalAddress"
+#define CMD_REPORT_PHYSICAL_ADDRESS        "ReportPhysicalAddress"
+#define CMD_GIVE_OSD_NAME                  "GiveOsdName"
+#define CMD_SET_OSD_NAME                   "SetOsdName"
+#define CMD_GIVE_AUDIO_STATUS              "GiveAudioStatus"
+#define CMD_SYSTEM_AUDIO_MODE_REQUEST      "SystemAudioModeRequest"
+#define CMD_SET_SYSTEM_AUDIO_MODE          "SetSystemAudioMode"
+#define CMD_SYSTEM_AUDIO_MODE_STATUS       "SystemAudioModeStatus"
+#define CMD_USER_CONTROL_PRESSED           "UserControlPressed"
+#define CMD_USER_CONTROL_RELEASED          "UserControlReleased"
+#define CMD_SET_STREAM_PATH                "SetStreamPath"
+#define CMD_STANDBY                        "Standby"
+#define CMD_GIVE_DEVICE_VENDOR_ID          "GiveDeviceVendorId"
+#define CMD_DEVICE_VENDOR_ID               "DeviceVendorId"
+#define CMD_GIVE_CEC_VERSION               "GiveCecVersion"
+#define CMD_CEC_VERSION                    "CecVersion"
+#define CMD_GIVE_DEVICE_POWER_STATUS       "GiveDevicePowerStatus"
+#define CMD_REPORT_POWER_STATUS            "ReportPowerStatus"
+#define CMD_SET_MENU_LANGUAGE              "SetMenuLanguage"
+#define CMD_GIVE_DEVICE_FEATURE            "GiveDeviceFeature"
+#define CMD_REPORT_DEVICE_FEATURE          "ReportDeviceFeature"
+#define CMD_GIVE_AUDIO_MODE_STATUS         "GiveAudioModeStatus"
+#define CMD_SET_OSD_STRING                 "SetOsdString"
+#define CMD_REQUEST_ACTIVE_SOURCE          "RequestActiveSource"
+#define CMD_ACTIVE_SOURCE                  "ActiveSource"
+#define CMD_INACTIVE_SOURCE                "InactiveSource"
+#define CMD_GIVE_SYSTEM_AUDIO_MODE_STATUS  "GiveSystemAudioModeStatus"
+#define CMD_ROUTING_CHANGE                 "RoutingChange"
+#define CMD_ROUTING_INFORMATION            "RoutingInformation"
+#define CMD_SET_AUDIO_RATE                 "SetAudioRate"
+#define CMD_INITIATE_ARC                   "InitiateArc"
+#define CMD_REPORT_ARC_INITIATED           "ReportArcInitiated"
+#define CMD_REPORT_ARC_TERMINATED          "ReportArcTerminated"
+#define CMD_REQUEST_ARC_INITIATION         "RequestArcInitiation"
+#define CMD_REQUEST_ARC_TERMINATION        "RequestArcTermination"
+#define CMD_TERMINATE_ARC                  "TerminateArc"
+
+//Parameter Names
 #define CMD_DATA_OSD_NAME "osd_name"
 
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
-typedef enum
+
+typedef enum 
 {
-  CEC_OPCODE_UNKNOWN = 0,
-  CEC_IMAGE_VIEW_ON = 0x04,
-  CEC_TEXT_VIEW_ON = 0x0D,
-  CEC_STANDBY = 0x36,
-  CEC_SET_OSD_NAME = 0x49,
-  CEC_ACTIVE_SOURCE = 0x82,
-  CEC_REQUEST_ACTIVE_SOURCE = 0x85,
-  CEC_INACTIVE_SOURCE = 0x9D,
+  CEC_OPCODE_UNKNOWN                 = -1,
+  CEC_FEATURE_ABORT                  = 0x00,
+  CEC_IMAGE_VIEW_ON                  = 0x04,
+  CEC_TUNER_STEP_INCREMENT           = 0x05,
+  CEC_TUNER_STEP_DECREMENT           = 0x06,
+  CEC_TUNER_DEVICE_STATUS            = 0x07,
+  CEC_GIVE_TUNER_DEVICE_STATUS       = 0x08,
+  CEC_RECORD_ON                      = 0x09,
+  CEC_RECORD_STATUS                  = 0x0A,
+  CEC_RECORD_OFF                     = 0x0B,
+  CEC_TEXT_VIEW_ON                   = 0x0D,
+  CEC_RECORD_TV_SCREEN               = 0x0F,
+  CEC_GIVE_DECK_STATUS               = 0x1A,
+  CEC_DECK_STATUS                    = 0x1B,
+  CEC_DECK_CONTROL                   = 0x42,
+  CEC_PLAY                           = 0x41,
+  CEC_TUNE_DIGITAL_SERVICE           = 0x43,
+  CEC_TUNE_ANALOG_SERVICE            = 0x44,
+  CEC_TUNE_SOURCE                    = 0x45,
+  CEC_TUNE_CHANNEL                   = 0x46,
+  CEC_GIVE_PHYSICAL_ADDRESS          = 0x83,
+  CEC_REPORT_PHYSICAL_ADDRESS        = 0x84,
+  CEC_GIVE_OSD_NAME                  = 0x46,
+  CEC_SET_OSD_NAME                   = 0x47,
+  CEC_GIVE_AUDIO_STATUS              = 0x71,
+  CEC_SYSTEM_AUDIO_MODE_REQUEST      = 0x70,
+  CEC_SET_SYSTEM_AUDIO_MODE          = 0x72,
+  CEC_SYSTEM_AUDIO_MODE_STATUS       = 0x7E,
+  CEC_USER_CONTROL_PRESSED           = 0x44,
+  CEC_USER_CONTROL_RELEASED          = 0x45,
+  CEC_SET_STREAM_PATH                = 0x86,
+  CEC_STANDBY                        = 0x36,
+  CEC_GIVE_DEVICE_VENDOR_ID          = 0x8C,
+  CEC_DEVICE_VENDOR_ID               = 0x87,
+  CEC_GIVE_CEC_VERSION               = 0x9F,
+  CEC_CEC_VERSION                    = 0x9E,
+  CEC_GIVE_DEVICE_POWER_STATUS       = 0x8F,
+  CEC_REPORT_POWER_STATUS            = 0x90,
+  CEC_SET_MENU_LANGUAGE              = 0x32,
+  CEC_GIVE_DEVICE_FEATURE            = 0xAA,
+  CEC_REPORT_DEVICE_FEATURE          = 0xAB,
+  CEC_GIVE_AUDIO_MODE_STATUS         = 0x71,
+  CEC_SET_OSD_STRING                 = 0x64,
+  CEC_REQUEST_ACTIVE_SOURCE          = 0x85,
+  CEC_ACTIVE_SOURCE                  = 0x82,
+  CEC_INACTIVE_SOURCE                = 0x9D,
+  CEC_GIVE_SYSTEM_AUDIO_MODE_STATUS  = 0x7D,
+  CEC_ROUTING_CHANGE                 = 0x80,
+  CEC_ROUTING_INFORMATION            = 0x81,
+  CEC_SET_AUDIO_RATE                 = 0x9A,
+  CEC_INITIATE_ARC                   = 0xC0,
+  CEC_REPORT_ARC_INITIATED           = 0xC1,
+  CEC_REPORT_ARC_TERMINATED          = 0xC2,
+  CEC_REQUEST_ARC_INITIATION         = 0xC3,
+  CEC_REQUEST_ARC_TERMINATION        = 0xC4,
+  CEC_TERMINATE_ARC                  = 0xC5
 } vcCommand_opcode_t;
+
 
 typedef enum
 {
@@ -79,8 +185,6 @@ typedef enum
   DEVICE_TYPE_TUNER,
   DEVICE_TYPE_PLAYBACK,
   DEVICE_TYPE_AUDIO_SYSTEM,
-  DEVICE_TYPE_FREEUSE,
-  DEVICE_TYPE_UNREGISTERED,
   DEVICE_TYPE_UNKNOWN
 } vcCommand_device_type_t;
 
