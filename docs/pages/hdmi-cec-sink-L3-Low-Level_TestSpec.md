@@ -41,7 +41,7 @@ Note: The below-shown prerequisites should be met before starting the test on th
 ```mermaid
 graph TB
 C[PC] <--> A
-A[Pulse-8 - 1] <--> |HDMI| B[TV]  
+A[Pulse-Eight CEC Adaptor ] <--> |HDMI| B[TV]  
 ```
 
 ### Pulse-Eight CEC Adaptor tool:
@@ -56,7 +56,8 @@ The Pulse-Eight CEC Adapter will be used to frame and send commands to the DUT. 
 - https://pypi.org/project/cec/ will provide more information on how to use this library.
   
 **cec-ctrl Commands used in Manual Mode**
-- To get the logical and physical address: cec-client -s -d 4
+- libcec should be installed on the PC where the Pulse-Eight CEC Adaptor is connected.
+- To get the logical and physical address: `cec-client -s -d 4`
 - To Tx data: `cec-client -s -t 1 --data <command>` or `echo "tx <data>" | cec-client -s` Eg:`echo "tx 10:36" | cec-client -s`
 - To check the last received data use `cec-client -m | grep '>>' | tail -n 1`.  `cec-client -m` shall monitor the data continuously 
   
