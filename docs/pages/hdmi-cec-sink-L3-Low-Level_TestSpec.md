@@ -230,7 +230,6 @@ sequenceDiagram
 ```
 
 #### Test Procedure 
-## New Test Plan (Broadcast Commands)
 
 | Variation / Steps | Description | Test Data | Expected Result | Notes |
 |-------------------|-------------|-----------|------------------|-------|
