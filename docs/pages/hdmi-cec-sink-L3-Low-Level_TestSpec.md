@@ -132,20 +132,25 @@ sequenceDiagram
     CEC Adaptor->>DUT: Send "GetCECVersion" before adding the logical address
     RAFT/user->>RAFT/user: No response or ack should be received.
     DUT->>DUT: Wait for the RAFT/user to signal to provide ack received or not.
+    RAFT/user->>DUT: RAFT/user to signal the test to move ahead
     DUT->>DUT: Check no RxCallback has been received and decide whether the test passes or fails
     DUT->>DUT: Add Logical Address
     DUT->>DUT: Wait for User/RAFT to enter the logical address
+    RAFT/user->>DUT: RAFT/user to provide the logical address 
     DUT->>CEC Adaptor: Send "GetCECVersion"
     CEC Adaptor->>DUT: Send the "CEC Version"
     DUT->>DUT: Validate CEC Version
     DUT->>DUT: Wait for User/RAFT to signal the start of the next test
+    RAFT/user->>DUT: RAFT/user to signal the test to move ahead
     RAFT/user->>CEC Adaptor: Command to send CEC OSD Command
     CEC Adaptor->>DUT: Send CEC OSD Command
     DUT->>DUT: Validate the received command
     RAFT/user->>RAFT/user: Read the CEC acknowledgment received and validate
     DUT->>DUT: Wait for User/RAFT to enter the acknowledgment confirmation and decide Test Pass/Fail
+    RAFT/user->>DUT: RAFT/user to provide the test result
     CEC Adaptor->>DUT: Send "GetCECVersion" to an LA other than `DUT`(0x01 to 0x0E). Repeat these 4 steps for all the addresses sent.
     DUT->>DUT: Wait for User/RAFT to signal when the CEC adaptor has sent a CEC message.
+    RAFT/user->>DUT: RAFT/user to signal the test to move ahead
     DUT->>DUT: Test fails if it has received any message.
     RAFT/user->>RAFT/user: No CEC acknowledgment is received after CEC Frames are sent.   
 ```
@@ -217,6 +222,7 @@ sequenceDiagram
     DUT->>DUT: Wait for the input from RAFT/user to provide the test result
     RAFT/user->>DUT: Provide the Test result of standby data received by it.
     DUT->>DUT: Wait for the input from RAFT/user to send a broadcast command
+    RAFT/user->>DUT: RAFT/user to signal the test to move ahead
     RAFT->>CEC Adaptor: Broadcast "standby" command
     RAFT/user->>DUT: Signal the command to validate the data RAFT/user broadcasted and received by DUT.
     CEC Adaptor->> DUT: Broadcast the standby command
@@ -285,9 +291,11 @@ sequenceDiagram
     RAFT/user->>RAFT/user: To validate the acknowledgment received each time when sent the CEC Frame.
     DUT-->>DUT: Validate the received command for 10 times
     RAFT/user->>DUT: DUT to wait till the RAFT/user provides the data ack result
+    RAFT/user->>DUT: RAFT/user to signal the test to move ahead with the ack result
     DUT->>CEC Adaptor: Send CEC OSD Command for 10 times
     RAFT/user->>RAFT/user: To validate the OSD Command received on the CEC Adaptor
     RAFT/user->>DUT: DUT to wait till the RAFT/user provides the data ack result
+    RAFT/user->>DUT: RAFT/user to signal the test with result
     DUT->>DUT: To decide the final result based on the RAFT/user result and its own result.
 ```
 
