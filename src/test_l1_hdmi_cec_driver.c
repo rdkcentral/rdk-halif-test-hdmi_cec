@@ -79,9 +79,6 @@
 */
 #define DEFAULT_LOGICAL_ADDRESS_STB 3
 
-#define TEST_UTIL_TYPE_SOURCE_VALUE     "source"
-#define TEST_UTIL_TYPE_SINK_VALUE       "sink"
-
 /// Set the CEC sink (Display device) logical address here
 #define DEFAULT_LOGICAL_ADDRESS_PANEL 0
 
