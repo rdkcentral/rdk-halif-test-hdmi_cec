@@ -977,7 +977,6 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
     int result;
     int handle = 0;
     int logicalAddress = 0;
-    int logicalAddressCrossCheck = INT_MIN;
     gTestID = 16;
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
