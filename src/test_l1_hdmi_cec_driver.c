@@ -557,7 +557,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
 
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
-    if(((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (physicalAddress > 0xffff)) || \
+    if(((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && ((physicalAddress >= 0xffff) || (physicalAddress <= 0x0000) )) || \
             ((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (physicalAddress != 0x0000))){
 	    UT_FAIL("Invalid physicalAddress");
     }
@@ -986,17 +986,11 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
 
-    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    result = HdmiCecGetLogicalAddress(handle, &logicalAddressCrossCheck);
+    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
-    if(logicalAddress != logicalAddressCrossCheck){
-             UT_FAIL("logicalAddress and logicalAddressCrossCheck are not same");
+    if(logicalAddress != 0x0f){
+             UT_FAIL("Invalid logicalAddress");
      }
-
-    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
