@@ -36,7 +36,7 @@
 
 
 /**
- * @defgroup HDMI_CEC_HALTESTS_L2 HDMI CEC HAL Tests L2 File
+ * @defgroup HDMI_CEC_HALTESTS_L3 HDMI CEC HAL Tests L2 File
  * @{
  * @parblock
  *
@@ -44,8 +44,8 @@
  *
  *
  * ## Module's Role
- * This module includes Level 2 functional tests (success and failure scenarios).
- * This is to ensure that the hdmi_cec_driver APIs meet the requirements across all vendors.
+ * This module includes Level 3 functional test interfaces.
+ * This Test Interfaces provides a scope to create a User Test cases for HDMI CEC Sink modules that can be either Manual or automated scripts.
  *
  * **Pre-Conditions:**  None@n
  * **Dependencies:** None@n
@@ -56,7 +56,7 @@
  */
 
 /**
- * @file test_l2_hdmi_cec_sink_driver.c
+ * @file test_l3_hdmi_cec_sink_driver.c
  *
  */
 
@@ -71,6 +71,18 @@ static int gTestGroup = 3;
 static int gTestID = 1;
 static int gHandle = 0;
 static int cbFlag = 0;
+
+
+/**
+* @brief Rx Callback function
+*
+* This function is a Receive Call back function called when data is received from a connected device. 
+* This function should be registered through HdmiCecSetRxCallback().
+*
+* **Test Group ID:** 03@n
+* **Test Case ID:** 000@n
+*
+*/
 
 /* Callback function */
 void onRxDataReceived(int handle, void *callbackData, unsigned char *buf, int len)
@@ -106,10 +118,16 @@ void onRxDataReceived(int handle, void *callbackData, unsigned char *buf, int le
 
 *
 * **Test Group ID:** 03@n
+*
 * **Test Case ID:** 001@n
 *
-* **Test Procedure:**
-* Refer to UT specification documentation
+* **Pre-Conditions:** None@n
+*
+* **Dependencies:** None@n
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 1 to before running any test.
+*
 */
 
 void test_l3_hdmi_cec_sink_hal_Init(void)
@@ -135,16 +153,26 @@ void test_l3_hdmi_cec_sink_hal_Init(void)
 }
 
 /**
-* @brief This test provides a scope to add the logical address
+* @brief This test provides a scope to add the sink logical address. Usually it shall be zero.
 *
-* This test case provides a scope to add the available logical address
+* This test case provides a scope to add the available sink logical address
 * to a Device under test.
+*
 * Note:   
 * This applies only for the Sink Devices.
 * Source devices will get the logical address during CEC open.
 *
 * **Test Group ID:** 02@n
+*
 * **Test Case ID:** 002@n
+*
+* **Pre-Conditions:** @n
+* HDMI-CEC Module should be intialized through Test 1 before calling this test.
+* 
+* **Dependencies:** None@n
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 2 and provide the logical address.
 *
 */
 void test_l3_hdmi_cec_sink_hal_AddLogicalAddress(void)
@@ -176,12 +204,22 @@ void test_l3_hdmi_cec_sink_hal_AddLogicalAddress(void)
 /**
 * @brief Test to get the logical address
 *
+* This test provides a scope to check the assigned logical address of the device.
 *
 * **Test Group ID:** 02@n
+*
 * **Test Case ID:** 003@n
 *
-*/
+* **Pre-Conditions:** @n
+* HDMI-CEC Module should be intialized through Test 1 before calling this test.
+*
+* **Dependencies:** None@n
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 3 and shall read the Logical address displayed on the console.
 
+*
+*/
 void test_l3_hdmi_cec_sink_hal_GetLogicalAddress(void)
 {
     gTestID = 3;
@@ -203,15 +241,25 @@ void test_l3_hdmi_cec_sink_hal_GetLogicalAddress(void)
 
 
 /**
-* @brief Test to Transmit the CEC Command
+* @brief  Test provides a scope to Transmit the CEC Command
 *
+* This test provides an interface to user/automation tool to transmit a CEC Command.
+* Necessary input should be provided to the test. 
 *
 * **Test Group ID:** 02@n
-* **Test Case ID:** 003@n
+*
+* **Test Case ID:** 004@n
+*
+* **Pre-Conditions:** @n
+* HDMI-CEC Module should be intialized through Test 1 before calling this test.
+*
+* **Dependencies:** None@n
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 4 and shall provide the necessary source and destination logical address, 
+* CEC command, data lenght and data.   
 *
 */
-
-
 void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void)
 {
     gTestID = 4;
@@ -264,20 +312,26 @@ void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void)
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
-
-
-
-
 /**
 * @brief Test to Receive the CEC Command
 *
+* This test provides an interface to check whether the CEC has received any frames or not.
 *
 * **Test Group ID:** 02@n
+*
 * **Test Case ID:** 005@n
 *
+* **Pre-Conditions:** @n
+* HDMI-CEC Module should be intialized through Test 1 before calling this test.
+*
+* **Dependencies:** @n
+* Depends on the external device to send a CEC Frames with necessary command and data.
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 5 and make sure that the CEC Frames has been sent from an external
+* device connected in the network.
+*
 */
-
-
 void test_l3_hdmi_cec_sink_hal_ReceiveHdmiCecCommand(void)
 {
     gTestID = 5;
@@ -298,9 +352,20 @@ void test_l3_hdmi_cec_sink_hal_ReceiveHdmiCecCommand(void)
 /**
 * @brief Test to get the physical address
 *
+* This test provides a scope to read the physical address of the device.
 *
 * **Test Group ID:** 02@n
+*
 * **Test Case ID:** 006@n
+*
+* **Pre-Conditions:** @n
+* HDMI-CEC Module should be intialized through Test 1 before calling this test.
+*
+* **Dependencies:** None@n
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 6 to read the physical address of the device 
+* device connected in the network.
 *
 */
 void test_l3_hdmi_cec_sink_hal_GetPhysicalAddress(void)
@@ -325,9 +390,20 @@ void test_l3_hdmi_cec_sink_hal_GetPhysicalAddress(void)
 /**
 * @brief Test to Remove logical address
 *
+* This test provides a scope to remove the logical address of the device. HAL API to set 
+* to default logical addres 0xF once the logical address is removed.
 *
 * **Test Group ID:** 02@n
-* **Test Case ID:** 006@n
+*
+* **Test Case ID:** 07@n
+*
+* **Pre-Conditions:** @n
+* HDMI-CEC Module should be intialized through Test 1 before calling this test.
+*
+* **Dependencies:** None@n
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 7 to delete the logical address.
 *
 */
 void test_l3_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
@@ -353,6 +429,24 @@ void test_l3_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
+/**
+* @brief Test to close the HDMI CEC device.
+*
+* This test provides a scope to close the created HDMI CEC handle.
+*
+* **Test Group ID:** 02@n
+* 
+* **Test Case ID:** 08@n
+*
+* **Pre-Conditions:** @n
+* HDMI-CEC Module should be intialized through Test 1 before calling this test.
+*
+* **Dependencies:** None@n
+*
+* **User Interaction:** @n
+* User or Automation tool should select the Test 8 to close the created HDMI CEC handle.
+*
+*/
 void test_l2_hdmi_cec_sink_hal_Close(void)
 {
     gTestID = 8;
