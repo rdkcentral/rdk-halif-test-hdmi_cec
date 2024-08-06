@@ -66,7 +66,7 @@ extern int test_hdmidec_hal_l1_register_sink_tests( void );
 extern int test_hdmidec_hal_l1_register_source_tests( void );
 extern int test_register_hdmicec_hal_source_l2_tests( void );
 extern int test_register_hdmicec_hal_sink_l2_tests( void );
-
+extern int test_register_hdmicec_hal_sink_l3_tests(void);
 
 int register_hdmicec_hal_common_l1_tests( void )
 {
@@ -109,6 +109,16 @@ int register_hdmicec_hal_sink_l2_tests( void )
 
     return registerFailed;
 }
+
+int register_hdmicec_hal_sink_l3_tests( void )
+{
+    int registerFailed=0;
+
+    registerFailed |= test_register_hdmicec_hal_sink_l3_tests();
+
+    return registerFailed;
+}
+
 
 /** @} */ // End of HDMI CEC HAL Tests Register File
 /** @} */ // End of HDMI CEC HAL Tests
