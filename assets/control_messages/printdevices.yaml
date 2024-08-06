@@ -1,0 +1,4 @@
+hdmicec:
+  state: PrintStatus
+  parameters:
+      status: Devices

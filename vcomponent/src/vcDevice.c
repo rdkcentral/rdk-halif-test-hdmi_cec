@@ -23,6 +23,7 @@
 #include <assert.h>
 
 #include "vcDevice.h"
+       #include <unistd.h>
 
 const static vcCommand_strVal_t gDIStrVal [] = {
   { "TV", (int) DEVICE_TYPE_TV },
@@ -31,9 +32,6 @@ const static vcCommand_strVal_t gDIStrVal [] = {
   { "RecordingDevice", (int) DEVICE_TYPE_RECORDER },
   { "Tuner", (int) DEVICE_TYPE_TUNER },
   { "Reserved",  (int) DEVICE_TYPE_RESERVED },
-  { "FreeUse", (int) DEVICE_TYPE_FREEUSE },
-  { "Unregistered", (int) DEVICE_TYPE_UNREGISTERED },
-  { "Unknown", (int) DEVICE_TYPE_UNKNOWN }
 };
 
 const static vcCommand_strVal_t gVCStrVal [] = {
@@ -200,8 +198,8 @@ void vcDevice_Reset(struct vcDevice_info_t* device)
     assert(device != NULL);
   }
   device->active_source = false;
-  device->logical_address = 0x0F;
-  device->physical_address = 0x0F;
+  device->logical_address = LOGICAL_ADDRESS_UNKNOWN;
+  device->physical_address = 0xFFFF;
   device->parent = NULL;
   device->first_child = NULL;
   device->next_sibling = NULL;
@@ -281,6 +279,9 @@ void vcDevice_RemoveChild(struct vcDevice_info_t* map, char* name)
   {
     prev->next_sibling = tmp->next_sibling;
   }
+  //Disconnect the subtree to prevent freeing the wrong nodes
+  tmp->next_sibling = NULL;
+
   //Remove the entire tree under this device.
   vcDevice_DestroyMap(tmp);
 }
@@ -288,10 +289,8 @@ void vcDevice_RemoveChild(struct vcDevice_info_t* map, char* name)
 struct vcDevice_info_t* vcDevice_Get(struct vcDevice_info_t* map, char* name)
 {
   struct vcDevice_info_t* device;
-
   if(map == NULL)
   {
-    VC_LOG("vcDevice_Get: map NULL");
     return NULL;
   }
   if(name == NULL)
@@ -364,21 +363,22 @@ void vcDevice_AllocatePhysicalLogicalAddresses(struct vcDevice_info_t * map, str
     }
     map->physical_address = ((physicalAddress[0] & 0x0F) << 12) | ((physicalAddress[1] & 0x0F) << 8) | ((physicalAddress[2] & 0x0F) << 4) | (physicalAddress[3] & 0x0F);
   }
-
-  //Allocate logical address
-  if(map->parent == NULL)
+  //Allocate logical address only if it is not already allocated
+  if(map->logical_address == LOGICAL_ADDRESS_UNKNOWN)
   {
-    if(!strcmp(map->osd_name, emulated_device->osd_name))
+    if(map->parent == NULL)
     {
-      //If the root device (TV) is the emulated device, then logical address is expected to be set by application
-      map->logical_address = LOGICAL_ADDRESS_BROADCAST; 
+      if(!strcmp(map->osd_name, emulated_device->osd_name))
+      {
+        //If the root device (TV) is the emulated device, then logical address is expected to be set by application
+        map->logical_address = LOGICAL_ADDRESS_BROADCAST; 
+      }
+    }
+    else
+    {
+        map->logical_address = vcDevice_AllocateLogicalAddress(pool, map->type);
     }
   }
-  else
-  {
-      map->logical_address = vcDevice_AllocateLogicalAddress(pool, map->type);
-  }
-
   vcDevice_AllocatePhysicalLogicalAddresses(map->next_sibling, emulated_device, pool);
   vcDevice_AllocatePhysicalLogicalAddresses(map->first_child, emulated_device, pool);
 }
@@ -394,7 +394,8 @@ vcCommand_logical_address_t vcDevice_AllocateLogicalAddress(vcDevice_logical_add
   {
     case DEVICE_TYPE_TV:
       possible_addresses[0] = LOGICAL_ADDRESS_TV;
-      num_possible_addresses = 1;
+      possible_addresses[1] = LOGICAL_ADDRESS_FREEUSE;
+      num_possible_addresses = 2;
       break;
     case DEVICE_TYPE_PLAYBACK:
       possible_addresses[0] = LOGICAL_ADDRESS_PLAYBACKDEVICE1;
@@ -419,16 +420,6 @@ vcCommand_logical_address_t vcDevice_AllocateLogicalAddress(vcDevice_logical_add
       possible_addresses[3] = LOGICAL_ADDRESS_TUNER4;
       num_possible_addresses = 4;
       break;
-    case DEVICE_TYPE_RESERVED:
-      possible_addresses[0] = LOGICAL_ADDRESS_RESERVED1;
-      possible_addresses[1] = LOGICAL_ADDRESS_RESERVED2;
-      num_possible_addresses = 2;
-      break;
-    case DEVICE_TYPE_FREEUSE:
-      possible_addresses[0] = LOGICAL_ADDRESS_FREEUSE;
-      num_possible_addresses = 1;
-      break;
-    case DEVICE_TYPE_UNREGISTERED:
     default:
       possible_addresses[0] = LOGICAL_ADDRESS_UNREGISTERED;
       num_possible_addresses = 1;
@@ -443,7 +434,7 @@ vcCommand_logical_address_t vcDevice_AllocateLogicalAddress(vcDevice_logical_add
       return possible_addresses[i];
     }
   }
-  return DEVICE_TYPE_UNREGISTERED; // No available addresses for the given device type
+  return LOGICAL_ADDRESS_UNREGISTERED; // No available addresses for the given device type
 }
 
 void vcDevice_ReleaseLogicalAddress(vcDevice_logical_address_pool_t *pool, vcCommand_logical_address_t address)

@@ -64,7 +64,6 @@ vcHdmiCec_t* vcHdmiCec_Initialize( void );
  * @retval VC_HDMICEC_STATUS_INVALID_HANDLE - Invalid vcHdmiCec_t* handle
  * @retval VC_HDMICEC_STATUS_INVALID_PARAM - pProfilePath is NULL
  * @retval VC_HDMICEC_STATUS_OUT_OF_MEMORY - Memory allocation error
- * @retval VC_HDMICEC_STATUS_ALREADY_INITIALIZED - Initialize called again.
  * @retval VC_HDMICEC_STATUS_PROFILE_READ_ERROR - Error reading the profile path from file
  */
 vcHdmiCec_Status_t vcHdmiCec_Open( vcHdmiCec_t* pVCHdmiCec, char* pProfilePath, bool enableCPMsgs );
