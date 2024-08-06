@@ -70,6 +70,8 @@ extern int register_hdmicec_hal_source_l1_tests( void );
 extern int register_hdmicec_hal_sink_l1_tests( void );
 extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
+extern int register_hdmicec_hal_sink_l3_tests( void );
+
 
 #ifdef VCOMPONENT
 extern int register_vcomponent_tests ( char* profile );
@@ -138,6 +140,7 @@ int main(int argc, char** argv)
     if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
         register_hdmicec_hal_sink_l1_tests ();
         register_hdmicec_hal_sink_l2_tests ();
+	register_hdmicec_hal_sink_l3_tests ();
     }
 
     UT_run_tests();
