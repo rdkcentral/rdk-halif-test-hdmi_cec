@@ -160,7 +160,7 @@ void DriverReceiveCallback(int handle, void *callbackData, unsigned char *buf, i
  * @param callbackData callback data passed
  * @param result async send status
  */
-void DriverTransmitCallback(int handle, void *callbackData, HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;)
+void DriverTransmitCallback(int handle, void *callbackData, int result )
 {
    if((handle!=0) && (callbackData !=NULL)) {
            //UT_ASSERT_TRUE_FATAL( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
@@ -382,7 +382,7 @@ void test_hdmicec_hal_l1_close_positive( void )
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
 {
-    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS; = 0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     unsigned int physicalAddress = 0;
     gTestID = 6;
@@ -446,7 +446,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
 {
-    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS; = 0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     unsigned int physicalAddress = 0;
     gTestID = 7;
