@@ -87,24 +87,7 @@ static int gTestID = 1;
 static bool extendedEnumsSupported=false;
 
 #define CEC_GET_CEC_VERSION (0x9F)
-#define CEC_DEVICE_VENDOR_ID (0x87)
 #define CEC_BROADCAST_ADDR (0xF)
-
-#define CEC_MEASURE_RESPONSE_TIME_START_CLOCK(start_time) \
-    do { \
-        start_time = clock(); \
-    } while (0)
-
-#define CEC_MEASURE_RESPONSE_TIME_GET_RESPONSE_TIME(start_time, end_time, responseTimeInMilliSecs) \
-    do { \
-        end_time = clock(); \
-        responseTimeInMilliSecs = ((double) (end_time - start_time)) / (CLOCKS_PER_SEC / 1000); \
-    } while (0)
-
-
-#define HDMICEC_TERM(){\
-       HdmiCecClose( handle );\
-}
 
 #define CHECK_FOR_EXTENDED_ERROR_CODE( result, enhanced, old )\
 {\
@@ -177,48 +160,13 @@ void DriverReceiveCallback(int handle, void *callbackData, unsigned char *buf, i
  * @param callbackData callback data passed
  * @param result async send status
  */
-void DriverTransmitCallback(int handle, void *callbackData, int result)
+void DriverTransmitCallback(int handle, void *callbackData, int result )
 {
    if((handle!=0) && (callbackData !=NULL)) {
            //UT_ASSERT_TRUE_FATAL( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
            UT_LOG ("\ncallbackData returned: %x result: %d\n",callbackData, result);
    }
 }
-/**
- * @brief get the logical address of the receiver
- * @param handle Hdmi device handle
- * @param logicalAddress logical address of the device
- * @param receiverLogicalAddress logical address of the receiver
- */
-void getReceiverLogicalAddressL1 (int handle, int logicalAddress, unsigned char* receiverLogicalAddress) {
-    int ret=0;
-    unsigned char buf[] = {0x00};
-    cec_isPingTriggeredl1_g = false;
-    //Ping all logical address and determine which device is connected
-    for(int i=0; i< CEC_BROADCAST_ADDR; i++ ) {
-        unsigned char addr = i & 0x0F; 
-        if (logicalAddress != addr) {
-            buf[0] = ((logicalAddress&0x0F)<<4)|addr;
-	        //No need to check the return status of HdmiCecTx since function will called
-	        //to check the hdmi disconnected conditions also
-	        ret = HDMI_CEC_IO_SUCCESS;
-            int result = HdmiCecTx(handle, buf, sizeof (buf), &ret);
-
-            //Wait for response delay for the reply
-            clock_gettime(CLOCK_REALTIME, &cec_tsl1_g); cec_tsl1_g.tv_sec += 1;
-            sem_timedwait(&cec_seml1_g, &cec_tsl1_g);
-            UT_LOG ("\n buf is : 0x%x ret value is  : 0x%x result is : 0x%x \n", buf[0], ret, result);
-            if (((HDMI_CEC_IO_SENT_AND_ACKD  == ret)||(HDMI_CEC_IO_SUCCESS==ret))&& (HDMI_CEC_IO_SUCCESS == result) ){
-                *receiverLogicalAddress = addr;
-                UT_LOG("\n Logical address of the receiver is : 0x%x\n", *receiverLogicalAddress); break;
-                break;
-            } else {
-                UT_LOG("\n failed to receive logical address  ret:0x%x result:0x%x\n", ret, result);
-            }
-        }
-    }
-}
-
 /**
  * @brief Validate negative scenarios for  HdmiCecOpen()
  * 
@@ -250,7 +198,7 @@ void getReceiverLogicalAddressL1 (int handle, int logicalAddress, unsigned char*
  */
 void test_hdmicec_hal_l1_open_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 1;
 
@@ -298,7 +246,7 @@ void test_hdmicec_hal_l1_open_negative( void )
  */
 void test_hdmicec_hal_l1_open_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 2;
 
@@ -309,50 +257,6 @@ void test_hdmicec_hal_l1_open_positive( void )
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
-
-    UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-
-}
-
-/**
- * @brief Ensure HdmiCecOpen() returns HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE when
- * none of the device specific logical address is not available.
- * 
- * **Test Group ID:** Basic: 01@n
- * **Test Case ID:** 003@n
- * 
- * **Pre-Conditions:**@n
- * Connect other four cec enabled playback source devices to the network
- * and ensure none of the playback device logical address is available 
- * to allocate for the current device.
- * 
- * **Dependencies:** None@n
- * **User Interaction:** None
- * 
- * **Test Procedure:**@n
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|Call HdmiCecOpen() - open interface when not all the logical address are in use | handle | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE| Should Pass |
- * |02|Call HdmiCecClose () - call with invalid handle | handle=0 | HDMI_CEC_IO_INVALID_HANDLE| Should Pass |
- * 
- */
-void test_hdmicec_hal_l1_open_logical_address_unavailable_source ( void )
-{
-    int result;
-    int handle = 0;
-    gTestID = 3;
-
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    UT_LOG ("\nPlease connect other 4 cec enabled playback devices to the cec network. \
-                  Please enter any key to continue"); getchar ();
-    result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE != result) { UT_FAIL_FATAL("open failed"); }
-    //The above open is failed handle should be null
-    UT_ASSERT_TRUE_FATAL(handle!=0);
-
-     //Here handle = 0 since open failed and close should fail.
-    result = HdmiCecClose( handle );
-    CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
@@ -383,7 +287,7 @@ void test_hdmicec_hal_l1_open_logical_address_unavailable_source ( void )
  */
 void test_hdmicec_hal_l1_close_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 4;
 
@@ -429,7 +333,7 @@ void test_hdmicec_hal_l1_close_negative( void )
  */
 void test_hdmicec_hal_l1_close_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 5;
 
@@ -478,7 +382,7 @@ void test_hdmicec_hal_l1_close_positive( void )
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
 {
-    int result = 0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     unsigned int physicalAddress = 0;
     gTestID = 6;
@@ -542,7 +446,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
 {
-    int result = 0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     unsigned int physicalAddress = 0;
     gTestID = 7;
@@ -600,7 +504,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
  */
 void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = INT_MAX;
     gTestID = 8;
@@ -660,7 +564,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
  */
 void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = DEFAULT_LOGICAL_ADDRESS_PANEL;
     gTestID = 9;
@@ -683,50 +587,6 @@ void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
 
-    UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-
-}
-
-/**
-  * @brief Ensure HdmiCecAddLogicalAddress() returns HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE when tying to add an existing logic address
-  * 
-  *  This test case is only applicable for sink devices
-  * 
-  * **Test Group ID:** Basic: 01@n
-  * **Test Case ID:** 011@n
-  * 
-  * **Pre-Conditions:**@n
-  * Device should be connected to another CEC enabled TV
-  * 
-  * **Dependencies:**None@n
-  * **User Interaction:** None
-  * 
-  * **Test Procedure:**@n
-  * |Variation / Step|Description|Test Data|Expected Result|Notes|
-  * |:--:|---------|----------|--------------|-----|
-  * |01|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
-  * |02|Call HdmiCecAddLogicalAddress() - call with valid arguments. Logical address 0 is already allocated | handle, logicalAddress = 0 | HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE | Should pass. |
-  * |03|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
-  *
-  */
-void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
-{
-    int result;
-    int handle = 0;
-    int logicalAddress = 0;
-    gTestID = 11;
-
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    UT_LOG ("\nPlease connect another CEC enabled sink device to the device. Please enter any key to continue"); getchar ();
-    result = HdmiCecOpen (&handle);
-    //if init is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS );
-    
-    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -764,7 +624,7 @@ void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
  */
 void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = DEFAULT_LOGICAL_ADDRESS_PANEL;
     gTestID = 12;
@@ -832,7 +692,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
  */
 void test_hdmicec_hal_l1_removeLogicalAddress_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = DEFAULT_LOGICAL_ADDRESS_PANEL;
     gTestID = 13;
@@ -895,7 +755,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_positive( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
     int logicalAddressCrossCheck = INT_MIN;
@@ -974,7 +834,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 16;
@@ -1027,7 +887,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 17;
@@ -1085,7 +945,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
 
@@ -1135,7 +995,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
  */
 void test_hdmicec_hal_l1_setRxCallback_negative ( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 19;
 
@@ -1188,7 +1048,7 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
  */
 void test_hdmicec_hal_l1_setRxCallback_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 20;
 
@@ -1238,7 +1098,7 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
  */
 void test_hdmicec_hal_l1_setTxCallback_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 21;
 
@@ -1286,7 +1146,7 @@ void test_hdmicec_hal_l1_setTxCallback_negative( void )
  */
 void test_hdmicec_hal_l1_setTxCallback_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 22;
 
@@ -1342,7 +1202,7 @@ void test_hdmicec_hal_l1_setTxCallback_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result =HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1380,19 +1240,19 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
-    /* Invalid input */
+    /* Invalid return variable */
     result = HdmiCecTx(handle, buf, len, NULL);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTx failed"); }
 
-    /* Invalid input */
+    /* Invalid buffer */
     result = HdmiCecTx(handle, NULL, len, &ret);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTx failed"); }
 
-    /* Invalid input */
+    /* Invalid device handle */
     result = HdmiCecTx(0, buf, len, &ret);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
 
-    /* Invalid input */
+    /* Invalid length */
     result = HdmiCecTx(handle, buf, INT_MIN, &ret);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTx failed"); }
 
@@ -1432,7 +1292,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1513,7 +1373,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1541,19 +1401,19 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
-    /* Invalid input */
+    /* Invalid return variable */
     result = HdmiCecTx(handle, buf, len, NULL);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTx failed"); }
 
-    /* Invalid input */
+    /* Invalid buffer */
     result = HdmiCecTx(handle, NULL, len, &ret);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTx failed"); }
 
-    /* Invalid input */
+    /* Invalid device handle */
     result = HdmiCecTx(0, buf, len, &ret);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
 
-    /* Invalid input */
+    /* Invalid message length */
     result = HdmiCecTx(handle, buf, INT_MIN, &ret);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTx failed"); }
 
@@ -1591,7 +1451,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1662,7 +1522,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 28;
@@ -1703,14 +1563,14 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
-    /* Invalid input */
+    /* Invalid buffer */
     result = HdmiCecTxAsync(handle, NULL, len);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTxAsync failed"); }
 
     result = HdmiCecTxAsync(0, buf, len);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
 
-    /* Invalid input */
+    /* Invalid message length */
     result = HdmiCecTxAsync(handle, buf, INT_MIN);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTxAsync failed"); }
 
@@ -1754,7 +1614,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 29;
@@ -1832,7 +1692,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 30;
@@ -1864,14 +1724,14 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
-    /* Invalid input */
+    /* Invalid buffer */
     result = HdmiCecTxAsync(handle, NULL, len);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTxAsync failed"); }
 
     result = HdmiCecTxAsync(0, buf, len);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
 
-    /* Invalid input */
+    /* Invalid message length */
     result = HdmiCecTxAsync(handle, buf, INT_MIN);
     if (HDMI_CEC_IO_INVALID_ARGUMENT != result) { UT_FAIL("HdmiCecTxAsync failed"); }
 
@@ -1913,7 +1773,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 31;
@@ -1953,141 +1813,6 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive( void )
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 }
-
-#if 0
-/**
- * @brief This function will try to ping an unavailable logical address and ensure ACK error happens
- *
- * **Test Group ID:** 02@n
- * **Test Case ID:** 027@n
- *
- *
- * *Pre-Conditions :** @n
- *  All of the device HDMI cable should be disconnected
- *
- **Dependencies :** N/A @n
- *
- * **Test Procedure :**@n
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|Call `HdmiCecOpen()` - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|Call `HdmiCecSetRxCallback()` - set RX Call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|Call `HdmiCecAddLogicalAddress()` - Call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|Call `HdmiCecGetLogicalAddress()` - Call get logical address with valid arguments | handle, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|Call `HdmiCecTx()` - Try to ping an unavailable logical address and ensure ACK error | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|Call `HdmiCecSetRxCallback()` - unregister RX Call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|Call `HdmiCecClose ()` - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- */
-void test_hdmicec_hal_l1_portDisconnected_sink( void )
-{
-    int result=0;
-    int ret=0;
-    int handle = 0;
-    int logicalAddress = 0;
-    unsigned char buf[] = {0x03};
-    gTestID = 27;
-
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    UT_LOG ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
-
-    /* Positive result */
-    result = HdmiCecOpen (&handle);
-    //if init is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
-
-    /* Positive result */
-    result = HdmiCecSetRxCallback(handle, DriverReceiveCallback, (void*)0xDEADBEEF);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    //Set logical address for TV.
-    logicalAddress = 0;
-    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
-
-    result = HdmiCecTx(handle, buf, sizeof(buf), &ret);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
-    if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
-
-    //Using NULL callback
-    result = HdmiCecSetRxCallback(handle, NULL, 0);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    /*calling hdmicec_close should pass */
-    result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("HdmiCecClose failed"); }
-
-    UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-}
-
-/**
- * @brief This function will try to ping an unavailable logical address and ensure ACK error happens
- *
- * **Test Group ID:** 02@n
- * **Test Case ID:** 032@n
- *
- *
- * *Pre-Conditions :** @n
- *  All of the device HDMI cable should be disconnected
- *
- **Dependencies :** N/A @n
- *
- * **Test Procedure :**@n
- * |Variation / Step|Description|Test Data|Expected Result|Notes|
- * |:--:|---------|----------|--------------|-----|
- * |01|Call `HdmiCecOpen()` - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|Call `HdmiCecSetRxCallback()` - set RX Call back with valid parameters | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|Call `HdmiCecAddLogicalAddress()` - Call add logical address with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|Call `HdmiCecGetLogicalAddress()` - Call get logical address with valid arguments | handle, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|Call `HdmiCecTx()` - Try to ping an unavailable logical address and ensure ACK error | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |06|Call `HdmiCecSetRxCallback()` - unregister RX Call back | handle, cbfunc=NULL, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |07|Call `HdmiCecClose ()` - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- */
-void test_hdmicec_hal_l1_portDisconnected_source( void )
-{
-    int result=0;
-    int ret=0;
-    int handle = 0;
-    int logicalAddress = 0;
-    unsigned char buf[] = {0x00};
-    gTestID = 32;
-
-
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    UT_LOG ("\nPlease disconnect All the HDMI ports. Please enter any key to continue"); getchar ();
-
-    /* Positive result */
-    result = HdmiCecOpen (&handle);
-    //if init is failed no need to proceed further
-    UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
-
-    /* Positive result */
-    result = HdmiCecSetRxCallback(handle, DriverReceiveCallback, (void*)0xDEADBEEF);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    //Get logical address of the device
-    result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
-
-    result = HdmiCecTx(handle, buf, sizeof(buf), &ret);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
-    if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
-
-    //Using NULL callback
-    result = HdmiCecSetRxCallback(handle, NULL, 0);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    /*calling hdmicec_close should pass */
-    result = HdmiCecClose (handle);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("HdmiCecClose failed"); }
-
-    UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-}
-
-#endif
 
 static UT_test_suite_t *pSuiteCommon = NULL;
 static UT_test_suite_t *pSuite_stb = NULL;
