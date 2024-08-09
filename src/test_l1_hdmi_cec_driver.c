@@ -160,7 +160,7 @@ void DriverReceiveCallback(int handle, void *callbackData, unsigned char *buf, i
  * @param callbackData callback data passed
  * @param result async send status
  */
-void DriverTransmitCallback(int handle, void *callbackData, int result)
+void DriverTransmitCallback(int handle, void *callbackData, HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;)
 {
    if((handle!=0) && (callbackData !=NULL)) {
            //UT_ASSERT_TRUE_FATAL( (unsigned long long)callbackData== (unsigned long long)0xDEADBEEF);
@@ -198,7 +198,7 @@ void DriverTransmitCallback(int handle, void *callbackData, int result)
  */
 void test_hdmicec_hal_l1_open_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 1;
 
@@ -246,7 +246,7 @@ void test_hdmicec_hal_l1_open_negative( void )
  */
 void test_hdmicec_hal_l1_open_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 2;
 
@@ -287,7 +287,7 @@ void test_hdmicec_hal_l1_open_positive( void )
  */
 void test_hdmicec_hal_l1_close_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 4;
 
@@ -333,7 +333,7 @@ void test_hdmicec_hal_l1_close_negative( void )
  */
 void test_hdmicec_hal_l1_close_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 5;
 
@@ -382,7 +382,7 @@ void test_hdmicec_hal_l1_close_positive( void )
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
 {
-    int result = 0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS; = 0;
     int handle = 0;
     unsigned int physicalAddress = 0;
     gTestID = 6;
@@ -446,7 +446,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
 {
-    int result = 0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS; = 0;
     int handle = 0;
     unsigned int physicalAddress = 0;
     gTestID = 7;
@@ -504,7 +504,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
  */
 void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = INT_MAX;
     gTestID = 8;
@@ -564,7 +564,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
  */
 void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = DEFAULT_LOGICAL_ADDRESS_PANEL;
     gTestID = 9;
@@ -615,7 +615,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
   */
 void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 11;
@@ -668,7 +668,7 @@ void test_hdmicec_hal_l1_addLogicalAddressWithAddressInUse_sinkDevice( void )
  */
 void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = DEFAULT_LOGICAL_ADDRESS_PANEL;
     gTestID = 12;
@@ -736,7 +736,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
  */
 void test_hdmicec_hal_l1_removeLogicalAddress_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = DEFAULT_LOGICAL_ADDRESS_PANEL;
     gTestID = 13;
@@ -799,7 +799,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_positive( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
     int logicalAddressCrossCheck = INT_MIN;
@@ -878,7 +878,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 16;
@@ -931,7 +931,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 17;
@@ -989,7 +989,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
  */
 void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     int logicalAddress = 0;
 
@@ -1039,7 +1039,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
  */
 void test_hdmicec_hal_l1_setRxCallback_negative ( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 19;
 
@@ -1092,7 +1092,7 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
  */
 void test_hdmicec_hal_l1_setRxCallback_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 20;
 
@@ -1142,7 +1142,7 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
  */
 void test_hdmicec_hal_l1_setTxCallback_negative( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 21;
 
@@ -1190,7 +1190,7 @@ void test_hdmicec_hal_l1_setTxCallback_negative( void )
  */
 void test_hdmicec_hal_l1_setTxCallback_positive( void )
 {
-    int result;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;;
     int handle = 0;
     gTestID = 22;
 
@@ -1246,7 +1246,7 @@ void test_hdmicec_hal_l1_setTxCallback_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result =HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1336,7 +1336,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1417,7 +1417,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1495,7 +1495,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
 {
-    int result=HDMI_CEC_IO_SENT_AND_ACKD;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SENT_AND_ACKD;
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
@@ -1566,7 +1566,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 28;
@@ -1658,7 +1658,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 29;
@@ -1736,7 +1736,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 30;
@@ -1817,7 +1817,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
  */
 void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive( void )
 {
-    int result=0;
+    HDMI_CEC_STATUS result = HDMI_CEC_IO_SUCCESS;
     int handle = 0;
     int logicalAddress = 0;
     gTestID = 31;
