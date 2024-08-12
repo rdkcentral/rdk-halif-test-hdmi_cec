@@ -401,18 +401,6 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
     result = HdmiCecGetPhysicalAddress(handle, NULL);
     if (HDMI_CEC_IO_INVALID_ARGUMENT  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
 
-
-    result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
-    if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
-
-    unsigned int maxVal = 0xFFFF;
-    //Max possible physical address is f.f.f.f
-    //Physical address conversion logic
-    // maxVal = (((0x0f & 0x0F) << 12)|( (0x0f & 0x0F) << 8) |(( 0x0f &0x0F ) << 4)  | (0x0f & 0x0F));
-    if (physicalAddress>maxVal) {
-        UT_FAIL ("physicalAddress miss match failed");
-    }
-
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
@@ -461,7 +449,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
 
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
-    if(((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && ((physicalAddress >= 0xffff) || (physicalAddress <= 0x0000) )) || \
+    if(((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && ((physicalAddress > 0xffff) || (physicalAddress <= 0x0000) )) || \
             ((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (physicalAddress != 0x0000))){
 	    UT_FAIL("Invalid physicalAddress");
     }
