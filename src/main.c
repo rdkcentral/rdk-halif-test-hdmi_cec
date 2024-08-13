@@ -70,49 +70,46 @@ extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
 
 #ifdef VCOMPONENT
-extern int register_vcomponent_tests ( char* profile, unsigned short cpPort, char* cpPath );
+extern int register_vcomponent_tests ( char* profile );
+extern int test_l3_hdmi_cec_driver_register ( char* pValidationProfilePath );
 #endif
 
 int main(int argc, char** argv)
 {
     ut_kvp_status_t status;
     char szReturnedString[UT_KVP_MAX_ELEMENT_SIZE];
+    int registerReturn = 0;
 
 #ifdef VCOMPONENT
     int opt;
     char* pProfilePath = NULL;
-    unsigned short cpPort = 8888;
-    char* pUrl = NULL;
+    char* pValidationProfilePath = NULL;
 
-    while ((opt = getopt(argc, argv, "p:c:u:")) != -1)
+    while ((opt = getopt(argc, argv, "u:v:")) != -1)
     {
         switch(opt)
         {
-            case 'p':
+            case 'u':
                 UT_LOG ("Setting Profile path [%s]\n",optarg);
                 pProfilePath = malloc(strlen(optarg) + 1);
                 strcpy(pProfilePath, optarg);
                 pProfilePath[strlen(optarg) + 1] = '\0';
                 break;
-            case 'c':
-                cpPort = atoi(optarg);
-                UT_LOG ("Setting control plane port [%d]\n",cpPort);
+            case 'v':
+                UT_LOG ("Setting Validation Profile path [%s]\n",optarg);
+                pValidationProfilePath = malloc(strlen(optarg) + 1);
+                strcpy(pValidationProfilePath, optarg);
+                pValidationProfilePath[strlen(optarg) + 1] = '\0';
                 break;
 
-            case 'u':
-                UT_LOG ("Setting control plane path [%s]\n",optarg);
-                pUrl = malloc(strlen(optarg) + 1);
-                strcpy(pUrl, optarg);
-                pUrl[strlen(optarg) + 1] = '\0';
-                break;
             case '?':
             case ':':
                 UT_LOG("unknown option: %c\n", optopt);
                 break;
         }
     }
+    optind = 1; //Reset argv[] element pointer for further processing
 #endif
-
 
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
@@ -126,18 +123,24 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    register_hdmicec_hal_l1_tests ();
+    registerReturn = register_hdmicec_hal_l1_tests();
+    if ( registerReturn == -1 )
+    {
+        UT_LOG_ERROR("\n register_hdmicec_hal_l1_tests() returned failure");
+        return -1;
+    }
+#ifdef VCOMPONENT
+    register_vcomponent_tests(pProfilePath);
+    test_l3_hdmi_cec_driver_register (pValidationProfilePath);
+#endif
 
     if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
-	register_hdmicec_hal_source_l2_tests ();
+         register_hdmicec_hal_source_l2_tests ();
     }
 
     if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
-	register_hdmicec_hal_sink_l2_tests ();
+         register_hdmicec_hal_sink_l2_tests ();
     }
-#ifdef VCOMPONENT
-    register_vcomponent_tests(pProfilePath, cpPort, pUrl);
-#endif
 
     UT_run_tests();
 
@@ -146,10 +149,9 @@ int main(int argc, char** argv)
     {
         free(pProfilePath);
     }
-
-    if(pUrl != NULL)
+    if(pValidationProfilePath != NULL)
     {
-        free(pUrl);
+        free(pValidationProfilePath);
     }
 #endif
 }

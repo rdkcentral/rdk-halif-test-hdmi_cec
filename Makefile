@@ -34,8 +34,9 @@ TOP_DIR := $(ROOT_DIR)
 SRC_DIRS = $(ROOT_DIR)/src
 INC_DIRS := $(ROOT_DIR)/../include
 HAL_LIB := RCECHal
-VCOMPONENT_SRCS := $(ROOT_DIR)/vcomponent/src/vcomponent_hdmi_cec.c
 SKELTON_SRCS := $(ROOT_DIR)/skeletons/src/hdmi_cec_driver.c
+VCOMPONENT_SRCS := $(wildcard $(ROOT_DIR)/vcomponent/src/*.c)
+VCOMPONENT_OBJS := $(subst src,build,$(VCOMPONENT_SRCS:.c=.o))
 
 ifeq ($(TARGET),)
 $(info TARGET NOT SET )
@@ -57,14 +58,13 @@ endif
 
 ifeq ($(TARGET),vcomponent)
 HAL_LIB_DIR := $(ROOT_DIR)/libs
-YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)  -lpthread -lrt
-INC_DIRS += $(ROOT_DIR)/vcomponent/include
-SETUP_SKELETON_LIBS := vcomponent
-XCFLAGS = -DVCOMPONENT
-export XCFLAGS
+TARGET=linux
+#YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)  -lpthread -lrt
+SRC_DIRS += $(ROOT_DIR)/vcomponent/src
+INC_DIRS += $(ROOT_DIR)/vcomponent/include $(ROOT_DIR)/ut-core/include $(ROOT_DIR)/ut-core/framework/ut-control/include
+KCFLAGS = -DVCOMPONENT
+export KCFLAGS
 endif
-
-
 
 .PHONY: clean list all
 
@@ -76,7 +76,7 @@ export TARGET
 export TOP_DIR
 export HAL_LIB_DIR
 
-.PHONY: clean list build vcomponent
+.PHONY: clean list build skeleton vcomponent
 
 build: $(SETUP_SKELETON_LIBS)
 	echo "SETUP_SKELETON_LIBS $(SETUP_SKELETON_LIBS)"
@@ -93,10 +93,9 @@ skeleton:
 
 vcomponent:
 	echo $(CC)
-	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include -I$(ROOT_DIR)/vcomponent/include -I$(ROOT_DIR)/ut-core/include -I$(ROOT_DIR)/ut-core/framework/ut-control/include $(VCOMPONENT_SRCS) -o lib$(HAL_LIB).so
+	$(CC) -fPIC -shared -I$(ROOT_DIR)/../include -I$(ROOT_DIR)/vcomponent/include -I$(ROOT_DIR)/ut-core/include -I$(ROOT_DIR)/ut-core/framework/ut-control/include $(VCOMPONENT_OBJS) -o lib$(HAL_LIB).so
 	mkdir -p $(HAL_LIB_DIR)
 	cp $(ROOT_DIR)/lib$(HAL_LIB).so $(HAL_LIB_DIR)
-
 
 list:
 	@echo UT [$@]

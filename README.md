@@ -17,7 +17,7 @@
 
 ## Description
 
-This repository contains the Unit Test Suites for HDMI CEC `HAL`.
+This repository contains the Unit Test Suites(L1 & L2) for HDMI CEC `HAL`.
 
 ## Reference Documents
 
@@ -33,5 +33,17 @@ This repository contains the Unit Test Suites for HDMI CEC `HAL`.
 
 - All APIs need to be implemented in this current version. If any API is not supported, please add stub implementation with return type HDMI_CEC_IO_OPERATION_NOT_SUPPORTED for the same.
 - Building against the actual library may introduce SOC dependencies. Hence, a template SKELETON library is created without SOC dependencies. On the real platform (target), it can be mounted, copied and bound with the actual library.
-- When running the binary, remember to include a profile file as an argument for designated test cases. The following example illustrates this: `./hal_test -p sink_hdmiCEC.yml`
+- When running the binary, remember to include a profile file as an argument for designated test cases. The following example illustrates this:
+
+```bash
+./hal_test -p sink_hdmiCEC.yml
+```
+
+Alternatively, use the run.sh script with the profile file:
+
+```bash
+./run.sh -p /absolute/path/to/profile/file
+```
+
 - Profiles file available in [profile yaml file](./profiles/)
+- vcomponent is an alpha release.
