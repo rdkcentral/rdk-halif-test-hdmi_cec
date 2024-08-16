@@ -24,5 +24,12 @@ MY_PATH="$(realpath ${BASH_SOURCE[0]})"
 MY_DIR="$(dirname ${MY_PATH})"
 VENV_DIR="${MY_DIR}/python_venv"  # Default virtual environment directory name
 
-source "$VENV_DIR"/bin/activate
-echo "Virtual environment '$VENV_DIR' activated."
+# Check if the script is sourced
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+    source "$VENV_DIR"/bin/activate
+    echo "Virtual environment '$VENV_DIR' activated."
+else
+    echo "The script must be sourced. 'source ./activate_venv.sh' or '. ./activate_venv.sh'"
+    echo "Once activated you can deactivate with 'deactivate' command"
+fi
+
