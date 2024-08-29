@@ -233,12 +233,10 @@ If the user chooses to run the test in interactive mode, then the test case has 
 | Variation / Steps | Description | Test Data | Expected Result | Notes|
 | -- | --------- | ---------- | -------------- | ----- |
 | 01 | Call the pre-requisite API HdmiCecOpen() | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 02 | Call the pre-requisite API HdmiCecAddLogicalAddress() | handle = valid handle, logicalAddress = Default logical address | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 03 | Call the API HdmiCecGetPhysicalAddress() | handle = valid handle, physicalAddress = valid address | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 04 | Check the return status of HdmiCecGetPhysicalAddress() | status = return status of HdmiCecGetPhysicalAddress() | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 05 | Verify that the physical address obtained is equal to 0.0.0.0  | physicalAddress = obtained physical address | physicalAddress == 0x0000 (as per HDMI Spec 1.4b and section 8.7.2) | Should be successful |
-| 06 | Call the pre-requisite API HdmiCecRemoveLogicalAddress() for the API HdmiCecClose | handle = valid handle, logicalAddress = Default logical address | HDMI_CEC_IO_SUCCESS | Should be successful |
-| 07 | Call the post-requisite API HdmiCecClose() | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 02 | Call the API HdmiCecGetPhysicalAddress() | handle = valid handle, physicalAddress = valid address | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 03 | Check the return status of HdmiCecGetPhysicalAddress() | status = return status of HdmiCecGetPhysicalAddress() | HDMI_CEC_IO_SUCCESS | Should be successful |
+| 04 | Verify that the physical address obtained is equal to 0.0.0.0  | physicalAddress = obtained physical address | physicalAddress == 0x0000 (as per HDMI Spec 1.4b and section 8.7.2) | Should be successful |
+| 05 | Call the post-requisite API HdmiCecClose() | handle = valid handle | HDMI_CEC_IO_SUCCESS | Should be successful |
 
 ```mermaid
 graph TB

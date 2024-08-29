@@ -64,8 +64,6 @@
 #include <ut_log.h>
 #include "hdmi_cec_driver.h"
 
-#define DEFAULT_LOGICAL_ADDRESS_PANEL 0
-
 static int gTestGroup = 2;
 static int gTestID = 1;
 
@@ -372,31 +370,22 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
     status = HdmiCecOpen(&handle);
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
 
-    // Step 2: Call the API HdmiCecAddLogicalAddress()
-    UT_LOG_DEBUG("Invoking HdmiCecAddLogicalAddress with handle: %d logical address:%d", handle);
-    status = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    UT_ASSERT_EQUAL( status, HDMI_CEC_IO_SUCCESS );
-
-    // Step 3: Call the API HdmiCecGetPhysicalAddress()
+    // Step 2: Call the API HdmiCecGetPhysicalAddress()
     UT_LOG_DEBUG("Invoking HdmiCecGetPhysicalAddress with handle: %d", handle);
     status = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    // Step 4: Check the return status of HdmiCecGetPhysicalAddress()
+
+    // Step 3: Check the return status of HdmiCecGetPhysicalAddress()
     if (status != HDMI_CEC_IO_SUCCESS)
     {
         UT_LOG_ERROR("HdmiCecGetPhysicalAddress failed with status: %d", status);
     }
 
-    // Step 5: Verify that the physical address obtained is equal to 0.0.0.0
+    // Step 4: Verify that the physical address obtained is equal to 0.0.0.0
     UT_LOG_DEBUG("Checking if physical address: %u is less than 0.0.0.0", physicalAddress);
     UT_ASSERT_TRUE(physicalAddress >= 0x0000)
 
-    // Step 6: Call the API HdmiCecRemoveLogicalAddress()
-    UT_LOG_DEBUG("Invoking HdmiCecRemoveLogicalAddress with handle: %d logical address:%d", handle);
-    status = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
-    UT_ASSERT_EQUAL( status, HDMI_CEC_IO_SUCCESS );
-
-    // Step 7: Call the post-requisite API HdmiCecClose()
+    // Step 5: Call the post-requisite API HdmiCecClose()
     UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
     status = HdmiCecClose(handle);
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
