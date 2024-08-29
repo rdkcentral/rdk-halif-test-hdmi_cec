@@ -439,8 +439,10 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
     int handle = 0;
     unsigned int physicalAddress = 0;
     gTestID = 7;
+    char typeString[UT_KVP_MAX_ELEMENT_SIZE];
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+    UT_KVP_PROFILE_GET_STRING("hdmicec/type",typeString);
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
