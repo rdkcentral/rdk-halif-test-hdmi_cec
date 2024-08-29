@@ -447,9 +447,10 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
  * |01|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|Call HdmiCecAddLogicalAddress() - for sink devives add Logical Address | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |02|Call HdmiCecAddLogicalAddress() - Add Logical Address for Sink device | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecGetPhysicalAddress() - call API with valid handle and physical address pointer | handle, physicalAddress  | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|Call HdmiCecClose() - close interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |04|Call HdmiCecRemoveLogicalAddress() - Remove Logical Address for sink device | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |05|Call HdmiCecClose() - close interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  *
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
@@ -608,7 +609,8 @@ void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
  * |:--:|---------|----------|--------------|-----|
  * |01|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |02|Call HdmiCecAddLogicalAddress() - call with valid arguments. API is applicable only for sink devices  | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass for sink devices |
- * |03|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |03|Call HdmiCecRemoveLogicalAddress() - call with valid arguments. API is applicable only for sink devices  | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass for sink devices |
+ * |04|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  *
  * HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE case is updated in separate L1 case
  */
@@ -809,15 +811,17 @@ void test_hdmicec_hal_l1_removeLogicalAddress_positive( void )
     result = HdmiCecOpen(&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
-//check need to remove/add fatal
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
     if (((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_SUCCESS != result)) || \
             ((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_OPERATION_NOT_SUPPORTED != result))){
         UT_FAIL("HdmiCecRemoveLogicalAddress call failed");
     }
 
-    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecRemoveLogicalAddress failed"); }
+    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+    if (((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_SUCCESS != result)) || \
+            ((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_OPERATION_NOT_SUPPORTED != result))){
+        UT_FAIL("HdmiCecRemoveLogicalAddress call failed");
+    }
 
     result = HdmiCecClose(handle);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
@@ -1152,10 +1156,11 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
  * |01|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|Call HdmiCecAddLogicalAddress() - Add Logic address for SInk device | handle, logic address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |02|Call HdmiCecAddLogicalAddress() - Add Logic address for Sink device | handle, logic address | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecSetRxCallback() - set RX Call back with valid parameters | handle, DriverReceiveCallback, data=0xDEADBEEF | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|Call HdmiCecSetRxCallback()  - set RX Call back with NULL callback | handle, Null pointer, data address | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|Call HdmiCecClose () - close interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |05|Call HdmiCecRemoveLogicalAddress() - Remove Logic address for Sink device | handle, logic address | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |06|Call HdmiCecClose () - close interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  *
  */
 void test_hdmicec_hal_l1_setRxCallback_positive( void )
@@ -1418,6 +1423,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
  * |02|Call HdmiCecAddLogicalAddress() - call add logical address for sink devices with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Specific to sink devices. Should Pass |
  * |03|Call HdmiCecGetLogicalAddress() - call get logical address with valid arguments. API should return the logical address added in the above step | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|Call HdmiCecTx() - send the cec message with valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS and ret=HDMI_CEC_IO_SENT_AND_ACKD| Should Pass |
+ * |02|Call HdmiCecremoveLogicalAddress() - call add logical address for sink devices with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Specific to sink devices. Should Pass |
  * |05|Call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  */
 void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
