@@ -64,6 +64,8 @@
 #include <ut_log.h>
 #include "hdmi_cec_driver.h"
 
+#define DEFAULT_LOGICAL_ADDRESS_PANEL 0
+
 static int gTestGroup = 2;
 static int gTestID = 1;
 
@@ -372,8 +374,8 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
 
     // Step 2: Call the API HdmiCecAddLogicalAddress()
     UT_LOG_DEBUG("Invoking HdmiCecAddLogicalAddress with handle: %d logical address:%d", handle);
-    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+    status = HdmiCecAddLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( status, HDMI_CEC_IO_SUCCESS );
 
     // Step 3: Call the API HdmiCecGetPhysicalAddress()
     UT_LOG_DEBUG("Invoking HdmiCecGetPhysicalAddress with handle: %d", handle);
@@ -391,8 +393,8 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
 
     // Step 6: Call the API HdmiCecRemoveLogicalAddress()
     UT_LOG_DEBUG("Invoking HdmiCecRemoveLogicalAddress with handle: %d logical address:%d", handle);
-    result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
-    UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+    status = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
+    UT_ASSERT_EQUAL( status, HDMI_CEC_IO_SUCCESS );
 
     // Step 7: Call the post-requisite API HdmiCecClose()
     UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
