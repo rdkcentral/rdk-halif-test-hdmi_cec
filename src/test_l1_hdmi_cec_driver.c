@@ -429,10 +429,8 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
  * |01|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|Call HdmiCecAddLogicalAddress() - Add Logical Address for Sink device | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |03|Call HdmiCecGetPhysicalAddress() - call API with valid handle and physical address pointer | handle, physicalAddress  | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|Call HdmiCecRemoveLogicalAddress() - Remove Logical Address for sink device | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|Call HdmiCecClose() - close interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |02|Call HdmiCecGetPhysicalAddress() - call API with valid handle and physical address pointer | handle, physicalAddress  | HDMI_CEC_IO_SUCCESS| Should Pass |
+ * |03|Call HdmiCecClose() - close interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  *
  */
 void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
