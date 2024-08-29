@@ -361,7 +361,6 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
     int handle;
     unsigned int physicalAddress;
     HDMI_CEC_STATUS status;
-
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     // Step 1: Call the pre-requisite API HdmiCecOpen()
