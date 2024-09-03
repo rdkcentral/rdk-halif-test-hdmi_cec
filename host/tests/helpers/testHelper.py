@@ -20,30 +20,23 @@
 # * limitations under the License.
 # *
 #* ******************************************************************************
-
 import os
 import sys
 
-# Add the framework path to system
 dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(dir_path)
+sys.path.append(dir_path+"/../")
 
-from raft.framework.plugins.ut_raft import ut_helper
+from raft.framework.plugins.ut_raft.utHelper import utHelperClass
 
-class basicTest(ut_helper):
- 
-    def __init__(self):
-        print('unit2 - Initializing test controller')
-        super().__init__("framework_test", "1")
+class testHelperClass(utHelperClass):
 
-    def testFunction(self):
-        print("unit_test2 called.")
-        return True
+    """
+    Test Helper Code
 
-if __name__ == '__main__':
+    This module provides common extensions for teams unit testing.
+    Rather than being generic common modules, maybe more team centric on the way that the team will require to create their testing suites
+    """
+    def __init__(self, testName, qcId, log=None ):
+        super().__init__(testName, qcId, log=log )
 
-    test = basicTest()
-    test.run()
-  
-
-    
+    # Engineering team adds any functions they require for the testing classes suite for this specific module.
