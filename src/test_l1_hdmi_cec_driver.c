@@ -777,12 +777,13 @@ void test_hdmicec_hal_l1_removeLogicalAddress_positive( void )
     result = HdmiCecOpen(&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
-    result = HdmiCecAddLogicalAddress( handle, logicalAddress );
-    if (((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_SUCCESS != result)) || \
-            ((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_OPERATION_NOT_SUPPORTED != result))){
-        UT_FAIL("HdmiCecRemoveLogicalAddress call failed");
-    }
 
+    if(strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
+        result = HdmiCecAddLogicalAddress( handle, logicalAddress );
+        UT_ASSERT_EQUAL( result, HDMI_CEC_IO_SUCCESS );
+    }
+ 
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
     if (((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_SUCCESS != result)) || \
             ((strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_OPERATION_NOT_SUPPORTED != result))){
