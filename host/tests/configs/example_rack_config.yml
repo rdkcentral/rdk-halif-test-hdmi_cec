@@ -28,6 +28,9 @@
 # slotx: address:  IP of device while running locally, replaced with slotx: ip
 # slotx: deviceConsole:  IP of device while running locally, replaced with slotx: devices
 
+# This example is taken from https://github.com/rdkcentral/python_raft/blob/master/examples/configs/example_rack_config.yml
+# For information on python_raft please refer to : https://github.com/rdkcentral/python_raft/blob/master/README.md
+
 # Data that is global to all tests.
 globalConfig:
     includes:
