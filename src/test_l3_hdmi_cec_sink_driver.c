@@ -115,6 +115,27 @@ CecCommandMap cecCommandTable[] = {
     // Add more commands as needed
 };
 
+/* cecError_t */
+const static ut_control_keyStringMapping_t cecError_mapTable [] = {
+  {"HDMI_CEC_IO_SUCCESS",           (int32_t)HDMI_CEC_IO_SUCCESS}
+  {"HDMI_CEC_IO_SENT_AND_ACKD",     (int32_t)HDMI_CEC_IO_SENT_AND_ACKD},
+  {"HDMI_CEC_IO_SENT_BUT_NOT_ACKD", (int32_t)HDMI_CEC_IO_SENT_BUT_NOT_ACKD},
+  {"HDMI_CEC_IO_SENT_FAILED",       (int32_t)HDMI_CEC_IO_SENT_FAILED},
+  {"HDMI_CEC_IO_NOT_OPENED",        (int32_t)HDMI_CEC_IO_NOT_OPENED},
+  {"HDMI_CEC_IO_INVALID_ARGUMENT",  (int32_t)HDMI_CEC_IO_INVALID_ARGUMENT},
+  {"HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE", (int32_t)HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE},
+  {"HDMI_CEC_IO_GENERAL_ERROR",     (int32_t)HDMI_CEC_IO_GENERAL_ERROR},
+  {"HDMI_CEC_IO_ALREADY_OPEN",      (int32_t)HDMI_CEC_IO_ALREADY_OPEN},
+  {"HDMI_CEC_IO_ALREADY_REMOVED",   (int32_t)HDMI_CEC_IO_ALREADY_REMOVED},
+  {"HDMI_CEC_IO_INVALID_OUTPUT",    (int32_t)HDMI_CEC_IO_INVALID_OUTPUT},
+  {"HDMI_CEC_IO_INVALID_HANDLE",    (int32_t)HDMI_CEC_IO_INVALID_HANDLE},
+  {"HDMI_CEC_IO_OPERATION_NOT_SUPPORTED", (int32_t)HDMI_CEC_IO_OPERATION_NOT_SUPPORTED},
+  {"HDMI_CEC_IO_NOT_ADDED",         (int32_t)HDMI_CEC_IO_NOT_ADDED},
+  {"HDMI_CEC_IO_MAX",               (int32_t)HDMI_CEC_IO_MAX}
+  {  NULL, -1 }
+};
+
+
 /**
 * @brief CEC Command with data size mapping function.
 *
@@ -216,18 +237,14 @@ void test_l3_hdmi_cec_sink_hal_Init(void)
    // Step 1: Call HdmiCecOpen()
    UT_LOG_INFO("Calling HdmiCecOpen(IN:gHandle[0x%0X])",&gHandle);
    status = HdmiCecOpen(&gHandle);
-   if ((status != HDMI_CEC_IO_SUCCESS) || (gHandle == NULL))
-   {
-       UT_LOG_ERROR("Failed to Invoke HdmiCecOpen()");
-   }
+   UT_LOG_INFO("Result HdmiCecSetRxCallback() cecError:[%s]",UT_ControlGetMapString(cecError_mapTable,status));
+   assert(status == HDMI_CEC_IO_SUCCESS);
 
    // Step 2: Register the call back
    UT_LOG_INFO("Calling HdmiCecSetRxCallback(IN:handle[0x%0X],IN:cbfunc[0x%0X]",gHandle,onRxDataReceived);
    status = HdmiCecSetRxCallback(gHandle, onRxDataReceived,(void*)0xABABABAB);
-   if(status != HDMI_CEC_IO_SUCCESS)
-   {
-      UT_LOG_ERROR("Failed HdmiCecSetRxCallback(IN:handle[0x%0X],IN:cbfunc[0x%0X]) status:%d",gHandle,onRxDataReceived),status;
-   }
+   UT_LOG_INFO("Result HdmiCecSetRxCallback() cecError:[%s]",UT_ControlGetMapString(cecError_mapTable,status));
+   assert(status == HDMI_CEC_IO_SUCCESS);
 
    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -261,20 +278,19 @@ void test_l3_hdmi_cec_sink_hal_AddLogicalAddress(void)
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     HDMI_CEC_STATUS status = HDMI_CEC_IO_SUCCESS;
+
     int logicalAddress = -1;
 
     UT_LOG_MENU_INFO("----------------------------------------------------------");
-    UT_LOG_MENU_INFO("Enter Logical Address: ");
+    UT_LOG_MENU_INFO("\t \tEnter Logical Address: ");
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
     scanf("%d", &logicalAddress);
 
     /* Check that logical address should be valid one */
     UT_LOG_INFO("Calling HdmiCecAddLogicalAddress(IN:handle:[0x%0X], IN:logicalAddress:[%d]",gHandle,logicalAddress);
     status = HdmiCecAddLogicalAddress(gHandle,logicalAddress );
-
-    if (status != HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG_ERROR("Failed HdmiCecAddLogicalAddress (IN:handle:[0x%0X], IN:logicalAddress:[%d]), status[%d]",gHandle,logicalAddress,status);
-    }
+    UT_LOG_INFO("Failed HdmiCecAddLogicalAddress (IN:handle:[0x%0X], IN:logicalAddress:[%d]), status[%d]",gHandle,logicalAddress,UT_ControlGetMapString(cecError_mapTable,status));
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -310,16 +326,9 @@ void test_l3_hdmi_cec_sink_hal_GetLogicalAddress(void)
     UT_LOG_INFO("Calling HdmiCecGetLogicalAddress(IN: handle: [0x%0X], OUT: logicalAddress: [])", gHandle);
     status = HdmiCecGetLogicalAddress(gHandle, &logicalAddress);
 
-    if (status == HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG_INFO("HdmiCecGetLogicalAddress successful (OUT: logicalAddress: [%d])", logicalAddress);
-    }
-    else
-    {
-        UT_LOG_ERROR("HdmiCecGetLogicalAddress failed (IN: handle: [0x%0X], OUT: logicalAddress: [%d]), status: [%d])", gHandle, logicalAddress, status);
-        // Additional error handling can be added here if necessary
-    }
-
+    UT_LOG_INFO("HdmiCecGetLogicalAddress failed (IN: handle: [0x%0X], OUT: logicalAddress: [%d]), status: [%d])", gHandle, logicalAddress, UT_ControlGetMapString(cecError_mapTable,status));
+    assert(status == HDMI_CEC_IO_SUCCESS);
+UT_ControlGetMapString(cecError_mapTable,status)
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
@@ -358,13 +367,20 @@ void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void) {
     int expectedDataLength;
 
     // Reading inputs from the user or test framework
-    UT_LOG_MENU_INFO("Enter a valid Source Logical Address:");
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
+    UT_LOG_MENU_INFO("\t \tEnter a valid Source Logical Address:");
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
     scanf("%d", &sourceLogicalAddress);
 
-    UT_LOG_MENU_INFO("Enter a valid Destination Logical Address: ");
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
+    UT_LOG_MENU_INFO("\t \tEnter a valid Destination Logical Address: ");
     scanf("%d", &destinationLogicalAddress);
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
 
-    UT_LOG_MENU_INFO("Enter CEC Command (in hex): ");
+
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
+    UT_LOG_MENU_INFO("\t \tEnter CEC Command (in hex): ");
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
     scanf("%x", &cecCommand);
 
     // Validate the CEC command and get the expected data length
@@ -372,7 +388,9 @@ void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void) {
         // Command not found in the map, prompt the user for additional information
         UT_LOG_WARNING("CEC command 0x%02X is not recognized. It might be a vendor-specific command.", cecCommand);
 
-        UT_LOG_MENU_INFO("Please enter the number of data bytes for the CEC command: ");
+	UT_LOG_MENU_INFO("----------------------------------------------------------");
+        UT_LOG_MENU_INFO("\t \tPlease enter the number of data bytes for the CEC command: ");
+        UT_LOG_MENU_INFO("----------------------------------------------------------");
         scanf("%d", &expectedDataLength);
 
         commandName = "Vendor Specific Command";
@@ -383,7 +401,7 @@ void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void) {
     // If the command has data bytes, prompt for them
     if (expectedDataLength > 0) {
         for (int i = 0; i < expectedDataLength; i++) {
-            UT_LOG_MENU_INFO("Enter Databyte[%d] (in hex):", i);
+            UT_LOG_MENU_INFO("\t \tEnter Databyte[%d] (in hex):", i);
             scanf("%x", &buf[i + 2]); // +2 to account for the first two bytes
         }
     }
@@ -402,13 +420,9 @@ void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void) {
 
     // Assume HdmiCecTx is a function to send the CEC command
     int status = HdmiCecTx(gHandle, buf, len, &result);
+    UT_LOG_INFO("HdmiCecTx failed (IN: handle: [0x%0X], IN: length: [%d], result: [%d], status:[%d])", gHandle, len, result, UT_ControlGetMapString(cecError_mapTable,status));
 
-    // Logging the result of the transmission
-    if ((result == HDMI_CEC_IO_SENT_BUT_NOT_ACKD) && (status == HDMI_CEC_IO_SUCCESS)) {
-        UT_LOG_INFO("HdmiCecTx successful (OUT: result: [%d])", result);
-    } else {
-        UT_LOG_ERROR("HdmiCecTx failed (IN: handle: [0x%0X], IN: length: [%d], result: [%d], status:[%d])", gHandle, len, result, status);
-    }
+    assert((result == HDMI_CEC_IO_SENT_BUT_NOT_ACKD) && (status == HDMI_CEC_IO_SUCCESS)) 
 
     // Optional delay after sending the command
     sleep(5);
@@ -448,6 +462,7 @@ void test_l3_hdmi_cec_sink_hal_ReceiveHdmiCecCommand(void)
     if (cbFlag != 1)
     {
         UT_LOG_ERROR("HdmiCecRx failed to receive data (IN: expected callback flag: [1], OUT: actual callback flag: [%d])", cbFlag);
+	assert(cbFlag == 1);
     }
     else
     {
@@ -490,16 +505,9 @@ void test_l3_hdmi_cec_sink_hal_GetPhysicalAddress(void)
 
     UT_LOG_INFO("Calling HdmiCecGetPhysicalAddress(IN: handle: [0x%0X], OUT: physicalAddress: [uninitialized])", gHandle);
 
-    status = HdmiCecGetPhysicalAddress(gHandle, &physicalAddress);
-
-    if (status == HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG_INFO("HdmiCecGetPhysicalAddress successful (OUT: physicalAddress: [0x%04X])", physicalAddress);
-    }
-    else
-    {
-        UT_LOG_ERROR("HdmiCecGetPhysicalAddress failed (IN: handle: [0x%0X], physicalAddress: [%d]), status:[%d]", gHandle, physicalAddress, status);
-    }
+    status = HdmiCecGetPhysiicalAddress(gHandle, &physicalAddress);
+    UT_LOG_INFO("HdmiCecGetPhysicalAddress failed (IN: handle: [0x%0X], physicalAddress: [%d]), status:[%d]", gHandle, physicalAddress,UT_ControlGetMapString(cecError_mapTable,status));
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -532,23 +540,19 @@ void test_l3_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
     HDMI_CEC_STATUS status = HDMI_CEC_IO_SUCCESS;
     int logicalAddress = -1;
 
-    UT_LOG_MENU_INFO("Enter Logical Address to Remove: ");
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
+    UT_LOG_MENU_INFO("\t \tEnter Logical Address to Remove: ");
+    UT_LOG_MENU_INFO("----------------------------------------------------------");
+
     scanf("%d", &logicalAddress);
 
     UT_LOG_INFO("Calling HdmiCecRemoveLogicalAddress(IN: handle: [0x%0X], IN: logicalAddress: [%d])", gHandle, logicalAddress);
 
     // Invoke the API HdmiCecRemoveLogicalAddress
     status = HdmiCecRemoveLogicalAddress(gHandle, logicalAddress);
-
-    if (status == HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG_INFO("HdmiCecRemoveLogicalAddress successful logicalAddress: [%d]", logicalAddress);
-    }
-    else
-    {
-        UT_LOG_ERROR("HdmiCecRemoveLogicalAddress failed (IN: handle: [0x%0X], IN: logicalAddress: [%d], OUT: status: [%d])", gHandle, logicalAddress, status);
-    }
-
+    UT_LOG_INFO("HdmiCecRemoveLogicalAddress failed (IN: handle: [0x%0X], IN: logicalAddress: [%d], OUT: status: [%d])", gHandle, logicalAddress, UT_ControlGetMapString(cecError_mapTable,status));
+    assert(status == HDMI_CEC_IO_SUCCESS);
+    
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 /**
@@ -581,16 +585,8 @@ void test_l2_hdmi_cec_sink_hal_Close(void)
 
     // Step 2: Call the API to close the HDMI CEC handle
     status = HdmiCecClose(gHandle);
-
-    // Step 3: Check if the close operation was successful
-    if (status == HDMI_CEC_IO_SUCCESS)
-    {
-        UT_LOG_INFO("HdmiCecClose successful (OUT: status: [%d])", status);
-    }
-    else
-    {
-        UT_LOG_ERROR("HdmiCecClose failed (IN: handle: [0x%0X])  status: [%d]", gHandle, status);
-    }
+    UT_LOG_INFO("HdmiCecClose failed (IN: handle: [0x%0X])  status: [%d]", gHandle, status);
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     // Step 4: Log the end of the function
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
