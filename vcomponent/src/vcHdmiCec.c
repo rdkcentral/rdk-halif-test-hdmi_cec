@@ -171,7 +171,6 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
   vcCommand_opcode_t opcode = CEC_OPCODE_UNKNOWN;
   struct vcDevice_info_t *src, *dest;
   vcCommand_logical_address_t la;
-  uint32_t len;
   assert(cmd != NULL);
 
   vcCommand_Clear(cec_cmd);
@@ -232,7 +231,7 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
     case CEC_SET_OSD_NAME:
     {
       ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CMD_DATA_OSD_NAME, str, UT_KVP_MAX_ELEMENT_SIZE);
-      vcCommand_PushBackArray(cec_cmd, str, strlen(str));
+      vcCommand_PushBackArray(cec_cmd, (uint8_t *)str, strlen(str));
     }
     break;
 
@@ -299,7 +298,7 @@ static void HandleStateMessages( vcHdmiCec_hal_t *hal, char* cmd, int size)
         len = vcCommand_GetRawBytes(&cmd, cec_data, VCCOMMAND_MAX_DATA_SIZE);
         if(hal->callbacks.rx_cb_func != NULL)
         {
-          hal->callbacks.rx_cb_func((int)hal, hal->callbacks.rx_cb_data, cec_data, len);
+          hal->callbacks.rx_cb_func((intptr_t)hal, hal->callbacks.rx_cb_data, cec_data, len);
         }
       }
   }
@@ -441,7 +440,7 @@ static void* MessageHandler(void *data)
         len = vcCommand_GetRawBytes(&cmd, cec_data, VCCOMMAND_MAX_DATA_SIZE);
         if(hal->callbacks.rx_cb_func != NULL)
         {
-          hal->callbacks.rx_cb_func((int)hal, hal->callbacks.rx_cb_data, cec_data, len);
+          hal->callbacks.rx_cb_func((intptr_t)hal, hal->callbacks.rx_cb_data, cec_data, len);
         }
       }
       break;
@@ -781,7 +780,7 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
   }
   PrintStatus(cec);
 
-  *handle = (int) cec;
+  *handle = (intptr_t) cec;
   gvcHdmiCec->cec_hal = cec;
   cec->state = HAL_STATE_READY;
 

@@ -37,7 +37,7 @@ typedef struct {
     bool allocated[LOGICAL_ADDRESS_BROADCAST];
 } vcDevice_logical_address_pool_t;
 
-struct vcDevice_info_t
+extern struct vcDevice_info_t
 {
   /*Variables to manage a non-binary tree of devices*/
   unsigned int number_children;
