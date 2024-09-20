@@ -58,7 +58,7 @@ endif
 
 ifeq ($(TARGET),vcomponent)
 HAL_LIB_DIR := $(ROOT_DIR)/libs
-TARGET=linux
+override TARGET := linux
 #YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)  -lpthread -lrt
 SRC_DIRS += $(ROOT_DIR)/vcomponent/src
 INC_DIRS += $(ROOT_DIR)/vcomponent/include $(ROOT_DIR)/ut-core/include $(ROOT_DIR)/ut-core/framework/ut-control/include
@@ -81,8 +81,8 @@ export HAL_LIB_DIR
 build: $(SETUP_SKELETON_LIBS)
 	echo "SETUP_SKELETON_LIBS $(SETUP_SKELETON_LIBS)"
 	@echo UT [$@]
-	make -C ./ut-core framework
-	make -C ./ut-core test
+	make -C ./ut-core framework TARGET=${TARGET}
+	make -C ./ut-core test TARGET=${TARGET}
 
 #Build against the real library leads to the SOC library dependency also.SOC lib dependency cannot be specified in the ut Makefile, since it is supposed to be common across may platforms. So in order to over come this situation, creating a template skelton library with empty templates so that the template library wont have any other Soc dependency. And in the real platform mount copy bind with the actual library will work fine.
 skeleton:
