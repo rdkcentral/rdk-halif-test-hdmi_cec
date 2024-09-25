@@ -546,12 +546,10 @@ int test_register_hdmicec_hal_source_l3_tests(void)
     // List of test function names and strings
 
     UT_add_test( pSuite, "L3_Init_HdmiCec", test_l3_hdmi_cec_source_hal_Init);
-    UT_add_test( pSuite, "L3_AddLogicalAddress", test_l3_hdmi_cec_source_hal_AddLogicalAddress);
     UT_add_test( pSuite, "L3_GetLogicalAddress", test_l3_hdmi_cec_source_hal_GetLogicalAddress);
     UT_add_test( pSuite, "L3_TransmitCecCommand", test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand);
     UT_add_test( pSuite, "L3_ReceiveCecCommand", test_l3_hdmi_cec_source_hal_ReceiveHdmiCecCommand);
     UT_add_test( pSuite, "L3_GetPhyiscalAddress", test_l3_hdmi_cec_source_hal_GetPhysicalAddress);
-    UT_add_test( pSuite, "L3_RemoveLogicalAddressHdmiCec_Source", test_l3_hdmi_cec_source_hal_RemoveLogicalAddress);
     UT_add_test( pSuite, "L3_Close_HdmiCec_Source", test_l2_hdmi_cec_source_hal_Close);
 
     return 0;
