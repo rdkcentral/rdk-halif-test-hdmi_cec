@@ -251,7 +251,7 @@ void test_l3_hdmi_cec_source_hal_Init(void)
    UT_LOG_INFO("Result HdmiCecOpen: (IN: handle: [0x%0X], OUT: logicalAddress: [%d]), status: [%s])",gHandle, logicalAddress,
                 UT_Control_GetMapString(HDMI_CEC_STATUS_mapTable, status));
 
-    UT_ASSERT_EQUAL_FATAL(status == HDMI_CEC_IO_SUCCESS);
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
    UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -291,7 +291,7 @@ void test_l3_hdmi_cec_source_hal_GetLogicalAddress(void)
     UT_LOG_INFO("Result HdmiCecGetLogicalAddress: (IN: handle: [0x%0X], OUT: logicalAddress: [%d]), status: [%s])",gHandle, logicalAddress,
                 UT_Control_GetMapString(HDMI_CEC_STATUS_mapTable, status));
 
-    UT_ASSERT_EQUAL_FATAL(status == HDMI_CEC_IO_SUCCESS);
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -397,7 +397,7 @@ void test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand(void) {
                 UT_Control_GetMapString(HDMI_CEC_STATUS_mapTable, status));
     }
 
-    UT_ASSERT_EQUAL_FATAL(status == HDMI_CEC_IO_SUCCESS);
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     // Optional delay after sending the command
     sleep(5);
@@ -484,7 +484,7 @@ void test_l3_hdmi_cec_source_hal_GetPhysicalAddress(void)
     UT_LOG_INFO("Result HdmiCecGetPhysicalAddress: (IN: handle: [0x%0X], OUT: physicalAddress: [%d]), status: [%s])",gHandle, physicalAddress,
                 UT_Control_GetMapString(HDMI_CEC_STATUS_mapTable, status));
 
-    UT_ASSERT_EQUAL_FATAL(status == HDMI_CEC_IO_SUCCESS);
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -524,7 +524,7 @@ void test_l2_hdmi_cec_source_hal_Close(void)
     UT_LOG_INFO("Result HdmiCecClose: (IN: handle: [0x%0X], status: [%s])",gHandle,
                 UT_Control_GetMapString(HDMI_CEC_STATUS_mapTable, status));
 
-    UT_ASSERT_EQUAL_FATAL(status == HDMI_CEC_IO_SUCCESS);
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     // Step 4: Log the end of the function
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
@@ -541,16 +541,16 @@ static UT_test_suite_t * pSuite = NULL;
 int test_register_hdmicec_hal_source_l3_tests(void)
 {
     // Create the test suite
-    pSuite = UT_add_suite("[L3 HDMICEC Source Functions] ", NULL, NULL);
-    UT_ASSERT_EQUAL_FATAL(pSuite == UT_KVP_STATUS_SUCCESS);
+    pSuite = UT_add_suite("[HDMICEC Source Functions] ", NULL, NULL);
+    assert(pSuite == UT_KVP_STATUS_SUCCESS);
     // List of test function names and strings
 
-    UT_add_test( pSuite, "L3_Init_HdmiCec", test_l3_hdmi_cec_source_hal_Init);
-    UT_add_test( pSuite, "L3_GetLogicalAddress", test_l3_hdmi_cec_source_hal_GetLogicalAddress);
-    UT_add_test( pSuite, "L3_TransmitCecCommand", test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand);
-    UT_add_test( pSuite, "L3_ReceiveCecCommand", test_l3_hdmi_cec_source_hal_ReceiveHdmiCecCommand);
-    UT_add_test( pSuite, "L3_GetPhyiscalAddress", test_l3_hdmi_cec_source_hal_GetPhysicalAddress);
-    UT_add_test( pSuite, "L3_Close_HdmiCec_Source", test_l2_hdmi_cec_source_hal_Close);
+    UT_add_test( pSuite, "Initialize HDMICEC", test_l3_hdmi_cec_source_hal_Init);
+    UT_add_test( pSuite, "Get Logical Address", test_l3_hdmi_cec_source_hal_GetLogicalAddress);
+    UT_add_test( pSuite, "Transmit CEC Command", test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand);
+    UT_add_test( pSuite, "Receive CEC Command", test_l3_hdmi_cec_source_hal_ReceiveHdmiCecCommand);
+    UT_add_test( pSuite, "Get Physical Address", test_l3_hdmi_cec_source_hal_GetPhysicalAddress);
+    UT_add_test( pSuite, "Close HDMICEC", test_l2_hdmi_cec_source_hal_Close);
 
     return 0;
 }
