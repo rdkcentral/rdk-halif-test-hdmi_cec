@@ -69,6 +69,8 @@
 #define TIMEOUT 5
 #define REPLY_TIMEOUT 5
 
+#define DS_ASSERT assert
+
 static int gTestGroup = 3;
 static int gTestID = 1;
 static int gHandle = 0;
