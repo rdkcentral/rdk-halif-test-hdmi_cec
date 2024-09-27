@@ -62,7 +62,7 @@
 
 #include <ut.h>
 #include <ut_log.h>
-#include <ut_kvp_profile.h>
+#include "ut_kvp_profile.h"
 #include <ut_control_plane.h>
 #include "hdmi_cec_driver.h"
 
