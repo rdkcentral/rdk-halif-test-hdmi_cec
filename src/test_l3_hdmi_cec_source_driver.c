@@ -543,8 +543,11 @@ static UT_test_suite_t * pSuite = NULL;
 int test_register_hdmicec_hal_source_l3_tests(void)
 {
     // Create the test suite
-    pSuite = UT_add_suite("[HDMICEC Source Functions] ", NULL, NULL);
-    assert(pSuite == UT_KVP_STATUS_SUCCESS);
+    pSuite = UT_add_suite_withGroupID("[L3 HDMICEC Source ]", NULL, NULL,UT_TESTS_L3);
+    if (pSuite == NULL)
+    {
+         return -1;
+    }
     // List of test function names and strings
 
     UT_add_test( pSuite, "Initialize HDMICEC", test_l3_hdmi_cec_source_hal_Init);
