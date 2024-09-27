@@ -250,7 +250,7 @@ void test_l3_hdmi_cec_source_hal_Init(void)
    UT_LOG_INFO("Calling HdmiCecSetRxCallback(IN:handle[0x%0X],IN:cbfunc[0x%0X]",gHandle,onRxDataReceived);
    status = HdmiCecSetRxCallback(gHandle, onRxDataReceived,(void*)0xABABABAB);
    
-   UT_LOG_INFO("Result HdmiCecOpen: (IN: handle: [0x%0X], OUT: logicalAddress: [%d]), status: [%s])",gHandle, logicalAddress,
+   UT_LOG_INFO("Result HdmiCecOpen: (IN: handle: [0x%0X]), status: [%s])",gHandle,
                 UT_Control_GetMapString(HDMI_CEC_STATUS_mapTable, status));
 
     assert(status == HDMI_CEC_IO_SUCCESS);
@@ -476,7 +476,7 @@ void test_l3_hdmi_cec_source_hal_GetPhysicalAddress(void)
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     HDMI_CEC_STATUS status = HDMI_CEC_IO_SUCCESS;
-    int physicalAddress = -1;
+    unsigned int physicalAddress = -1;
 
     //Step 1: Call the API to get the physical address
     UT_LOG_INFO("Calling HdmiCecGetPhysicalAddress(IN: handle: [0x%0X], OUT: physicalAddress: [uninitialized])", gHandle);
