@@ -640,10 +640,10 @@ void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecRemoveLogicalAddress() - call with invalid handle | handle=0, logicalAddress | HDMI_CEC_IO_INVALID_HANDLE| Should Pass |
  * |04|Call HdmiCecRemoveLogicalAddress() - call with invalid logical address | handle, logicalAddress=0x10 | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
- * |05|Call HdmiCecRemoveLogicalAddress() - Try to remove with out adding the logical address| handle, logicalAddress | HDMI_CEC_IO_ALREADY_REMOVED| Should Pass |
+ * |05|Call HdmiCecRemoveLogicalAddress() - Try to remove with out adding the logical address| handle, logicalAddress | HDMI_CEC_IO_NOT_ADDED| Should Pass |
  * |06|Call HdmiCecAddLogicalAddress() - call with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |07|Call HdmiCecRemoveLogicalAddress() - remove allocated logical address.  | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass|
- * |08|Call HdmiCecRemoveLogicalAddress() - remove same logical address again. | handle, logicalAddress | HDMI_CEC_IO_ALREADY_REMOVED| Should Pass |
+ * |08|Call HdmiCecRemoveLogicalAddress() - remove same logical address again. | handle, logicalAddress | HDMI_CEC_IO_NOT_ADDED| Should Pass |
  * |09|Call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |10|Call HdmiCecRemoveLogicalAddress() - call after module is closed | handle, logicalAddress | HDMI_CEC_IO_NOT_OPENED| Should Pass |
  */
@@ -723,7 +723,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
         }
 
         result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_ALREADY_REMOVED, HDMI_CEC_IO_SUCCESS);
+        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_ADDED, HDMI_CEC_IO_SUCCESS);
 
         result = HdmiCecClose(handle);
         if (HDMI_CEC_IO_SUCCESS != result)

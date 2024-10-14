@@ -413,7 +413,7 @@ void test_l2_hdmi_cec_sink_hal_TransmitCECCommand(void)
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     int handle;
-    int logicalAddresses = 0x4; // Example logical address
+    int logicalAddresses = 0x0; // Example logical address
     unsigned char buf[] = {0x47, 0x9F}; // Example CEC message
     int len = sizeof(buf);
     int result;
