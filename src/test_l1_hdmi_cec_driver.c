@@ -640,6 +640,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecRemoveLogicalAddress() - call with invalid handle | handle=0, logicalAddress | HDMI_CEC_IO_INVALID_HANDLE| Should Pass |
  * |04|Call HdmiCecRemoveLogicalAddress() - call with invalid logical address | handle, logicalAddress=0x10 | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
+ * |04|Call HdmiCecRemoveLogicalAddress() - call with invalid logical address | handle, logicalAddress=-1  | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |05|Call HdmiCecRemoveLogicalAddress() - Try to remove with out adding the logical address| handle, logicalAddress | HDMI_CEC_IO_NOT_ADDED| Should Pass |
  * |06|Call HdmiCecAddLogicalAddress() - call with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |07|Call HdmiCecRemoveLogicalAddress() - remove allocated logical address.  | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass|
