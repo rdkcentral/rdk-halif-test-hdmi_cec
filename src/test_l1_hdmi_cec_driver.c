@@ -1935,7 +1935,7 @@ int test_hdmidec_hal_l1_register(void)
 {
     char typeString[UT_KVP_MAX_ELEMENT_SIZE];
 
-    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
+    extendedEnumsSupported = UT_KVP_PROFILE_GET_BOOL("hdmicec/features/extendedEnumsSupported");
 
     UT_KVP_PROFILE_GET_STRING("hdmicec/type",typeString);
     if(strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0){
