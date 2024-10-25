@@ -1435,7 +1435,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     /* Positive result */
     result = HdmiCecTx(handle, buf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
-    if (HDMI_CEC_IO_SENT_AND_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
+    if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD  != ret) { UT_FAIL("HdmiCecTx failed"); }
 
     /* Remove Logical address*/
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
