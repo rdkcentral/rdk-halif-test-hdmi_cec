@@ -1405,7 +1405,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, CEC_GET_CEC_VERSION};
+    unsigned char buf[] = {0x38, CEC_GET_CEC_VERSION};
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -1435,7 +1435,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     /* Positive result */
     result = HdmiCecTx(handle, buf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
-    if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
+    if (HDMI_CEC_IO_SENT_AND_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
 
     /* Remove Logical address*/
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
@@ -1934,6 +1934,8 @@ static UT_test_suite_t *pSuite = NULL;
 int test_hdmidec_hal_l1_register(void)
 {
     char typeString[UT_KVP_MAX_ELEMENT_SIZE];
+
+    extendedEnumsSupported = ut_kvp_getBoolField( ut_kvp_profile_getInstance(), "hdmicec/features/extendedEnumsSupported" );
 
     UT_KVP_PROFILE_GET_STRING("hdmicec/type",typeString);
     if(strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0){
