@@ -1404,7 +1404,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
 
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
-    //Sender as 3 and broadcast
+    //Sender as 3 and to CEC address 8
     unsigned char buf[] = {0x38, CEC_GET_CEC_VERSION};
 
 
