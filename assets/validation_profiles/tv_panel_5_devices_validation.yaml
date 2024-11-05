@@ -21,7 +21,7 @@ hdmicec:
       parameters:
         size: 2
         data: [0x20,0x00] #Physical address 2.0.0.0
-  SetOSDName:
+  SetOsdName:
     input:
       initiator: IPSTB
       destination: TVPanel
@@ -29,7 +29,7 @@ hdmicec:
     result:
       initiator: 8
       destination: 0
-      opcode: 0x49
+      opcode: 0x47
       parameters:
         size: 5
         data: [0x49,0x50,0x53,0x54,0x42] # "IPSTB" in hex ascii
@@ -53,3 +53,14 @@ hdmicec:
       opcode: 0x0D
       parameters:
         size: 0
+  ReportPhysicalAddress:
+    input:
+      initiator: TestDevice
+      destination: Broadcast
+    result:
+      initiator: 15 # The device will take UNREGISTERED=15 as there is already 3 Playback devices in network
+      destination: 15 # Broadcast
+      opcode: 0x84
+      parameters:
+        size: 3
+        data: [0x30,0x00,0x04] # Physical Address[3.0.0.0], Device Type - Playback Device

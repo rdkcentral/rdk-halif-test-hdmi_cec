@@ -1,0 +1,111 @@
+#** *****************************************************************************
+# *
+# * If not stated otherwise in this file or this component's LICENSE file the
+# * following copyright and licenses apply:
+# *
+# * Copyright 2023 RDK Management
+# *
+# * Licensed under the Apache License, Version 2.0 (the "License");
+# * you may not use this file except in compliance with the License.
+# * You may obtain a copy of the License at
+# *
+# *
+# http://www.apache.org/licenses/LICENSE-2.0
+# *
+# * Unless required by applicable law or agreed to in writing, software
+# * distributed under the License is distributed on an "AS IS" BASIS,
+# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# * See the License for the specific language governing permissions and
+# * limitations under the License.
+# *
+#* ******************************************************************************
+
+# This config file creates your environment, defaults are setup internally unless otherwise overridden.
+# you will need at least 1 rack and 1 slot to operate.
+# each module e.g. console options, will be off by default unless otherwise stated
+
+# Depreciated
+# slotx: address:  IP of device while running locally, replaced with slotx: ip
+# slotx: deviceConsole:  IP of device while running locally, replaced with slotx: devices
+
+# Data that is global to all tests.
+globalConfig:
+    includes:
+        # [ includes: ]
+        # [ deviceConfig: "required.yml file"  ]
+        deviceConfig: "deviceConfig.yml"
+    capture:
+        # [capture: optional]
+            # [ocrEnginePath: "/usr/bin/tesseract"] # "C:\\Program Files\\Tesseract-OCR\\tesseract.exe" (For Windows) - tesseract binary
+            # [resolution: "1080p"] - Capture resolution
+            # [input: 0] - which input is connected to the video path
+        # Note: Video capture will not be installed unless screenRegions: is defined in deviceConfig:
+        ocrEnginePath: "/usr/bin/tesseract" # "C:\\Program Files\\Tesseract-OCR\\tesseract.exe" (For Windows)
+        resolution: "1080p"
+        input: 0
+    local:
+        log:                # log for each slot
+            directory: "./logs"
+            delimiter: "/"
+
+# Define racks, their slots and the devices in them. These are not always physical racks and slots.
+rackConfig:
+    rack1:
+        name: "rack1"
+        description: "ulrond example config at my desk"
+        slot1:
+            # [ name: "required", description: "optional"]
+            name: "slot1"
+            devices:
+                # [ devices: ]
+                # [ type: "serial": port: "COM7" baudRate: "(default)115200" dataBits: "optional(8)" stopBits: "optional(1)" parity: "optional(None)" FlowControl: "optional(None)" ]
+                # [ type: "ssh": port: 22 username: "test" password: "test" ]
+                # [ type: "telnet": port: 23 username: "test" password: "test" ]
+                - dut:
+                    ip: "127.0.0.1"  # IP Address of the ADA Hub
+                    description: "local PC"
+                    platform: "linux PC"
+                    consoles:
+                        - default:
+                            type: "serial"
+                            port: "/dev/ttyUSB0"
+                        - ssh:
+                            port: 22
+                            username: "root"
+                            ip: "192.168.99.1"
+                    remoteController:
+                        # [ remoteController: ]
+                        # [ type: "olimex" ip: "192.168.0.17" port: 7 map: "llama_rc6", config: "remote_commander.yml" ]
+                        # [ type: "skyProc" map: "skyq_map", config: "remote_commander.yml" ]
+                        # [ type: "None" ]
+                        type: "none"
+                        map: "skyq_map"
+                        config: "example_remote_commander.yml"
+                    outbound:
+                        download_url: "tftp://tftp-server.com/rack1/slot1/"    # download location for the CPE device
+                        upload_url: "sftp://server-address/home/workspace/tftp/rack1/slot1/" # upload location
+                        upload_url_base_dir: "sftp://server-address/home/workspace/tftp/rack1/slot1" # alternative upload location
+                        httpProxy: 'socks5h://localhost:1234'   # Local Proxy if required
+                        workspaceDirectory: './logs/workspace'   # Local working directory
+                    powerSwitch:       # Specific power switch for each slot    
+                        # supported types, if this section is undefined this is ok
+                        # [type: "orvbioS20", ip: "", mac: "", port:"optional", relay:"optional"]
+                        # [type: "kasa", ip: "", options:"--plug" ] #  <- Plug
+                        # [type: "kasa", ip: "", options:"--strip", args:'--index 2' ] # <- Power Strip
+                        # [type: "hs100", ip:"", port:"optional" ]  kara also supports hs100
+                        # [type: "apc", ip:"", username:"", password:"" ]  rack apc switch
+                        # [type: "olimex", ip:"", port:"optional", relay:""  ]  
+                        # [type: "SLP", ip:"", username: "", password: "", outlet_id:"", port:"optional"]
+                        # [type: "none" ] if section doesn't exist then type:none will be used
+                        type: "HS100"
+                        ip: "192.168.1.7"
+                        port: 9999
+                - pi2:
+                    ip: "192.168.99.1"
+                    description: "local pi4"
+                    platform: "pi4"
+                    consoles:
+                        - ssh:
+                            type: "ssh"
+                            port: 22
+                            username: "root"

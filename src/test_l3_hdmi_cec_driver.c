@@ -52,8 +52,9 @@
 #define CEC_IMAGE_VIEW_ON 0x04
 #define CEC_TEXT_VIEW_ON 0x0D
 #define CEC_STANDBY 0x36
-#define CEC_SET_OSD_NAME 0x49
+#define CEC_SET_OSD_NAME 0x47
 #define CEC_ACTIVE_SOURCE 0x82
+#define CEC_REPORT_PHYSICAL_ADDRESS 0x84
 #define CEC_REQUEST_ACTIVE_SOURCE 0x85
 #define CEC_INACTIVE_SOURCE 0x9D
 #define CEC_COMMAND_UNKNOWN 0x00
@@ -64,7 +65,8 @@
 #define CMD_ACTIVE_SOURCE "ActiveSource"
 #define CMD_REQUEST_ACTIVE_SOURCE "RequestActiveSource"
 #define CMD_INACTIVE_SOURCE "InactiveSource"
-#define CMD_SET_OSD_NAME "SetOSDName"
+#define CMD_SET_OSD_NAME "SetOsdName"
+#define CMD_REPORT_PHYSICAL_ADDRESS "ReportPhysicalAddress"
 
 #define VP_PREFIX "hdmicec/"
 #define CMD_DATA_OSD_NAME "/osd_name"
@@ -89,7 +91,8 @@ const static strVal_t gOpCode [] = {
   { CMD_STANDBY , CEC_STANDBY },
   { CMD_ACTIVE_SOURCE, CEC_ACTIVE_SOURCE },
   { CMD_REQUEST_ACTIVE_SOURCE, CEC_REQUEST_ACTIVE_SOURCE },
-  { CMD_INACTIVE_SOURCE, CEC_INACTIVE_SOURCE }
+  { CMD_INACTIVE_SOURCE, CEC_INACTIVE_SOURCE },
+  { CMD_REPORT_PHYSICAL_ADDRESS, CEC_REPORT_PHYSICAL_ADDRESS}
 };
 
 
@@ -166,99 +169,89 @@ void ReceiveCallback(int handle, void *callbackData, unsigned char *buf, int len
     int length = 0, field_len = 0;
 
     UT_LOG ("\nBuffer generated: %x length: %d\n",buf, len);
-    if((handle!=0) && (callbackData !=NULL) && (len>0))
+
+    UT_ASSERT_MSG( handle != 0, "Error: Invalid handle.");
+    UT_ASSERT_MSG( callbackData != NULL, "Error: Null callback data.");
+    UT_ASSERT_MSG( len > 0, "Error: Invalid length.");
+
+    vp_instance = (ut_kvp_instance_t *)callbackData;
+
+    UT_LOG("\nCall back data generated is \n");
+    for (int index=0; index < len; index++)
     {
-        vp_instance = (ut_kvp_instance_t *)callbackData;
+            UT_LOG("buf at index : %d is %x", index, buf[index]);
+    }
 
-        UT_LOG("\nCall back data generated is \n");
-        for (int index=0; index < len; index++)
+    src = (buf[0] & 0xF0) >> 4;
+    dest = buf[0] & 0x0F;
+    opcode = buf[1];
+
+    expected_command = GetOpCodeString(gOpCode, COUNT(gOpCode), gExpectedCecCommand);
+    strcpy(field_name, VP_PREFIX);
+    strcpy(field_name + strlen(VP_PREFIX), expected_command);
+    length = strlen(field_name);
+
+    strcpy(field_name + length, VP_RESULT_INITIATOR);
+    expected_src = ut_kvp_getUInt8Field (vp_instance, field_name);
+
+    strcpy(field_name + length, VP_RESULT_DESTINATION);
+    expected_dest = ut_kvp_getUInt8Field (vp_instance, field_name);
+
+    strcpy(field_name + length, VP_RESULT_OPCODE);
+    expected_opcode = ut_kvp_getUInt8Field (vp_instance, field_name);
+
+    strcpy(field_name + length, VP_RESULT_PARAMETER_SIZE);
+    parameter_size = ut_kvp_getUInt8Field (vp_instance, field_name);
+    field_len = strlen(field_name);
+    strcpy(field_name + length, VP_RESULT_PARAMETER_DATA);
+
+    for (int i = 0; i < parameter_size; ++i)
+    {
+        int num_len = snprintf( NULL, 0, "%d", i );
+        snprintf( field_name + field_len + 1 , num_len + 1, "%d", i );
+        parameter_data[i] = ut_kvp_getUInt8Field (vp_instance, field_name);
+        UT_LOG("Expected Parameter data at [%d]: 0x%02x",i,parameter_data[i]);
+    }
+
+    UT_LOG("\nExpected Command[%s] Src[%d] Dest[%d] \n", (GetOpCodeString(gOpCode, COUNT(gOpCode), gExpectedCecCommand)),expected_src, expected_dest);
+    UT_LOG("\nCommand[%s] triggered Src[%d] Dest[%d] \n", (GetOpCodeString(gOpCode, COUNT(gOpCode), opcode)),src, dest);
+
+    switch (opcode)
+    {
+        case CEC_ACTIVE_SOURCE:
+        case CEC_INACTIVE_SOURCE:
         {
-                UT_LOG("buf at index : %d is %x", index, buf[index]);
+            UT_LOG("\nPhysicalAddress[%d.%d.%d.%d]\n",(buf[2] >> 4) & 0x0F, buf[2] & 0x0F, (buf[3] >> 4) & 0xF0, buf[3] & 0x0F);
         }
-
-        src = (buf[0] & 0xF0) >> 4;
-        dest = buf[0] & 0x0F;
-        opcode = buf[1];
-
-        expected_command = GetOpCodeString(gOpCode, COUNT(gOpCode), gExpectedCecCommand);
-        strcpy(field_name, VP_PREFIX);
-        strcpy(field_name + strlen(VP_PREFIX), expected_command);
-        length = strlen(field_name);
-
-        strcpy(field_name + length, VP_RESULT_INITIATOR);
-        expected_src = ut_kvp_getUInt8Field (vp_instance, field_name);
-
-        strcpy(field_name + length, VP_RESULT_DESTINATION);
-        expected_dest = ut_kvp_getUInt8Field (vp_instance, field_name);
-
-        strcpy(field_name + length, VP_RESULT_OPCODE);
-        expected_opcode = ut_kvp_getUInt8Field (vp_instance, field_name);
-
-        strcpy(field_name + length, VP_RESULT_PARAMETER_SIZE);
-        parameter_size = ut_kvp_getUInt8Field (vp_instance, field_name);
-        field_len = strlen(field_name);
-        strcpy(field_name + length, VP_RESULT_PARAMETER_DATA);
-
-        for (int i = 0; i < parameter_size; ++i)
+        break;
+        case CEC_SET_OSD_NAME:
         {
-            int num_len = snprintf( NULL, 0, "%d", i );
-            snprintf( field_name + field_len + 1 , num_len + 1, "%d", i );
-            parameter_data[i] = ut_kvp_getUInt8Field (vp_instance, field_name);
-            UT_LOG("Expected Parameter data at [%d]: 0x%02x",i,parameter_data[i]);
+            char str[len - 1];
+            memcpy(str, &buf[2], len-2);
+            str[len-2] = '\0';
+            UT_LOG("\nosd_name[%s]\n", str);
         }
-
-        UT_LOG("\nExpected Command[%s] Src[%d] Dest[%d] \n", (GetOpCodeString(gOpCode, COUNT(gOpCode), gExpectedCecCommand)),expected_src, expected_dest);
-        UT_LOG("\nCommand[%s] triggered Src[%d] Dest[%d] \n", (GetOpCodeString(gOpCode, COUNT(gOpCode), opcode)),src, dest);
-
-        switch (opcode)
+        break;
+    }
+    //Lets see if this the opcode that was expected. If it is not test will timeout
+    if(gExpectedCecCommand == opcode)
+    {
+        //Lets validate the addresses and opcode
+        if(src == expected_src && dest == expected_dest && opcode == expected_opcode)
         {
-            case CEC_ACTIVE_SOURCE:
-            case CEC_INACTIVE_SOURCE:
+            UT_LOG("\nParameter size[%d] received size[%d]\n", parameter_size, len - 2);
+            //Expected parameter size should be equal to length of cec buffer received minus 2 (Address, opcode bytes)
+            gCommandValidated = gExpectedCecCommand;
+            if(parameter_size > 0)
             {
-                UT_LOG("\nPhysicalAddress[%d.%d.%d.%d]\n",(buf[2] >> 4) & 0x0F, buf[2] & 0x0F, (buf[3] >> 4) & 0xF0, buf[3] & 0x0F);
-            }
-            break;
-            case CEC_SET_OSD_NAME:
-            {
-                char str[len - 1];
-                memcpy(str, &buf[2], len-2);
-                str[len-2] = '\0';
-                UT_LOG("\nosd_name[%s]\n", str);
-            }
-            break;
-        }
-        //Lets see if this the opcode that was expected. If it is not test will timeout
-        if(gExpectedCecCommand == opcode)
-        {
-            //Lets validate the addresses and opcode
-            if(src == expected_src && dest == expected_dest && opcode == expected_opcode)
-            {
-                UT_LOG("\nParameter size[%d] received size[%d]\n", parameter_size, len - 2);
-                //Expected parameter size should be equal to length of cec buffer received minus 2 (Address, opcode bytes)
-                gCommandValidated = gExpectedCecCommand;
-                if(parameter_size > 0)
+                if((parameter_size != (len - 2)) || (memcmp(parameter_data, &buf[2], parameter_size) != 0))
                 {
-                    if((parameter_size != (len - 2)) || (memcmp(parameter_data, &buf[2], parameter_size) != 0))
-                    {
-                        gCommandValidated = CEC_COMMAND_UNKNOWN;
-                    }
+                    gCommandValidated = CEC_COMMAND_UNKNOWN;
                 }
             }
-            //Even if the validation fails, signal the test as the opcode is same.
-            sem_post(&gSemCallbackReceived);
         }
-    }
-    else 
-    {
-        if (handle == 0) {
-            UT_FAIL("Error: Invalid handle.\n");
-        }
-        if (callbackData == NULL) {
-            UT_FAIL("Error: Null callback data.\n");
-        }
-        if (len <= 0) {
-            UT_FAIL("Error: Invalid length.\n");
-        }
+        //Even if the validation fails, signal the test as the opcode is same.
+        sem_post(&gSemCallbackReceived);
     }
 }
 
@@ -304,19 +297,13 @@ int TimedWaitForCallback(uint32_t timeOutSeconds)
     return result;
 }
 
-
-/**
-*  HdmiCecOpen() Positive
-*  HdmiCec
-* 
-*/
-void test_l3_sink_image_view_on (void)
+static void validate_receive_callback_data(uint8_t expected_cmd, const char *cmd_str, const char *func, uint32_t timeOutSecs)
 {
 	int result;
     int handle = 0;
     gTestID = 1;
 
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
+    UT_LOG("\n In %s [%02d%03d]\n", func, gTestGroup, gTestID);
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
 
@@ -329,170 +316,55 @@ void test_l3_sink_image_view_on (void)
     result = HdmiCecAddLogicalAddress( handle, DEFAULT_LOGICAL_ADDRESS_PANEL );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
 
-    gExpectedCecCommand = CEC_IMAGE_VIEW_ON;
+    gExpectedCecCommand = expected_cmd;
     gCommandValidated = CEC_COMMAND_UNKNOWN;
 
-    UT_LOG ("\nTrigger ImageViewOn\n");
-    result = TimedWaitForCallback(MAX_WAIT_TIME_SECS);
+    UT_LOG ("\nTrigger %s\n", cmd_str);
+    result = TimedWaitForCallback(timeOutSecs);
     if(result != 0)
     {
-        UT_FAIL("Failed to receive ImageViewOn"); 
+        UT_FAIL("Failed to receive expected command in callback");
     }
     if(gCommandValidated != gExpectedCecCommand)
     {
-        UT_FAIL("Test Validation of ImageViewOn failed"); 
+        UT_FAIL("Test Validation failed"); 
     }
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
+}
 
+
+/**
+*  Positive cases that receive callback data
+*/
+void test_l3_sink_image_view_on (void)
+{
+    validate_receive_callback_data(CEC_IMAGE_VIEW_ON, CMD_IMAGE_VIEW_ON, __FUNCTION__, MAX_WAIT_TIME_SECS);
 }
 
 void test_l3_sink_text_view_on (void)
 {
-	int result;
-    int handle = 0;
-    gTestID = 1;
-
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
-
-    result = HdmiCecSetRxCallback(handle, ReceiveCallback, (void*)gValidationProfileInstance);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    result = HdmiCecSetTxCallback( handle, TransmitCallback, (void*)0xDEADBEEF );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetTxCallback failed"); }
-
-    result = HdmiCecAddLogicalAddress( handle, DEFAULT_LOGICAL_ADDRESS_PANEL );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    gExpectedCecCommand = CEC_TEXT_VIEW_ON;
-    gCommandValidated = CEC_COMMAND_UNKNOWN;
-
-    UT_LOG ("\nTrigger TextViewOn\n");
-    result = TimedWaitForCallback(MAX_WAIT_TIME_SECS);
-    if(result != 0)
-    {
-        UT_FAIL("Failed to receive TextViewOn"); 
-    }
-    if(gCommandValidated != gExpectedCecCommand)
-    {
-        UT_FAIL("Test Validation of TextViewOn failed"); 
-    }
-    result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
-
+    validate_receive_callback_data(CEC_TEXT_VIEW_ON, CMD_TEXT_VIEW_ON, __FUNCTION__, MAX_WAIT_TIME_SECS);
 }
 
 void test_l3_sink_active_source (void)
 {
-	int result;
-    int handle = 0;
-    gTestID = 1;
-
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
-
-    result = HdmiCecSetRxCallback(handle, ReceiveCallback, (void*)gValidationProfileInstance);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    result = HdmiCecSetTxCallback( handle, TransmitCallback, (void*)0xDEADBEEF );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetTxCallback failed"); }
-
-    result = HdmiCecAddLogicalAddress( handle, DEFAULT_LOGICAL_ADDRESS_PANEL );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    gExpectedCecCommand = CEC_ACTIVE_SOURCE;
-    gCommandValidated = CEC_COMMAND_UNKNOWN;
-
-    UT_LOG ("\nTrigger ActiveSource\n");
-    result = TimedWaitForCallback(MAX_WAIT_TIME_SECS);
-    if(result != 0)
-    {
-        UT_FAIL("Failed to receive ActiveSource"); 
-    }
-    if(gCommandValidated != gExpectedCecCommand)
-    {
-        UT_FAIL("Test Validation of ActiveSource failed"); 
-    }
-    result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
-
+    validate_receive_callback_data(CEC_ACTIVE_SOURCE, CMD_ACTIVE_SOURCE, __FUNCTION__, MAX_WAIT_TIME_SECS);
 }
 
 void test_l3_sink_inactive_source (void)
 {
-	int result;
-    int handle = 0;
-    gTestID = 1;
-
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
-
-    result = HdmiCecSetRxCallback(handle, ReceiveCallback, (void*)gValidationProfileInstance);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    result = HdmiCecSetTxCallback( handle, TransmitCallback, (void*)0xDEADBEEF );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetTxCallback failed"); }
-
-    result = HdmiCecAddLogicalAddress( handle, DEFAULT_LOGICAL_ADDRESS_PANEL );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    gExpectedCecCommand = CEC_INACTIVE_SOURCE;
-    gCommandValidated = CEC_COMMAND_UNKNOWN;
-
-    UT_LOG ("\nTrigger InactiveSource\n");
-    result = TimedWaitForCallback(MAX_WAIT_TIME_SECS);
-    if(result != 0)
-    {
-        UT_FAIL("Failed to receive InactiveSource"); 
-    }
-    if(gCommandValidated != gExpectedCecCommand)
-    {
-        UT_FAIL("Test Validation of InactiveSource failed"); 
-    }
-    result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
-
+    validate_receive_callback_data(CEC_INACTIVE_SOURCE, CMD_INACTIVE_SOURCE, __FUNCTION__, MAX_WAIT_TIME_SECS);
 }
 
 void test_l3_sink_set_osd_name (void)
 {
-	int result;
-    int handle = 0;
-    gTestID = 1;
+    validate_receive_callback_data(CEC_SET_OSD_NAME, CMD_SET_OSD_NAME, __FUNCTION__, MAX_WAIT_TIME_SECS);
+}
 
-    UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
-    result = HdmiCecOpen( &handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
-
-    result = HdmiCecSetRxCallback(handle, ReceiveCallback, (void*)gValidationProfileInstance);
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetRxCallback failed"); }
-
-    result = HdmiCecSetTxCallback( handle, TransmitCallback, (void*)0xDEADBEEF );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetTxCallback failed"); }
-
-    result = HdmiCecAddLogicalAddress( handle, DEFAULT_LOGICAL_ADDRESS_PANEL );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
-
-    gExpectedCecCommand = CEC_SET_OSD_NAME;
-    gCommandValidated = CEC_COMMAND_UNKNOWN;
-
-    UT_LOG ("\nTrigger SetOSDName\n");
-    result = TimedWaitForCallback(MAX_WAIT_TIME_SECS);
-    if(result != 0)
-    {
-        UT_FAIL("Failed to receive SetOSDName"); 
-    }
-    if(gCommandValidated != gExpectedCecCommand)
-    {
-        UT_FAIL("Test Validation of SetOSDName failed"); 
-    }
-    result = HdmiCecClose( handle );
-    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
-
+void test_l3_sink_add_device (void)
+{
+    validate_receive_callback_data(CEC_REPORT_PHYSICAL_ADDRESS, CMD_REPORT_PHYSICAL_ADDRESS, __FUNCTION__, MAX_WAIT_TIME_SECS);
 }
 /**
  * @brief Register the main test(s) for this module
@@ -531,6 +403,7 @@ int test_l3_hdmi_cec_driver_register ( char* validation_profile )
     UT_add_test( pSuite, "test_l3_sink_active_source" ,test_l3_sink_active_source);
     UT_add_test( pSuite, "test_l3_sink_inactive_source" ,test_l3_sink_inactive_source );
     UT_add_test( pSuite, "test_l3_sink_set_osd_name" ,test_l3_sink_set_osd_name );
+    UT_add_test( pSuite, "test_l3_sink_add_device" ,test_l3_sink_add_device );
 
 	return 0;
 } 
