@@ -1404,8 +1404,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
 
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
-    //Sender as 3 and to CEC address 8
-    unsigned char buf[] = {0x38, CEC_GET_CEC_VERSION};
+    //Sender as 0 and to CEC address 3
+    unsigned char buf[] = {0x03, CEC_GET_CEC_VERSION};
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -1422,7 +1422,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
 
-    buf[0] = 0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = 0x03; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address
     result = HdmiCecGetLogicalAddress(handle,  &logicalAddress);
@@ -1430,7 +1430,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
 
 
     UT_LOG ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = ((logicalAddress&0xFF)<<4)|0x03; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
     result = HdmiCecTx(handle, buf, len, &ret);
