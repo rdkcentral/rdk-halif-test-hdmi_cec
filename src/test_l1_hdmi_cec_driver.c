@@ -1422,15 +1422,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecAddLogicalAddress failed"); }
 
-    buf[0] = 0x03; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
-
     //Get logical address
     result = HdmiCecGetLogicalAddress(handle,  &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
 
-    UT_LOG ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x03; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    UT_LOG ("\n hdmicec source logicalAddress: 0x%x\n", (logicalAddress&0xFF));
+    UT_LOG ("\n hdmicec destination logicalAddress: 0x03\n");
+    buf[0] = ((logicalAddress&0xFF)<<4)|(0x03); UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
     result = HdmiCecTx(handle, buf, len, &ret);
