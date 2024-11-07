@@ -1400,6 +1400,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     int ret=0;
     int handle = 0;
     int logicalAddress = 0;
+    int initiatorAddress = 0;
+    int destinationAddress = 0;
     gTestID = 24;
 
     int len = 2;
@@ -1427,8 +1429,11 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
 
-    UT_LOG ("\n hdmicec source logicalAddress: 0x%x\n", (logicalAddress&0xFF));
-    UT_LOG ("\n hdmicec destination logicalAddress: 0x03\n");
+    // Extract and log initiator and destination addresses from buf
+    initiatorAddress = (buf[0] & 0xF0) >> 4;    // Upper nibble of buf[0]
+    destinationAddress = (buf[0] & 0x0F);       // Lower nibble of buf[0]
+    UT_LOG("\n hdmicec initiator address (from buf): 0x%x\n", initiatorAddress);
+    UT_LOG("\n hdmicec destination address (from buf): 0x%x\n", destinationAddress);
     buf[0] = ((logicalAddress&0xFF)<<4)|(0x03); UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result */
