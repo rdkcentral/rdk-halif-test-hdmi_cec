@@ -75,7 +75,7 @@
 
 static int gTestGroup = 3;
 static int gTestID = 1;
-static int gHandle = 0;
+static int gHandle = -1;
 static int cbFlag = 0;
 
 // CEC command map table and supporting function
@@ -243,7 +243,7 @@ void test_l3_hdmi_cec_source_hal_Init(void)
    // Step 1: Call HdmiCecOpen()
    UT_LOG_INFO("Calling HdmiCecOpen(IN:gHandle[0x%0X])",&gHandle);
    status = HdmiCecOpen(&gHandle);
-   if ((status != HDMI_CEC_IO_SUCCESS) || (gHandle == NULL))
+   if ((status != HDMI_CEC_IO_SUCCESS) || (gHandle == -1))
    {
        UT_LOG_ERROR("Failed to Invoke HdmiCecOpen()");
    }
