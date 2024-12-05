@@ -26,12 +26,13 @@ import sys
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(dir_path, "../../"))
+sys.path.append(os.path.join(dir_path, "../"))
 
 from raft.framework.plugins.ut_raft.configRead import ConfigRead
 from raft.framework.plugins.ut_raft.utUserResponse import utUserResponse
 from raft.framework.plugins.ut_raft import utHelperClass
 from raft.framework.core.logModule import logModule
-from classes.hdmCEC import hdmiCECClass
+from classes.hdmiCEC import hdmiCECClass
 
 class hdmiCECHelperClass(utHelperClass):
 
@@ -45,7 +46,7 @@ class hdmiCECHelperClass(utHelperClass):
             log (class, optional): Parent log class. Defaults to None.
         """
         self.testName  = ""
-        self.testSetupPath = os.path.join(dir_path, "hdmiCEC__L3_testSetup.yml")
+        self.testSetupPath = os.path.join(dir_path, "hdmiCEC_L3_testSetup.yml")
         self.moduleName = "hdmiCEC"
         self.rackDevice = "dut"
 
@@ -130,7 +131,7 @@ class hdmiCECHelperClass(utHelperClass):
 
 
         # Run Prerequisites listed in the test setup configuration file
-        self.testRunPrerequisites()
+        #self.testRunPrerequisites()
 
         # Create the hdmiCEC class
         self.testhdmiCEC = hdmiCECClass(self.moduleConfigProfileFile, self.hal_session, self.targetWorkspace)
@@ -139,7 +140,7 @@ class hdmiCECHelperClass(utHelperClass):
 
     def testEndFunction(self, powerOff=True):
         # Clean the assets downloaded to the device
-        self.testCleanAssets()
+        #self.testCleanAssets()
 
         # Clean up the hdmiCEC instance
         del self.testhdmiCEC

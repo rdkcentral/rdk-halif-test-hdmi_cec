@@ -26,10 +26,6 @@ hdmiCEC:  # Prefix must always exist
   assets:
     device:
       test01_TransmitSingleStandbyCommandandValidateAck:
-        <<: *defaults
       test02_BroadcastStandbyCommand:
-        <<: *defaults
       test03_TransmitOSDCommandandValidateAck:
-        <<: *defaults
       test04_TransmitLargerOSDCommandRepeatedlyandValidate:
-        <<: *defaults

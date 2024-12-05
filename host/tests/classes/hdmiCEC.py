@@ -56,8 +56,8 @@ class hdmiCECClass():
             None
         """
         self.moduleName = "hdmiCEC"
-        self.testConfigFile = os:.path.join(dir_path, "hdmiCEC_testConfig.yml")
-        self.testSuite = "L3 hdmicec - Sink"
+        self.testConfigFile = os.path.join(dir_path, "hdmiCEC_testConfig.yml")
+        self.testSuite = "L3 HDMICEC Sink Functions"
 
         # Load configurations for device profile and menu
         self.moduleConfigProfile = ConfigRead( moduleConfigProfileFile , self.moduleName)
@@ -146,7 +146,7 @@ class hdmiCECClass():
         Remove logical address.
 
         Args:
-            logicalAddress (int): The Logical address of the DUT that should be removed.  
+            logicalAddress (int): The Logical address of the DUT that should be removed.
 
         Returns:
             None
@@ -190,8 +190,6 @@ class hdmiCECClass():
         Returns:
             int: Physical Address of the DUT.
         """
-        
-
         result = self.utMenu.select( self.testSuite, "L3_GetPhyiscalAddress")
         typeStatusPattern = r"HdmiCecGetPhysicalAddress\(IN: handle: [.*\], physicalAddress: [.*\]), status:[.*\]"
         physicalAddress = self.searchPattern(result, typeStatusPattern)
@@ -200,7 +198,7 @@ class hdmiCECClass():
 
     def cecTransmitCmd(self, sourceLogicalAddress:int, destLogicalAddress:int, cecCommand:int, cecData:list=None):
         """
-        Transmit/Broadcast the CEC command and data to the respective destination. 
+        Transmit/Broadcast the CEC command and data to the respective destination.
 
         Args:
             None.
@@ -233,8 +231,8 @@ class hdmiCECClass():
                    {
                        "query_type": "direct",
                        "query": "Enter Databyte",
-                       "input": str(byte)  
-                   })  
+                       "input": str(byte)
+                   })
 
         result = self.utMenu.select( self.testSuite, "L3_TransmitCecCommand",promptWithAnswers)
 
@@ -257,16 +255,21 @@ if __name__ == '__main__':
     shell = InteractiveShell()
     shell.open()
 
-    platformProfile = dir_path + "/../../../profiles/sink/Sink_AudioSettings.yaml"
+    platformProfile = dir_path + "/../../../profiles/sink/sink_hdmiCEC.yaml"
+
     # test the class assuming that it's optional
-    test = dsAudioClass(platformProfile, shell)
+    test = hdmiCECClass(platformProfile, shell)
 
+    # Initialize the hdmiCEC module
     test.initialise()
-    ports = test.getSupportedPorts()
 
-    test.enablePort(ports[0][0], ports[0][1])
-    test.disablePort(ports[0][0], ports[0][1])
+    # Add the logical Address. For now 0 only.
+    test.addLogicalAddress(0)
 
+    # Get Physical Address
+    physicalAddress = test.getPhysicalAddress()
+
+    # Close the device
     test.terminate()
 
     shell.close()

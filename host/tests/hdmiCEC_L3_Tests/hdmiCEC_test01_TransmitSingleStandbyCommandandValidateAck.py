@@ -30,6 +30,7 @@ sys.path.append(os.path.join(dir_path, "../"))
 
 from hdmiCECHelperClass import hdmiCECHelperClass
 from raft.framework.core.logModule import logModule
+from raft.framework.plugins.ut_raft.configRead import ConfigRead
 
 class hdmiCEC_test01_TransmitSingleStandbyCommandandValidateAck(hdmiCECHelperClass):
     """
@@ -50,6 +51,13 @@ class hdmiCEC_test01_TransmitSingleStandbyCommandandValidateAck(hdmiCECHelperCla
         self.testName  = "test01_TransmitSingleStanbyCommandandValidateAck"
         self.qcID = '1'
 
+        self.testCECCommands = os.path.join(dir_path, "hdmiCECTestCommands.yml")
+        hdmicec = ConfigRead(self.testCECCommands, "hdmiCEC")
+        self.cecCommands = hdmicec.fields.get("test01_TransmitSingleStandbyCommandandValidateAck")
+        for command in self.cecCommands:
+            cec = command.get("command")
+            payload = command.get("payload")
+            print(cec, payload)
         super().__init__(self.testName, self.qcID, log)
 
     #TODO: Current version supports only manual verification.
@@ -57,7 +65,7 @@ class hdmiCEC_test01_TransmitSingleStandbyCommandandValidateAck(hdmiCECHelperCla
         """
         Verifies the CEC Transmit Status through the result and also through the manual input.
 
-        For manual verification, it prompts the user to confirm if CEC data is received by the destination 
+        For manual verification, it prompts the user to confirm if CEC data is received by the destination
         device and the action has been performed.
 
         Args:
@@ -69,7 +77,7 @@ class hdmiCEC_test01_TransmitSingleStandbyCommandandValidateAck(hdmiCECHelperCla
             bool: True if ACK verification succeeds, False otherwise.Also True if Manual test is Y and Flase if N
         """
         if manual == True:
-            return self.testUserResponse.getUserYN(f"Is Stanby Command honored {port}? (Y/N):")
+            return self.testUserResponse.getUserYN(f"Is Stanby Command honored? (Y/N):")
         else :
             #TODO: Add automation verification methods
             return False
@@ -79,7 +87,7 @@ class hdmiCEC_test01_TransmitSingleStandbyCommandandValidateAck(hdmiCECHelperCla
         The main test function that Transmits the Stanby Command and checks the ACK and validates it.
 
         This function:
-        - Send a standby command to a device that is connected on the CEC network and get the ack.  
+        - Send a standby command to a device that is connected on the CEC network and get the ack.
         - User to confirm whether the targetted device had recieved this command or not.
 
         Returns:
@@ -89,17 +97,36 @@ class hdmiCEC_test01_TransmitSingleStandbyCommandandValidateAck(hdmiCECHelperCla
         # Initialize the hdmiCEC module
         self.testhdmiCEC.initialise()
 
-        # Add the logical Address
+        # Add the logical Address. For now 0 only.
         self.testhdmiCEC.addLogicalAddress(0)
 
-        # Transmit Standby command to a specific destination address
-        self.testhdmiCEC.cecTransmitCmd(0,3,65,[0])
+        self.cecDevices = [1,2,3]#self.cecAdapter.listDevices()
 
-        #Verify the test result
-        result = self.testVerifyStandbyStatus(ack, True)
+        for device in self.cecDevices:
+            logicalAddress = 1#int(device["address"].split('.')[0])
 
-        # Remove the Logical Address
-        self.testhdmiCEC.removeLogicalAddress(0)
+            # To bypass sending the message to TV
+            if logicalAddress == 0 or logicalAddress == 14:
+                continue
+
+          # self.log.stepStart(f'HdmiCecTx(IN: handle: [0x%0X], IN: length: [%d], result: [%d], status:[%d]')
+
+            for command in self.cecCommands:
+                cec = command.get("command")
+                payload = command.get("payload")
+                #result = self.cecAdapter.startMonitoring()
+                #print(result)
+                # Transmit Standby command to a specific destination address
+                self.testhdmiCEC.cecTransmitCmd(0, logicalAddress,cec,payload)
+                #self.cecAdapter.stopMonitoring()
+
+                #Verify the test result
+                result = self.testVerifyStanbyStatus(logicalAddress, True)
+
+            self.log.stepResult()
+
+            # Remove the Logical Address
+            self.testhdmiCEC.removeLogicalAddress(0)
 
         # Terminate dsAudio Module
         self.testdsAudio.terminate()

@@ -1,0 +1,14 @@
+hdmiCEC:
+  test01_TransmitSingleStandbyCommandandValidateAck:
+      - command: "0x36"  # Standby
+        responses:
+          - type: "power_status"
+            loop_devices: true  # Apply this response to all devices in the device map
+            payload: "[:sender]:90:[:power_status]"  # Response pattern with placeholders
+            description: "Devices report their power status"
+      - command: "0x8F"  # Request Power Status
+        responses:
+          - type: "power_status_response"
+            loop_devices: true  # Apply this response to all devices in the device map
+            payload: "[:sender]:90:[:power_status]"  # Response pattern with placeholders
+            description: "Devices respond with their current power status"
