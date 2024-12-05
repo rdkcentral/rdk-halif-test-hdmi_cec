@@ -66,6 +66,8 @@
 #include <ut_control_plane.h>
 #include "hdmi_cec_driver.h"
 
+#include <unistd.h>
+
 #define TIMEOUT 5
 #define REPLY_TIMEOUT 5
 
@@ -370,7 +372,7 @@ void test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand(void) {
     if (expectedDataLength > 0) {
         for (int i = 0; i < expectedDataLength; i++) {
             UT_LOG_MENU_INFO("Enter Databyte[%d] (in hex):", i);
-            scanf("%x", &buf[i + 2]); // +2 to account for the first two bytes
+            scanf("%hhx", &buf[i + 2]); // +2 to account for the first two bytes
         }
     }
 
