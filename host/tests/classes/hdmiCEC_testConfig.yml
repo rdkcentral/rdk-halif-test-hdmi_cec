@@ -19,7 +19,7 @@
 # * limitations under the License.
 # *
 #* ******************************************************************************
-hdmiCEC:
+hdmicec:
     description: "hdmi CEC testing profile / menu system for UT"
     test:
         artifacts:
@@ -56,11 +56,10 @@ hdmiCEC:
             2:
                 name: "L3 hdmicec - Sink"
                 tests:
-                    - "L3_Init_HdmiCec"
-                    - "L3_AddLogicalAddress"
-                    - "L3_GetLogicalAddress"
-                    - "L3_TransmitCecCommand"
-                    - "L3_ReceiveCecCommand"
-                    - "L3_GetPhyiscalAddress"
-                    - "L3_RemoveLogicalAddressHdmiCec_Sink"
-                    - "L3_Close_HdmiCec_Sink"
+                    - "Init HDMI CEC"
+                    - "Add Logical Address"
+                    - "Get Logical Address"
+                    - "Transmit CEC Command"
+                    - "Get Phyiscal Address"
+                    - "Remove Logical Address"
+                    - "Close HDMI CEC"

@@ -21,7 +21,7 @@
 #* ******************************************************************************
 
 
-hdmiCEC:  # Prefix must always exist
+hdmicec:  # Prefix must always exist
   description: "hdmiCEC test setup"
   assets:
     device:

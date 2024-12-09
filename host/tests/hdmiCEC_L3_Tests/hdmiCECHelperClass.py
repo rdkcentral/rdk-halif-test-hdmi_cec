@@ -47,7 +47,7 @@ class hdmiCECHelperClass(utHelperClass):
         """
         self.testName  = ""
         self.testSetupPath = os.path.join(dir_path, "hdmiCEC_L3_testSetup.yml")
-        self.moduleName = "hdmiCEC"
+        self.moduleName = "hdmicec"
         self.rackDevice = "dut"
 
         super().__init__(testName, qcId, log)

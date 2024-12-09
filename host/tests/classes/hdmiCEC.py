@@ -55,7 +55,7 @@ class hdmiCECClass():
         Returns:
             None
         """
-        self.moduleName = "hdmiCEC"
+        self.moduleName = "hdmicec"
         self.testConfigFile = os.path.join(dir_path, "hdmiCEC_testConfig.yml")
         self.testSuite = "L3 HDMICEC Sink Functions"
 
@@ -105,7 +105,7 @@ class hdmiCECClass():
         Returns:
             None
         """
-        result = self.utMenu.select( self.testSuite, "L3_Init_HdmiCec")
+        result = self.utMenu.select( self.testSuite, "Init HDMI CEC")
 
     def terminate(self):
         """
@@ -117,7 +117,7 @@ class hdmiCECClass():
         Returns:
             None
         """
-        result = self.utMenu.select(self.testSuite, "L3_Close_HdmiCec_Sink")
+        result = self.utMenu.select(self.testSuite, "Close HDMI CEC")
 
     def addLogicalAddress(self, logicalAddress:int):
         """
@@ -137,11 +137,9 @@ class hdmiCECClass():
                     "input": str(logicalAddress)
                 }
         ]
+        result = self.utMenu.select(self.testSuite, "Add Logical Address", promptWithAnswers)
 
-
-        result = self.utMenu.select(self.testSuite, "L3_AddLogicalAddress", promptWithAnswers)
-
-    def removeLogicalAddress(self, logicalAddress:int):
+    def removeLogicalAddress(self):
         """
         Remove logical address.
 
@@ -151,17 +149,7 @@ class hdmiCECClass():
         Returns:
             None
         """
-        promptWithAnswers = [
-                {
-                    "query_type": "direct",
-                    "query": "Enter Logical Address to Remove:",
-                    "input": str(logicalAddress)
-                }
-        ]
-
-        result = self.utMenu.select(self.testSuite, "L3_RemoveLogicalAddressHdmiCec_Sink", promptWithAnswers)
-
-
+        result = self.utMenu.select(self.testSuite, "Remove Logical Address")
 
     def getLogicalAddress(self):
         """
@@ -173,12 +161,11 @@ class hdmiCECClass():
         Returns:
             int: Logical address of the device.
         """
-        result = self.utMenu.select( self.testSuite, "L3_GetLogicalAddress")
-        connectionStatusPattern = r"HdmiCecGetLogicalAddress\(IN: handle: [.*\], OUT: logicalAddress: [.*\]), status: [.*\])"
+        result = self.utMenu.select( self.testSuite, "Get Logical Address")
+        connectionStatusPattern = r"Result HdmiCecGetLogicalAddress\(IN:handle:[.*\], OUT:logicalAddress:[.*\]) HDMI_CEC_STATUS:[.*\])"
         logicalAddress = self.searchPattern(result, connectionStatusPattern)
 
         return logicalAddress
-
 
     def getPhysicalAddress(self):
         """
@@ -190,13 +177,13 @@ class hdmiCECClass():
         Returns:
             int: Physical Address of the DUT.
         """
-        result = self.utMenu.select( self.testSuite, "L3_GetPhyiscalAddress")
-        typeStatusPattern = r"HdmiCecGetPhysicalAddress\(IN: handle: [.*\], physicalAddress: [.*\]), status:[.*\]"
+        result = self.utMenu.select( self.testSuite, "Get Phyiscal Address")
+        typeStatusPattern = r"Result HdmiCecGetPhysicalAddress\(IN:handle:[.*\], OUT:physicalAddress:[.*\]) HDMI_CEC_STATUS:[.*\]"
         physicalAddress = self.searchPattern(result, typeStatusPattern)
 
         return physicalAddress
 
-    def cecTransmitCmd(self, sourceLogicalAddress:int, destLogicalAddress:int, cecCommand:int, cecData:list=None):
+    def cecTransmitCmd(self, destLogicalAddress:int, cecCommand:int, cecData:list=None):
         """
         Transmit/Broadcast the CEC command and data to the respective destination.
 
@@ -210,17 +197,12 @@ class hdmiCECClass():
         promptWithAnswers = [
                 {
                     "query_type": "direct",
-                    "query": "Enter a valid Source Logical Address:",
-                    "input": str(sourceLogicalAddress)
-                },
-                {
-                    "query_type": "direct",
                     "query": "Enter a valid Destination Logical Address:",
                     "input": str(destLogicalAddress)
                 },
                 {
                     "query_type": "direct",
-                    "query": "Enter CEC Command:",
+                    "query": "Enter CEC Command (in hex):",
                     "input": str(cecCommand)
                 },
         ]
@@ -234,8 +216,7 @@ class hdmiCECClass():
                        "input": str(byte)
                    })
 
-        result = self.utMenu.select( self.testSuite, "L3_TransmitCecCommand",promptWithAnswers)
-
+        result = self.utMenu.select( self.testSuite, "Transmit CEC Command",promptWithAnswers)
 
     def __del__(self):
         """
