@@ -339,7 +339,7 @@ static void handleOsdDisplay(uint8_t *buf, int32_t len)
         for (int32_t i = 3; i < len; i++)
         {
             int32_t len = 0;
-            len = snprintf(temp, HDMI_CEC_MAX_OSDNAME, "%c", buf[i]);
+            len = snprintf((char*)temp, HDMI_CEC_MAX_OSDNAME, "%c", buf[i]);
             temp += len;
         }
         UT_LOG_INFO("OSD Display message received: %s", buffer);
@@ -367,7 +367,7 @@ static void handleSetOSDName(uint8_t *buf, int32_t len)
         for (int32_t i = 2; i < len; i++)
         {
             int32_t len = 0;
-            len = snprintf(temp, HDMI_CEC_MAX_OSDNAME, "%c", buf[i]);
+            len = snprintf((char*)temp, HDMI_CEC_MAX_OSDNAME, "%c", buf[i]);
             temp += len;
         }
         UT_LOG_INFO("OSD Name received: %s", buffer);
@@ -432,14 +432,14 @@ static void handleSetMenuLanguage(uint8_t *buf, int32_t len)
 
 static void handleCurrentLatency(int32_t handle, uint8_t *buf, int32_t len, uint8_t *pPhysicalAddress, uint8_t videoDelay, uint8_t audioDelay, uint8_t latency)
 {
-    uint8_t response[] = {(gLogicalAddress << 4) | gBroadcastAddress, 0xA8, buf[2], buf[3], videoDelay, latency, audioDelay};
+    uint8_t response[] = {((gLogicalAddress << 4) | gBroadcastAddress), 0xA8, buf[2], buf[3], videoDelay, latency, audioDelay};
 
     int32_t result;
 
     if (len >= 4)
     {
-        if (buf[2] == (pPhysicalAddress[3] << 4) | pPhysicalAddress[2] &&
-            buf[3] == (pPhysicalAddress[1] << 4) | pPhysicalAddress[0])
+        if ((buf[2] == (pPhysicalAddress[3] << 4) | pPhysicalAddress[2]) &&
+            (buf[3] == (pPhysicalAddress[1] << 4) | pPhysicalAddress[0]))
         {
             response[4] = videoDelay;
             response[5] = latency;
@@ -457,7 +457,7 @@ static void handleCurrentLatency(int32_t handle, uint8_t *buf, int32_t len, uint
 
 static void handleRequestActiveSource(int32_t handle, uint8_t *pPhysicalAddress)
 {
-    uint8_t response[] = { (gLogicalAddress << 4) | gBroadcastAddress, 0x82, (pPhysicalAddress[3] << 4) | pPhysicalAddress[2], (pPhysicalAddress[1] << 4 ) | pPhysicalAddress[0]};
+    uint8_t response[] = { ((gLogicalAddress << 4) | gBroadcastAddress), 0x82, ((pPhysicalAddress[3] << 4) | pPhysicalAddress[2]), ((pPhysicalAddress[1] << 4 ) | pPhysicalAddress[0])};
     int32_t result;
     HdmiCecTx(handle, response, sizeof(response), &result);
     UT_LOG_INFO("Requested Active Sources response sent with result: %d\n", result);
@@ -508,13 +508,13 @@ static void onRxDataReceived(int32_t handle, void *callbackData, uint8_t *buf, i
         UT_LOG_INFO("Initiator: [0x%02X], Destination: [0x%02X], Opcode: [0x%02X]", initiator, destination, opcode);
         if (len > 2)
         {
-            char buffer[HDMI_CEC_MAX_PAYLOAD] = {0};
+            uint8_t buffer[HDMI_CEC_MAX_PAYLOAD] = {0};
             uint8_t *temp = buffer;
             // Log each byte received in the buffer
             for (int32_t index = 2; index < len; index++)
             {
                 int32_t len = 0;
-                len = snprintf(temp, HDMI_CEC_MAX_PAYLOAD, "0x%02X, ", buf[index]);
+                len = snprintf((char*)temp, HDMI_CEC_MAX_PAYLOAD, "0x%02X, ", buf[index]);
                 temp += len;
             }
             buffer[strlen(buffer)-2] = '\0';
@@ -808,6 +808,7 @@ void test_l2_hdmi_cec_source_hal_Close(void)
     gHandle = 0;
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
+}
 
 
 static UT_test_suite_t * pSuite = NULL;
