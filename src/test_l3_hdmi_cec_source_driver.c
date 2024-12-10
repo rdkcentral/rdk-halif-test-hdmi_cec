@@ -438,8 +438,8 @@ static void handleCurrentLatency(int32_t handle, uint8_t *buf, int32_t len, uint
 
     if (len >= 4)
     {
-        if ((buf[2] == (pPhysicalAddress[3] << 4) | pPhysicalAddress[2]) &&
-            (buf[3] == (pPhysicalAddress[1] << 4) | pPhysicalAddress[0]))
+        if (((buf[2] == (pPhysicalAddress[3] << 4)) | pPhysicalAddress[2]) &&
+            ((buf[3] == (pPhysicalAddress[1] << 4)) | pPhysicalAddress[0]))
         {
             response[4] = videoDelay;
             response[5] = latency;
@@ -517,7 +517,7 @@ static void onRxDataReceived(int32_t handle, void *callbackData, uint8_t *buf, i
                 len = snprintf((char*)temp, HDMI_CEC_MAX_PAYLOAD, "0x%02X, ", buf[index]);
                 temp += len;
             }
-            buffer[strlen(buffer)-2] = '\0';
+            buffer[strlen((char*)buffer)-2] = '\0';
             UT_LOG_INFO("Payload: [%s]", buffer);
         }
 
@@ -775,6 +775,7 @@ void test_l3_hdmi_cec_source_hal_GetPhysicalAddress(void)
     assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
+}
 
 /**
 * @brief Test to close the HDMI CEC device.
