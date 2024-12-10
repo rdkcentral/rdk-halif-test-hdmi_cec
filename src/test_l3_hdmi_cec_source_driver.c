@@ -67,6 +67,14 @@
 #include <ut_control_plane.h>
 #include "hdmi_cec_driver.h"
 
+#define TIMEOUT 5
+#define REPLY_TIMEOUT 5
+
+#define HDMI_CEC_MAX_PAYLOAD 128
+#define HDMI_CEC_MAX_OSDNAME 15
+
+#define UT_LOG_MENU_INFO UT_LOG_INFO
+
 // CEC command map table and supporting function
 typedef struct
 {
@@ -793,21 +801,13 @@ void test_l2_hdmi_cec_source_hal_Close(void)
 
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
-    // Step 1: Log the pre-requisite action
-    UT_LOG_INFO("Calling HdmiCecClose(IN: handle: [0x%0X])", gHandle);
-
-    // Step 2: Call the API to close the HDMI CEC handle
+    UT_LOG_INFO("Calling HdmiCecClose(IN:handle:[0x%0X])", gHandle);
     status = HdmiCecClose(gHandle);
-
-    // Step 3: Check if the close operation was successful
-    UT_LOG_INFO("Result HdmiCecClose: (IN: handle: [0x%0X], status: [%s])",gHandle,
-                UT_Control_GetMapString(HDMI_CEC_STATUS_mapTable, status));
-
+    UT_LOG_INFO("Result HdmiCecClose(IN:handle:[0x%0X]) HDMI_CEC_STATUS:[%s]", gHandle, UT_Control_GetMapString(cecError_mapTable,status));
     assert(status == HDMI_CEC_IO_SUCCESS);
+    gHandle = 0;
 
-    // Step 4: Log the end of the function
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
-}
 
 
 static UT_test_suite_t * pSuite = NULL;
