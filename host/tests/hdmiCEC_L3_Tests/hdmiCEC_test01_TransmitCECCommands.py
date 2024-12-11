@@ -50,11 +50,8 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         # Class variables
         self.testName  = "test01_TransmitCECCommands"
         self.qcID = '1'
-        self.sourceLogicalAddress = 0
-
-        self.testCECCommands = os.path.join(dir_path, "hdmiCECTestCommands.yml")
-        hdmicec = ConfigRead(self.testCECCommands, "hdmiCEC")
-        self.cecCommands = hdmicec.fields.get(self.testName)
+        self.tvLogicalAddress = '0'
+        self.broadcastAddress = 'f'
 
         super().__init__(self.testName, self.qcID, log)
 
@@ -74,29 +71,41 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         self.testhdmiCEC.initialise()
 
         # Add the logical Address.
-        self.testhdmiCEC.addLogicalAddress(self.sourceLogicalAddress)
+        self.testhdmiCEC.addLogicalAddress(self.tvLogicalAddress)
 
-        self.cecDevices = self.cecAdapter.listDevices()
+        # Get the logical Address.
+        deviceLogicalAddress = self.testhdmiCEC.getLogicalAddress()
 
+        self.cecDevices = self.hdmiCECController.listDevices()
+
+        finalResult = True
         for device in self.cecDevices:
             logicalAddress = device["logical address"]
 
             # To bypass sending the message to TV
-            if logicalAddress == 0 or logicalAddress == 14:
+            if logicalAddress == '0' or logicalAddress == 'f':
                 continue
 
             for command in self.cecCommands:
+                result = False
                 cec = command.get("command")
                 payload = command.get("payload")
+                type = command.get("type")
+
+                destinationLogicalAddress = logicalAddress
+                if type == "Broadcast":
+                    destinationLogicalAddress = self.broadcastAddress
 
                 # Transmit Standby command to a specific destination address
-                self.testhdmiCEC.cecTransmitCmd(logicalAddress, cec, payload)
+                self.testhdmiCEC.cecTransmitCmd(destinationLogicalAddress, cec, payload)
 
-                self.log.stepStart(f'HdmiCecTx Source: {self.sourceLogicalAddress} Destination: {logicalAddress} CEC OPCode: {cec} Payload: {payload}')
+                self.log.stepStart(f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
 
-                result = self.cecAdapter.checkTransmitStatus(self.sourceLogicalAddress, logicalAddress, cec, payload)
+                result = self.hdmiCECController.checkTransmitStatus(deviceLogicalAddress, destinationLogicalAddress, cec, payload)
 
-                self.log.stepResult(result, f'HdmiCecTx Source: {self.sourceLogicalAddress} Destination: {logicalAddress} CEC OPCode: {cec} Payload: {payload}')
+                self.log.stepResult(result, f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
+
+                finalResult &= result
 
         # Remove the Logical Address
         self.testhdmiCEC.removeLogicalAddress()
@@ -104,7 +113,7 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         # Terminate dsAudio Module
         self.testhdmiCEC.terminate()
 
-        return result
+        return finalResult
 
 if __name__ == '__main__':
     summerLogName = os.path.splitext(os.path.basename(__file__))[0] + "_summery"

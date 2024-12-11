@@ -69,6 +69,11 @@ class hdmiCECHelperClass(utHelperClass):
         self.targetWorkspace = self.cpe.get("target_directory")
         self.targetWorkspace = os.path.join(self.targetWorkspace, self.moduleName)
 
+        self.testCECCommands = os.path.join(dir_path, "hdmiCECTestCommands.yml")
+        hdmicec = ConfigRead(self.testCECCommands, self.moduleName)
+        self.cecCommands = hdmicec.fields.get(self.testName)
+        self.hdmiCECController = self.dut.hdmiCECController
+
 #    def testDownloadAssets(self):
 #        """
 #        Downloads the test artifacts listed in the test setup configuration.

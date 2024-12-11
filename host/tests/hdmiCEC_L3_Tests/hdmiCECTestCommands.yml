@@ -1,15 +1,72 @@
-hdmiCEC:
+hdmicec:
   test01_TransmitCECCommands:
-      - command: "0x04"  # Image View on
-        payload:
-        responses:
-      - command: "0x36"  # Standby
-        payload:
-        responses:
-      - command: "0x9F"  # Get CEC version
-        payload:
-        responses:
-          - type: "Get CEC Version"
-            loop_devices: false  # Apply this response to all devices in the device map
-            payload: ""  # Response pattern with placeholders
-            description: "Device request for CEC version"
+    - command: "0x82"  # Active Soruce
+      payload: ["0x00", "0x00"]
+      type: "Broadcast"
+    - command: "0x90"  # "Report power status
+      payload: ["0x00"]
+      type: "Direct"
+      response: null
+    - command: "0x47"  # Give OSD Name
+      payload: ['0x52', '0x44', '0x4b', '0x20', '0x56', '0x54', '0x53', '0x20', '0x44', '0x65', '0x76', '0x69', '0x63', '0x65']
+      type: "Direct"
+      response: null
+  test02_ReceiveCECCommands:
+    - command: "0x04"  # Image View on
+      payload:
+      type: "Direct"
+      response: null
+    - command: "0x85"  # Request Active source
+      payload:
+      type: "Broadcast"
+      response:
+        type: "Broadcast"
+        command: "0x82"
+        update_payload: true
+        payload: ["0x00", "0x00"]
+        description: "Active Soruce"
+    - command: "0x91"  # Get Menu Language
+      payload:
+      type: "Direct"
+      response:
+        type: "Broadcast"
+        command: "0x32"
+        update_payload: false
+        payload: ["0x65", "0x6E", "0x67"]
+        description: "Set Menu Language"
+    - command: "0x8C"  # Give Vendor ID
+      payload:
+      type: "Direct"
+      response:
+        type: "Broadcast"
+        command: "0x87"
+        update_payload: false
+        payload: ["0x00", "0x00","0x01"]
+        description: "Device Vendor Id"
+    - command: "0x8F"  # Give power status
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x90"
+        update_payload: false
+        payload: ["0x00"]
+        description: "Report power status"
+    - command: "0x9F"  # Get CEC version
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x9E"
+        update_payload: false
+        payload: ["0x05"]
+        description: "Device request for CEC version"
+    - command: "0x46"  # Give OSD Name
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x47"
+        update_payload: false
+        payload: ['0x52', '0x44', '0x4b', '0x20', '0x56', '0x54', '0x53', '0x20', '0x44', '0x65', '0x76', '0x69', '0x63', '0x65']
+        description: "Device request OSD name"

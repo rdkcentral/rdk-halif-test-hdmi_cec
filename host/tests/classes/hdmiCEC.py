@@ -21,12 +21,9 @@
 # *
 #* ******************************************************************************
 
-import subprocess
+import re
 import os
 import sys
-from enum import Enum, auto
-import re
-import yaml
 
 # Add parent directory to the system path for module imports
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -119,13 +116,13 @@ class hdmiCECClass():
         """
         result = self.utMenu.select(self.testSuite, "Close HDMI CEC")
 
-    def addLogicalAddress(self, logicalAddress:int):
+    def addLogicalAddress(self, logicalAddress:str='0'):
         """
         Adding the logical address of a specific device.
         For now Sink to support only the logical address 0.
 
         Args:
-            logicalAddress (int): The Logical address of the DUT.  This will be fixed to zero for a sink device for now.
+            logicalAddress (str): The Logical address of the DUT. This will be fixed to zero for a sink device for now.
 
         Returns:
             None
@@ -134,7 +131,7 @@ class hdmiCECClass():
                 {
                     "query_type": "direct",
                     "query": "Enter Logical Address:",
-                    "input": str(logicalAddress)
+                    "input": logicalAddress
                 }
         ]
         result = self.utMenu.select(self.testSuite, "Add Logical Address", promptWithAnswers)
@@ -162,7 +159,7 @@ class hdmiCECClass():
             int: Logical address of the device.
         """
         result = self.utMenu.select( self.testSuite, "Get Logical Address")
-        connectionStatusPattern = r"Result HdmiCecGetLogicalAddress\(IN:handle:[.*\], OUT:logicalAddress:[.*\]) HDMI_CEC_STATUS:[.*\])"
+        connectionStatusPattern = r"Result HdmiCecGetLogicalAddress\(IN:handle:\[0x[0-9A-F]+\], OUT:logicalAddress:\[([0-9A-Fa-f]+)\]\)"
         logicalAddress = self.searchPattern(result, connectionStatusPattern)
 
         return logicalAddress
@@ -183,7 +180,7 @@ class hdmiCECClass():
 
         return physicalAddress
 
-    def cecTransmitCmd(self, destLogicalAddress:int, cecCommand:int, cecData:list=None):
+    def cecTransmitCmd(self, destLogicalAddress:str, cecCommand:str, cecData:list=None):
         """
         Transmit/Broadcast the CEC command and data to the respective destination.
 
@@ -198,12 +195,12 @@ class hdmiCECClass():
                 {
                     "query_type": "direct",
                     "query": "Enter a valid Destination Logical Address:",
-                    "input": str(destLogicalAddress)
+                    "input": destLogicalAddress
                 },
                 {
                     "query_type": "direct",
                     "query": "Enter CEC Command (in hex):",
-                    "input": str(cecCommand)
+                    "input": cecCommand
                 },
         ]
 
@@ -217,6 +214,63 @@ class hdmiCECClass():
                    })
 
         result = self.utMenu.select( self.testSuite, "Transmit CEC Command",promptWithAnswers)
+
+    def readCallbackDetails (self):
+        """
+        Parses the callback logs from the device.
+
+        Args:
+            None.
+
+        Returns:
+            dict: A dictionary with two keys:
+                - "Received": A list of dictionaries containing details about received opcodes.
+                - "Response": A list of dictionaries containing details about sent response opcodes.
+                Each dictionary contains the following keys:
+                    - "Opcode" (str): The opcode value in hexadecimal.
+                    - "Description" (str): A textual description of the opcode.
+                    - "Initiator" (str): The initiator address in hexadecimal.
+                    - "Destination" (str): The destination address in hexadecimal.
+                    - "Data" (list): The data associated with the opcode.
+        """
+        result = {
+            "Received": [],
+            "Response": []
+        }
+        callbackLogs = self.testSession.read_all()
+
+        received_pattern = re.compile(
+            r"Received Opcode: \[([^\]]+)\] \[([^\]]+)\] Initiator: \[([^\]]+)\], Destination: \[([^\]]+)\] Data: \[(.*?)\]"
+        )
+        sent_pattern = re.compile(
+            r"Sent Response Opcode: \[([^\]]+)\] \[([^\]]+)\] Initiator: \[([^\]]+)\], Destination: \[([^\]]+)\] Data: \[(.*?)\]"
+        )
+
+        def parse_data_field(data_field):
+            # Split the data field into an array of hex values
+            return ["0x" + value.strip() for value in data_field.split(":")]
+
+        for match in received_pattern.finditer(callbackLogs):
+            opcode, description, initiator, destination, data = match.groups()
+            result["Received"].append({
+                "Opcode": opcode,
+                "Description": description,
+                "Initiator": initiator,
+                "Destination": destination,
+                "Data": parse_data_field(data)
+            })
+
+        for match in sent_pattern.finditer(callbackLogs):
+            opcode, description, initiator, destination, data = match.groups()
+            result["Response"].append({
+                "Opcode": opcode,
+                "Description": description,
+                "Initiator": initiator,
+                "Destination": destination,
+                "Data": parse_data_field(data)
+            })
+
+        return result
 
     def __del__(self):
         """
