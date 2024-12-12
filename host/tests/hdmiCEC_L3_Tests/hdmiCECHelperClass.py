@@ -53,15 +53,11 @@ class hdmiCECHelperClass(utHelperClass):
             log (logModule, optional): Parent log module instance for logging. Defaults to None.
         """
         self.testName  = ""
-        self.testSetupPath = os.path.join(dir_path, "hdmiCEC_L3_testSetup.yml")
         self.moduleName = "hdmicec"
         self.rackDevice = "dut"
 
         # Initialize the base helper class
         super().__init__(testName, qcId, log)
-
-        # Load test setup configuration
-        self.testSetup = ConfigRead(self.testSetupPath, self.moduleName)
 
         # Open Sessions hal test
         self.hal_session = self.dut.getConsoleSession("ssh_hal_test")
@@ -80,7 +76,6 @@ class hdmiCECHelperClass(utHelperClass):
         self.testCECCommands = os.path.join(dir_path, "hdmiCECTestCommands.yml")
         hdmicec = ConfigRead(self.testCECCommands, self.moduleName)
         self.cecCommands = hdmicec.fields.get(self.testName)
-        self.hdmiCECController = self.dut.hdmiCECController
 
     def testPrepareFunction(self):
         """
@@ -100,5 +95,7 @@ class hdmiCECHelperClass(utHelperClass):
 
     def testEndFunction(self, powerOff=True):
 
+        super().testEndFunction(powerOff)
         # Clean up the hdmiCEC instance
         del self.testhdmiCEC
+

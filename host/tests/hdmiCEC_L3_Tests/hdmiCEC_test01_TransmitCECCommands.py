@@ -23,6 +23,7 @@
 
 import os
 import sys
+import time
 
 # Append the current and parent directory paths to sys.path for module imports
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -32,7 +33,6 @@ sys.path.append(os.path.join(dir_path, "../"))
 # Importing helper classes and modules for HDMI-CEC testing and logging
 from hdmiCECHelperClass import hdmiCECHelperClass
 from raft.framework.core.logModule import logModule
-from raft.framework.plugins.ut_raft.configRead import ConfigRead
 
 class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
     """
@@ -86,6 +86,8 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         # Final test result
         finalResult = True
 
+        self.hdmiCECController.startMonitoring()
+
         for device in self.cecDevices:
             logicalAddress = device["logical address"]
 
@@ -107,6 +109,8 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
                 # Transmit the CEC command
                 self.testhdmiCEC.cecTransmitCmd(destinationLogicalAddress, cec, payload)
 
+                time.sleep(2)
+
                 self.log.stepStart(f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
 
                 # Validate the transmission
@@ -115,6 +119,8 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
                 self.log.stepResult(result, f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
 
                 finalResult &= result
+
+        self.hdmiCECController.stopMonitoring()
 
         # Remove the Logical Address
         self.testhdmiCEC.removeLogicalAddress()

@@ -120,6 +120,7 @@ class hdmiCEC_test02_ReceiveCECCommands(hdmiCECHelperClass):
         # Get the logical address of the HDMI-CEC adapter
         cecAdapterLogicalAddress = self.cecAdaptor["logical address"]
 
+        self.hdmiCECController.startMonitoring()
         finalResult = True
         for command in self.cecCommands:
             result = False
@@ -159,6 +160,8 @@ class hdmiCEC_test02_ReceiveCECCommands(hdmiCECHelperClass):
                 self.log.stepResult(result, f'Response Test: {cecAdapterLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
 
                 finalResult &= result
+
+        self.hdmiCECController.stopMonitoring()
 
         # Remove the Logical Address
         self.testhdmiCEC.removeLogicalAddress()
