@@ -328,7 +328,7 @@ static bool getCommandResponse(uint8_t opcode, cecResponse_t *pResponse)
             pResponse->cecCommand = UT_KVP_PROFILE_GET_UINT8(key_string);
 
             snprintf(key_string, HDMI_CEC_KVP_SIZE, "hdmicec/cec_responses/%d/response/type" , i);
-            UT_KVP_PROFILE_GET_STRING(key_string, pResponse->type);
+            UT_KVP_PROFILE_GET_STRING(key_string, (char*)pResponse->type);
 
             snprintf(key_string, HDMI_CEC_KVP_SIZE, "hdmicec/cec_responses/%d/response/payload" , i);
             pResponse->payloadSize = UT_KVP_PROFILE_GET_LIST_COUNT(key_string);
@@ -356,7 +356,7 @@ static void sendResponse(int32_t handle, uint8_t initiator, uint8_t destination,
         const char* commandName;
         int32_t expectedDataLength;
 
-        if (!strcmp(pCecResponse->type, "Direct"))
+        if (!strcmp((char*)pCecResponse->type, "Direct"))
         {
             response[0] = (destination << 4) | initiator;
         }
@@ -378,10 +378,10 @@ static void sendResponse(int32_t handle, uint8_t initiator, uint8_t destination,
             for (int32_t index = 0; index < pCecResponse->payloadSize + 2; index++)
             {
                 int32_t len = 0;
-                len = snprintf(temp, HDMI_CEC_MAX_PAYLOAD, "%02X:", response[index]);
+                len = snprintf((char*)temp, HDMI_CEC_MAX_PAYLOAD, "%02X:", response[index]);
                 temp += len;
             }
-            prBuffer[strlen(prBuffer)-1] = '\0';
+            prBuffer[strlen((char*)prBuffer)-1] = '\0';
 
         }
 
@@ -431,15 +431,17 @@ static void onRxDataReceived(int32_t handle, void *callbackData, uint8_t *buf, i
             for (int32_t index = 0; index < len; index++)
             {
                 int32_t len = 0;
-                len = snprintf(temp, HDMI_CEC_MAX_PAYLOAD, "%02X:", buf[index]);
+                len = snprintf((char*)temp, HDMI_CEC_MAX_PAYLOAD, "%02X:", buf[index]);
                 temp += len;
             }
-            prBuffer[strlen(prBuffer)-1] = '\0';
+            prBuffer[strlen((char*)prBuffer)-1] = '\0';
         }
 
         UT_LOG_INFO("Received Opcode: [0x%02X] [%s] Initiator: [%x], Destination: [%x] Data: [%s]\n", opcode, commandName, initiator, destination, prBuffer);
 
         result = getCommandResponse(opcode, &cecResponse);
+
+        UT_LOG_INFO("result: %d\n", result);
 
         sendResponse(handle, initiator, destination, buf, len, &cecResponse);
     }
@@ -589,7 +591,7 @@ void test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand(void) {
 
     // Reading inputs from the user or test framework
     UT_LOG_MENU_INFO("Enter a valid Destination Logical Address: ");
-    readInt(&destinationLogicalAddress);
+    readHex(&destinationLogicalAddress);
 
     UT_LOG_MENU_INFO("Enter CEC Command (in hex): ");
     readHex(&cecCommand);
