@@ -36,18 +36,20 @@ from raft.framework.plugins.ut_raft.utBaseUtils import utBaseUtils
 
 class hdmiCECClass():
     """
-     HDMI CEC Class.
+    HDMI CEC Class.
 
-    This module provides common functionalities and extensions for the HDMI CEC Module.
+    Provides functionalities for initializing, configuring, and controlling
+    HDMI CEC (Consumer Electronics Control) operations in the test environment.
     """
 
-    def __init__(self, moduleConfigProfileFile :str, session=None, targetWorkspace="/tmp"):
+    def __init__(self, moduleConfigProfileFile:str, session=None, targetWorkspace:str="/tmp"):
         """
-        Initializes the HDMI CEC Class instance with configuration settings.
+        Initialize the HDMI CEC Class with configuration settings.
 
         Args:
-            moduleConfigProfileFile  (str): Path to the device profile configuration file.
-            session: Optional; session object for the user interface.
+            moduleConfigProfileFile (str): Path to the profile configuration file for the HDMI CEC module.
+            session: Optional session object for managing interactions with the device.
+            targetWorkspace (str, optional): Target workspace directory on the device. Defaults to "/tmp".
 
         Returns:
             None
@@ -56,18 +58,21 @@ class hdmiCECClass():
         self.testConfigFile = os.path.join(dir_path, "hdmiCEC_testConfig.yml")
         self.testSuite = "L3 HDMICEC Sink Functions"
 
-        # Load configurations for device profile and menu
-        self.moduleConfigProfile = ConfigRead( moduleConfigProfileFile , self.moduleName)
+        # Prepare the profile file on the target workspace
+        profileOnTarget = os.path.join(targetWorkspace, os.path.basename(moduleConfigProfileFile))
         self.testConfig    = ConfigRead(self.testConfigFile, self.moduleName)
-        self.testConfig.test.execute = os.path.join(targetWorkspace, self.testConfig.test.execute)
+        self.testConfig.test.execute = os.path.join(targetWorkspace, self.testConfig.test.execute) + f" -p {profileOnTarget}"
         self.utMenu        = UTSuiteNavigatorClass(self.testConfig, None, session)
         self.testSession   = session
         self.utils         = utBaseUtils()
-        self.ports = self.moduleConfigProfile.fields.get("Ports")
 
+        # Copy required artifacts to the target workspace
         for artifact in self.testConfig.test.artifacts:
             filesPath = os.path.join(dir_path, artifact)
             self.utils.rsync(self.testSession, filesPath, targetWorkspace)
+
+        # Copy the profile configuration to the target workspace
+        self.utils.scpCopy(self.testSession, moduleConfigProfileFile, targetWorkspace)
 
         # Start the user interface menu
         self.utMenu.start()
@@ -118,11 +123,10 @@ class hdmiCECClass():
 
     def addLogicalAddress(self, logicalAddress:str='0'):
         """
-        Adding the logical address of a specific device.
-        For now Sink to support only the logical address 0.
+        Add a logical address for the device.
 
         Args:
-            logicalAddress (str): The Logical address of the DUT. This will be fixed to zero for a sink device for now.
+            logicalAddress (str, optional): Logical address of the device. Defaults to '0'. Value ranges from '0' - 'f'
 
         Returns:
             None
@@ -138,10 +142,10 @@ class hdmiCECClass():
 
     def removeLogicalAddress(self):
         """
-        Remove logical address.
+        Remove the logical address of the device.
 
         Args:
-            logicalAddress (int): The Logical address of the DUT that should be removed.
+            None
 
         Returns:
             None
@@ -150,13 +154,13 @@ class hdmiCECClass():
 
     def getLogicalAddress(self):
         """
-        Retrieves the Logical Address of the DUT.
+        Get the logical address of the device.
 
         Args:
             None.
 
         Returns:
-            int: Logical address of the device.
+            str: Logical address of the device. Value ranges from '0' - 'f'
         """
         result = self.utMenu.select( self.testSuite, "Get Logical Address")
         connectionStatusPattern = r"Result HdmiCecGetLogicalAddress\(IN:handle:\[0x[0-9A-F]+\], OUT:logicalAddress:\[([0-9A-Fa-f]+)\]\)"
@@ -166,13 +170,13 @@ class hdmiCECClass():
 
     def getPhysicalAddress(self):
         """
-        Retrieve the Physical Address of the DUT.
+        Get the physical address of the device.
 
         Args:
             None.
 
         Returns:
-            int: Physical Address of the DUT.
+            str: Physical Address of the DUT.
         """
         result = self.utMenu.select( self.testSuite, "Get Phyiscal Address")
         typeStatusPattern = r"Result HdmiCecGetPhysicalAddress\(IN:handle:[.*\], OUT:physicalAddress:[.*\]) HDMI_CEC_STATUS:[.*\]"
@@ -182,10 +186,12 @@ class hdmiCECClass():
 
     def cecTransmitCmd(self, destLogicalAddress:str, cecCommand:str, cecData:list=None):
         """
-        Transmit/Broadcast the CEC command and data to the respective destination.
+        Transmit or broadcast a CEC command to a specified destination.
 
         Args:
-            None.
+            destLogicalAddress (str): Destination logical address.
+            cecCommand (str): CEC command in hexadecimal.
+            cecData (list, optional): List of data bytes to include in the transmission.
 
         Returns:
             None
@@ -233,10 +239,8 @@ class hdmiCECClass():
                     - "Destination" (str): The destination address in hexadecimal.
                     - "Data" (list): The data associated with the opcode.
         """
-        result = {
-            "Received": [],
-            "Response": []
-        }
+        result = {"Received": [], "Response": []}
+
         callbackLogs = self.testSession.read_all()
 
         received_pattern = re.compile(
@@ -303,6 +307,15 @@ if __name__ == '__main__':
 
     # Get Physical Address
     physicalAddress = test.getPhysicalAddress()
+
+    # Broadcast 0x85 cec command
+    test.cecTransmitCmd('f', '0x85')
+
+    # Transmitt 0x04 cec command to '1'
+    test.cecTransmitCmd('1', '0x85')
+
+    # Read the callback details
+    result = test.readCallbackDetails()
 
     # Close the device
     test.terminate()

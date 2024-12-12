@@ -37,18 +37,6 @@ globalConfig:
         # [ includes: ]
         # [ deviceConfig: "required.yml file"  ]
         deviceConfig: "example_device_config.yml"
-    capture:
-        # [capture: optional]
-            # [ocrEnginePath: "/usr/bin/tesseract"] # "C:\\Program Files\\Tesseract-OCR\\tesseract.exe" (For Windows) - tesseract binary
-            # [resolution: "1080p"] - Capture resolution
-            # [input: 0] - which input is connected to the video path
-        # Note: Video capture will not be installed unless screenRegions: is defined in deviceConfig:
-        ocrEnginePath: "/usr/bin/tesseract" # "C:\\Program Files\\Tesseract-OCR\\tesseract.exe" (For Windows)
-        resolution: "1080p"
-        input: 0
-    cec-adaptor:
-        type: cec-client
-        adaptor: /dev/ttyACM0
     local:
         log:                # log for each slot
             directory: "./logs"
@@ -68,29 +56,36 @@ rackConfig:
                 # [ type: "ssh": port: 22 username: "test" password: "test" ]
                 # [ type: "telnet": port: 23 username: "test" password: "test" ]
                 - dut:
-                    ip: "127.0.0.1"  # IP Address of the ADA Hub
-                    description: "local PC"
-                    platform: "PC"
+                    ip: "127.0.0.1"
+                    description: "element"
+                    platform: "element"
                     consoles:
                         - default:
                             type: "ssh"
                             port: 22
-                            username: "srr07"
-                            ip: "127.0.0.1" #IP address
-                            password: '1234'
+                            username: "root"
+                            ip: "127.0.0.1"
+                            password: ' '
                         - ssh_player:
                             type: "ssh"
                             port: 22
-                            username: "srr07"
-                            ip: "127.0.0.1" #IP address
-                            password: '1234'
+                            username: "root"
+                            ip: "127.0.0.1"
+                            password: ' '
                         - ssh_hal_test:
                             type: "ssh"
                             port: 22
-                            username: "srr07"
-                            ip: "127.0.0.1" #IP address
-                            password: '1234'
+                            username: "root"
+                            ip: "127.0.0.1"
+                            password: ' '
                     outbound:
                         download_url: "http://localhost:8000/"    # download location for the CPE device
                         httpProxy:   # Local Proxy if required
                         workspaceDirectory: './logs/workspace'   # Local working directory
+                    hdmiCECController:
+                        type: remote-cec-client
+                        vendor: "Pulse Eight"
+                        adaptor: /dev/ttyACM0 # Adaptor device entry
+                        address: "127.0.0.1" # Needs to be be filled out with IP address
+                        username: "root" # Needs to be filled out with login username
+                        password: ' ' # Needs to be filled out with login password

@@ -20,12 +20,10 @@
 # *
 #* ******************************************************************************
 
-
-hdmicec:  # Prefix must always exist
+hdmicec:
   description: "hdmiCEC test setup"
   assets:
     device:
-      test01_TransmitSingleStandbyCommandandValidateAck:
-      test02_BroadcastStandbyCommand:
-      test03_TransmitOSDCommandandValidateAck:
-      test04_TransmitLargerOSDCommandRepeatedlyandValidate:
+      test01_TransmitCECCommands:
+      test02_ReceiveCECCommands:
+

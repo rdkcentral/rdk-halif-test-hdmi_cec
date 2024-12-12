@@ -36,20 +36,28 @@ from classes.hdmiCEC import hdmiCECClass
 
 class hdmiCECHelperClass(utHelperClass):
 
+    """
+    Helper class for managing HDMI CEC tests.
+
+    This class extends the `utHelperClass` and provides functionality for preparing
+    and cleaning up HDMI CEC tests.
+    """
+
     def __init__(self, testName:str, qcId:str, log:logModule=None ):
         """
-        Initializes the test class with test name, setup configuration, and sessions for the device.
+        Initializes the test helper class with test name, setup configuration, and session management.
 
         Args:
-            testName (str) : name of the test
-            qcId (str): QC ID of the test.
-            log (class, optional): Parent log class. Defaults to None.
+            testName (str): Name of the test.
+            qcId (str): Quality Control (QC) ID of the test.
+            log (logModule, optional): Parent log module instance for logging. Defaults to None.
         """
         self.testName  = ""
         self.testSetupPath = os.path.join(dir_path, "hdmiCEC_L3_testSetup.yml")
         self.moduleName = "hdmicec"
         self.rackDevice = "dut"
 
+        # Initialize the base helper class
         super().__init__(testName, qcId, log)
 
         # Load test setup configuration
@@ -74,69 +82,16 @@ class hdmiCECHelperClass(utHelperClass):
         self.cecCommands = hdmicec.fields.get(self.testName)
         self.hdmiCECController = self.dut.hdmiCECController
 
-#    def testDownloadAssets(self):
-#        """
-#        Downloads the test artifacts listed in the test setup configuration.
-#
-#        This function retrieves the necessary files and saves them on the DUT.
-#
-#        Args:
-#            None
-#        """
-#
-#        # List of streams with path
-#        self.testStreams = []
-#        url = []
-#
-#        streamPaths = self.testSetup.get("assets").get("device").get(self.testName).get("streams")
-#
-#        # Download test streams to device
-#        if streamPaths and self.streamDownloadURL:
-#            for streamPath in streamPaths:
-#                url.append(os.path.join(self.streamDownloadURL, streamPath))
-#                self.testStreams.append(os.path.join(self.targetWorkspace, os.path.basename(streamPath)))
-#            self.downloadToDevice(url, self.targetWorkspace, self.rackDevice)
-
-#    def testCleanAssets(self):
-#        """
-#        Removes the downloaded assets and test streams from the DUT after test execution.
-#
-#        Args:
-#            None
-#        """
-#        self.deleteFromDevice(self.testStreams)
-#
-    def testRunPrerequisites(self):
-        """
-        Executes prerequisite commands listed in the test setup configuration file on the DUT.
-
-        Args:
-            None
-        """
-
-        # Run commands as part of test prerequisites
-        test = self.testSetup.get("assets").get("device").get(self.testName)
-        cmds = test.get("execute")
-        if cmds is not None:
-            for cmd in cmds:
-                self.writeCommands(cmd)
-
     def testPrepareFunction(self):
         """
-        Prepares the environment and assets required for the test.
+        Cleans up the test environment by deinitializing the HDMI CEC instance.
 
-        This function:
-        - Downloads the required assets.
-        - Runs the prerequisite commands.
-        - Creates hdmiCEC
+        Args:
+            powerOff (bool, optional): Flag to indicate whether to power off the device. Defaults to True.
 
         Returns:
             bool
         """
-
-
-        # Run Prerequisites listed in the test setup configuration file
-        #self.testRunPrerequisites()
 
         # Create the hdmiCEC class
         self.testhdmiCEC = hdmiCECClass(self.moduleConfigProfileFile, self.hal_session, self.targetWorkspace)
@@ -144,12 +99,6 @@ class hdmiCECHelperClass(utHelperClass):
         return True
 
     def testEndFunction(self, powerOff=True):
-        # Clean the assets downloaded to the device
-        #self.testCleanAssets()
 
         # Clean up the hdmiCEC instance
         del self.testhdmiCEC
-
-    def testExceptionCleanUp (self):
-        # Clean the assets downloaded to the device
-        self.testCleanAssets()

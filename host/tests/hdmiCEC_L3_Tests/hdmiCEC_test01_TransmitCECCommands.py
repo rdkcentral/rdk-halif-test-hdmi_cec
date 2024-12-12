@@ -24,28 +24,26 @@
 import os
 import sys
 
+# Append the current and parent directory paths to sys.path for module imports
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(dir_path))
 sys.path.append(os.path.join(dir_path, "../"))
 
+# Importing helper classes and modules for HDMI-CEC testing and logging
 from hdmiCECHelperClass import hdmiCECHelperClass
 from raft.framework.core.logModule import logModule
 from raft.framework.plugins.ut_raft.configRead import ConfigRead
 
 class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
     """
-    Test class to enable, disable, and verify the status of audio ports on a device.
-
-    This class uses the `dsAudioClass` to interact with the device's audio ports,
-    downloading necessary test assets, playing audio streams, enabling and disabling
-    audio ports, and performing verification of audio output.
+    A class for testing HDMI-CEC functionality by transmitting and verifying CEC commands.
     """
     def __init__(self, log:logModule=None):
         """
-        Initializes the test class with test name, setup configuration, and sessions for the device.
+        Initializes the test class with test-specific configurations.
 
         Args:
-            None
+            log (logModule): Logging module instance to record test execution.
         """
         # Class variables
         self.testName  = "test01_TransmitCECCommands"
@@ -53,18 +51,24 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         self.tvLogicalAddress = '0'
         self.broadcastAddress = 'f'
 
+        # Initialize the parent class
         super().__init__(self.testName, self.qcID, log)
 
     def testFunction(self):
         """
-        The main test function that Transmits the Stanby Command and checks the ACK and validates it.
+        Main test function for transmitting HDMI-CEC commands and validating responses.
 
-        This function:
-        - Send a standby command to a device that is connected on the CEC network and get the ack.
-        - User to confirm whether the targetted device had recieved this command or not.
+        Steps:
+        1. Initialize HDMI-CEC module.
+        2. Add a logical address to the test device.
+        3. Get the logical address of the device.
+        4. List all connected CEC devices.
+        5. Iterate through devices and send commands to appropriate logical addresses.
+        6. Validate transmission and record results.
+        7. Clean up by removing logical addresses and terminating the HDMI-CEC module.
 
         Returns:
-            bool: Final result of the test.
+            bool: Final result of the test execution.
         """
 
         # Initialize the hdmiCEC module
@@ -76,14 +80,17 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         # Get the logical Address.
         deviceLogicalAddress = self.testhdmiCEC.getLogicalAddress()
 
+        # List all connected CEC devices
         self.cecDevices = self.hdmiCECController.listDevices()
 
+        # Final test result
         finalResult = True
+
         for device in self.cecDevices:
             logicalAddress = device["logical address"]
 
-            # To bypass sending the message to TV
-            if logicalAddress == '0' or logicalAddress == 'f':
+            # Skip sending messages to TV
+            if logicalAddress == '0' or logicalAddress == 'e':
                 continue
 
             for command in self.cecCommands:
@@ -92,15 +99,17 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
                 payload = command.get("payload")
                 type = command.get("type")
 
+                # Determine the destination logical address
                 destinationLogicalAddress = logicalAddress
                 if type == "Broadcast":
                     destinationLogicalAddress = self.broadcastAddress
 
-                # Transmit Standby command to a specific destination address
+                # Transmit the CEC command
                 self.testhdmiCEC.cecTransmitCmd(destinationLogicalAddress, cec, payload)
 
                 self.log.stepStart(f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
 
+                # Validate the transmission
                 result = self.hdmiCECController.checkTransmitStatus(deviceLogicalAddress, destinationLogicalAddress, cec, payload)
 
                 self.log.stepResult(result, f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
@@ -110,13 +119,16 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         # Remove the Logical Address
         self.testhdmiCEC.removeLogicalAddress()
 
-        # Terminate dsAudio Module
+        # Terminate the hdmiCEC Module
         self.testhdmiCEC.terminate()
 
         return finalResult
 
 if __name__ == '__main__':
+    # Configure the summary log file
     summerLogName = os.path.splitext(os.path.basename(__file__))[0] + "_summery"
     summeryLog = logModule(summerLogName, level=logModule.INFO)
+
+    # Create an instance of the test class and execute the test
     test = hdmiCEC_test01_TransmitCECCommands(summeryLog)
     test.run(False)

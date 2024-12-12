@@ -30,9 +30,7 @@ deviceConfig:
         target_directory: "/tmp/"  # Target Directory on device
         prompt: "" # Prompt string on console
         test:
-            #TODO: Use the single profile file which contains all details (ds, hdmi, etc)
-            profile: "../../../../profiles/sink/sink_hdmiCEC_test.yaml"
-            streams_download_url: "<URL_Path>" #URL path from which the streams are downloaded to the device
+            profile: "../../../profiles/sink/sink_hdmiCEC.yml"
     cpe2:
         platform: "test"
         model: "test"
