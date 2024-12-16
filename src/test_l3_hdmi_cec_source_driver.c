@@ -335,8 +335,17 @@ static bool getCommandResponse(uint8_t opcode, cecResponse_t *pResponse)
 
             for(uint8_t j = 0; j < pResponse->payloadSize; j++)
             {
-                snprintf(key_string, HDMI_CEC_KVP_SIZE, "hdmicec/cec_responses/%d/response/payload/%d" , i, j);
-                pResponse->payload[j] = UT_KVP_PROFILE_GET_UINT8(key_string);
+                if((command == 0xA8 || command == 0x84) && j < 2) //Needs this devices physical address
+                {
+                    pResponse->payload[j] = gPhysicalAddressBytes[j];
+                    continue;
+                }
+                else{
+                    snprintf(key_string, HDMI_CEC_KVP_SIZE, "hdmicec/cec_responses/%d/response/payload/%d" , i, j);
+                    pResponse->payload[j] = UT_KVP_PROFILE_GET_UINT8(key_string);
+
+                }
+                
             }
             return true;
         }
@@ -632,6 +641,7 @@ void test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand(void) {
     UT_LOG_INFO("Calling HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[])", gHandle, buf, len);
     int32_t status = HdmiCecTx(gHandle, buf, len, &result);
     UT_LOG_INFO("Result HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[%d]) HDMI_CEC_STATUS:[%s]", gHandle, buf, len, result, UT_Control_GetMapString(cecError_mapTable,status));
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -723,11 +733,11 @@ int test_register_hdmicec_hal_source_l3_tests(void)
     }
     // List of test function names and strings
 
-    UT_add_test( pSuite, "Init HDMI CEC Source", test_l3_hdmi_cec_source_hal_Init);
-    UT_add_test( pSuite, "Get Logical Address Source", test_l3_hdmi_cec_source_hal_GetLogicalAddress);
-    UT_add_test( pSuite, "Transmit CEC Command Source", test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand);
-    UT_add_test( pSuite, "Get Physical Address Source", test_l3_hdmi_cec_source_hal_GetPhysicalAddress);
-    UT_add_test( pSuite, "Close HDMICEC Source", test_l2_hdmi_cec_source_hal_Close);
+    UT_add_test( pSuite, "Init HDMI CEC", test_l3_hdmi_cec_source_hal_Init);
+    UT_add_test( pSuite, "Get Logical Address", test_l3_hdmi_cec_source_hal_GetLogicalAddress);
+    UT_add_test( pSuite, "Transmit CEC Command", test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand);
+    UT_add_test( pSuite, "Get Physical Address", test_l3_hdmi_cec_source_hal_GetPhysicalAddress);
+    UT_add_test( pSuite, "Close HDMI CEC", test_l2_hdmi_cec_source_hal_Close);
 
     return 0;
 }
