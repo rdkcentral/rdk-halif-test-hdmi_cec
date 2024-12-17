@@ -54,7 +54,7 @@ hdmicec:
                     - "L2_VerifyPhysicalAddress_Sink"
                     - "L2_TransmitCECCommand_Sink"
             2:
-                name: "L3 hdmicec - Sink"
+                name: "L3 HDMICEC Functions"
                 tests:
                     - "Init HDMI CEC"
                     - "Add Logical Address"

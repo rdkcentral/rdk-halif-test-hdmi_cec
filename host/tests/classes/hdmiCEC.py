@@ -59,6 +59,7 @@ class hdmiCECClass():
         self.testSuite = "L3 HDMICEC Sink Functions"
 
         # Prepare the profile file on the target workspace
+        self.moduleConfigProfile = ConfigRead( moduleConfigProfileFile , self.moduleName)
         profileOnTarget = os.path.join(targetWorkspace, os.path.basename(moduleConfigProfileFile))
         self.testConfig    = ConfigRead(self.testConfigFile, self.moduleName)
         self.testConfig.test.execute = os.path.join(targetWorkspace, self.testConfig.test.execute) + f" -p {profileOnTarget}"
@@ -285,6 +286,23 @@ class hdmiCECClass():
             })
 
         return result
+
+    def getDeviceType(self):
+        """
+        Retrieves the type of the audio device.
+
+        Args:
+            None.
+
+        Returns:
+            str: The type of device:
+                - "sink" -  sink device.
+                - "source" - source device.
+                - None if the device type is unknown or unsupported.
+        """
+        type = self.moduleConfigProfile.fields.get("type")
+
+        return type
 
     def __del__(self):
         """

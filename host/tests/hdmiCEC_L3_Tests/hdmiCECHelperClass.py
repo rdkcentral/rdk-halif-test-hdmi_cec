@@ -91,6 +91,7 @@ class hdmiCECHelperClass(utHelperClass):
 
         # Create the hdmiCEC class
         self.testhdmiCEC = hdmiCECClass(self.moduleConfigProfileFile, self.hal_session, self.targetWorkspace)
+        self.deviceType  = self.testhdmiCEC.getDeviceType()
 
         return True
 

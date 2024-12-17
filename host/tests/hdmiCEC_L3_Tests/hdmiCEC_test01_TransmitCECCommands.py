@@ -104,7 +104,7 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
             logicalAddress = device["logical address"]
 
             # Skip sending messages to TV
-            if logicalAddress == '0' or logicalAddress == 'e':
+            if logicalAddress == deviceLogicalAddress:
                 continue
 
             for command in self.cecCommands:
