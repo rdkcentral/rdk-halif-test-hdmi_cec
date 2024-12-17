@@ -165,63 +165,6 @@ CecCommandMap cecCommandTable[] = {
     {0xFF, "Abort", 0}
 };
 
-typedef enum HDMI_CEC_DEVICE_TYPE_T
-{
-    HDMI_CEC_RECORDER = 1,
-    HDMI_CEC_AMPLIFIER,
-    HDMI_CEC_TUNER,
-    HDMI_CEC_PLAYBACK,
-    HDMI_CEC_AUDIO,
-    HDMI_CEC_TV,
-    HDMI_CEC_RESERVED
-} HDMI_CEC_DEVICE_TYPE;
-
-const static ut_control_keyStringMapping_t cecDeviceType_mapTable[] =
-{
-  {"Recorder",        (int32_t)HDMI_CEC_RECORDER},
-  {"Amplifier",       (int32_t)HDMI_CEC_AMPLIFIER},
-  {"Tuner",           (int32_t)HDMI_CEC_TUNER},
-  {"Playback Device", (int32_t)HDMI_CEC_PLAYBACK},
-  {"Audio System",    (int32_t)HDMI_CEC_AUDIO},
-  {"TV",              (int32_t)HDMI_CEC_TV},
-  {"Reserved",        (int32_t)HDMI_CEC_RESERVED}
-};
-
-typedef enum HDMI_CEC_POWER_STATUS_T
-{
-    HDMI_CEC_ON = 0,
-    HDMI_CEC_STANDBY,
-    HDMI_CEC_TRANSIT_STANDBY,
-    HDMI_CEC_TRANSIT_ON
-} HDMI_CEC_POWER_STATUS;
-
-const static ut_control_keyStringMapping_t cecPowerStatus_mapTable[] =
-{
-  {"On",                    (int32_t)HDMI_CEC_ON},
-  {"Standby",               (int32_t)HDMI_CEC_STANDBY},
-  {"Transition to Standby", (int32_t)HDMI_CEC_TRANSIT_STANDBY},
-  {"Transition to On",      (int32_t)HDMI_CEC_TRANSIT_ON}
-};
-
-typedef enum HDMI_CEC_FEATURE_ABORT_REASON_T
-{
-    HDMI_CEC_UNRECOGNIZE = 0,
-    HDMI_CEC_NOTCORRECTMODE,
-    HDMI_CEC_CANNOTPROVIDE,
-    HDMI_CEC_INVALID,
-    HDMI_CEC_REFUSED,
-    HDMI_CEC_UNABLE
-} HDMI_CEC_FEATURE_ABORT_REASON;
-
-const static ut_control_keyStringMapping_t cecFeatureAbortReason_mapTable[] =
-{
-  {"Unrecognized opcode",            (int32_t)HDMI_CEC_UNRECOGNIZE},
-  {"Not in Correct mode to respond", (int32_t)HDMI_CEC_NOTCORRECTMODE},
-  {"Cannot provide source",          (int32_t)HDMI_CEC_CANNOTPROVIDE},
-  {"Invalid operand",                (int32_t)HDMI_CEC_INVALID},
-  {"Refused",                        (int32_t)HDMI_CEC_REFUSED},
-  {"Unable to determine",            (int32_t)HDMI_CEC_UNABLE}
-};
 /* cecError_t */
 const static ut_control_keyStringMapping_t cecError_mapTable [] =
 {
@@ -335,7 +278,7 @@ static bool getCommandResponse(uint8_t opcode, cecResponse_t *pResponse)
 
             for(uint8_t j = 0; j < pResponse->payloadSize; j++)
             {
-                if((command == 0xA8 || command == 0x84) && j < 2) //Needs this devices physical address
+                if((command == 0xA8 || command == 0x84|| command == 0x82) && j < 2) //Needs this devices physical address
                 {
                     pResponse->payload[j] = gPhysicalAddressBytes[j];
                     continue;
@@ -640,7 +583,7 @@ void test_l3_hdmi_cec_source_hal_TransmitHdmiCecCommand(void) {
     // Logging the transmission attempt
     UT_LOG_INFO("Calling HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[])", gHandle, buf, len);
     int32_t status = HdmiCecTx(gHandle, buf, len, &result);
-    UT_LOG_INFO("Result HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[%d]) HDMI_CEC_STATUS:[%s]", gHandle, buf, len, result, UT_Control_GetMapString(cecError_mapTable,status));
+    UT_LOG_INFO("Result HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[%s]) HDMI_CEC_STATUS:[%s]", gHandle, buf, len, UT_Control_GetMapString(cecError_mapTable, result)? UT_Control_GetMapString(cecError_mapTable, result):"HDMI_CEC_IO_SENT_FAILED", UT_Control_GetMapString(cecError_mapTable,status));
     assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
