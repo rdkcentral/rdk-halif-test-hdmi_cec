@@ -48,11 +48,23 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         # Class variables
         self.testName  = "test01_TransmitCECCommands"
         self.qcID = '1'
-        self.tvLogicalAddress = '0'
         self.broadcastAddress = 'f'
 
         # Initialize the parent class
         super().__init__(self.testName, self.qcID, log)
+
+    def testVerifyTxResults(self, txResult:str, rxResult:bool):
+        """
+        Verifies the tx and rx results.
+
+        Args:
+            txResult(str): tx result
+            rxResult(bool): rx result
+        Returns:
+            bool: Final result of the test.
+        """
+
+        return rxResult
 
     def testFunction(self):
         """
@@ -75,7 +87,7 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         self.testhdmiCEC.initialise()
 
         # Add the logical Address.
-        self.testhdmiCEC.addLogicalAddress(self.tvLogicalAddress)
+        self.testhdmiCEC.addLogicalAddress(self.testLogicalAddress)
 
         # Get the logical Address.
         deviceLogicalAddress = self.testhdmiCEC.getLogicalAddress()
@@ -96,7 +108,6 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
                 continue
 
             for command in self.cecCommands:
-                result = False
                 cec = command.get("command")
                 payload = command.get("payload")
                 type = command.get("type")
@@ -106,19 +117,24 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
                 if type == "Broadcast":
                     destinationLogicalAddress = self.broadcastAddress
 
+                self.log.stepStart(f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
+
                 # Transmit the CEC command
-                self.testhdmiCEC.cecTransmitCmd(destinationLogicalAddress, cec, payload)
+                txResults = self.testhdmiCEC.cecTransmitCmd(destinationLogicalAddress, cec, payload)
+
+                self.log.stepResult(txResults, f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
+
+                finalResult &= txResults
 
                 time.sleep(2)
 
-                self.log.stepStart(f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
-
+                self.log.stepStart(f'HdmiCecTx Receive Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
                 # Validate the transmission
-                result = self.hdmiCECController.checkTransmitStatus(deviceLogicalAddress, destinationLogicalAddress, cec, payload)
+                rxResult = self.hdmiCECController.checkTransmitStatus(deviceLogicalAddress, destinationLogicalAddress, cec, payload)
 
-                self.log.stepResult(result, f'HdmiCecTx Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
+                self.log.stepResult(rxResult, f'HdmiCecTx Receive Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
 
-                finalResult &= result
+                finalResult &= rxResult
 
         self.hdmiCECController.stopMonitoring()
 

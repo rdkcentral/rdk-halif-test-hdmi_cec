@@ -221,6 +221,16 @@ class hdmiCECClass():
 
         result = self.utMenu.select( self.testSuite, "Transmit CEC Command",promptWithAnswers)
 
+        pattern = r"Result HdmiCecTx\(.*OUT:result:\[(.*?)\]\).*HDMI_CEC_STATUS:\[(.*?)\]"
+
+        txStatus = self.searchPattern(result, pattern)
+
+        status = False
+        if txStatus == "HDMI_CEC_IO_SENT_AND_ACKD" or txStatus == "HDMI_CEC_IO_SENT_BUT_NOT_ACKD":
+            status = True
+
+        return status
+
     def readCallbackDetails (self):
         """
         Parses the callback logs from the device.

@@ -76,6 +76,7 @@ class hdmiCECHelperClass(utHelperClass):
         self.testCECCommands = os.path.join(dir_path, "hdmiCECTestCommands.yml")
         hdmicec = ConfigRead(self.testCECCommands, self.moduleName)
         self.cecCommands = hdmicec.fields.get(self.testName)
+        self.testLogicalAddress = hdmicec.logicalAddress
 
     def testPrepareFunction(self):
         """

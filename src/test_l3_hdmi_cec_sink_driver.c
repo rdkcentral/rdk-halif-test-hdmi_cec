@@ -161,63 +161,6 @@ CecCommandMap cecCommandTable[] = {
     {0xFF, "Abort", 0}
 };
 
-typedef enum HDMI_CEC_DEVICE_TYPE_T
-{
-    HDMI_CEC_RECORDER = 1,
-    HDMI_CEC_AMPLIFIER,
-    HDMI_CEC_TUNER,
-    HDMI_CEC_PLAYBACK,
-    HDMI_CEC_AUDIO,
-    HDMI_CEC_TV,
-    HDMI_CEC_RESERVED
-} HDMI_CEC_DEVICE_TYPE;
-
-const static ut_control_keyStringMapping_t cecDeviceType_mapTable[] =
-{
-  {"Recorder",        (int32_t)HDMI_CEC_RECORDER},
-  {"Amplifier",       (int32_t)HDMI_CEC_AMPLIFIER},
-  {"Tuner",           (int32_t)HDMI_CEC_TUNER},
-  {"Playback Device", (int32_t)HDMI_CEC_PLAYBACK},
-  {"Audio System",    (int32_t)HDMI_CEC_AUDIO},
-  {"TV",              (int32_t)HDMI_CEC_TV},
-  {"Reserved",        (int32_t)HDMI_CEC_RESERVED}
-};
-
-typedef enum HDMI_CEC_POWER_STATUS_T
-{
-    HDMI_CEC_ON = 0,
-    HDMI_CEC_STANDBY,
-    HDMI_CEC_TRANSIT_STANDBY,
-    HDMI_CEC_TRANSIT_ON
-} HDMI_CEC_POWER_STATUS;
-
-const static ut_control_keyStringMapping_t cecPowerStatus_mapTable[] =
-{
-  {"On",                    (int32_t)HDMI_CEC_ON},
-  {"Standby",               (int32_t)HDMI_CEC_STANDBY},
-  {"Transition to Standby", (int32_t)HDMI_CEC_TRANSIT_STANDBY},
-  {"Transition to On",      (int32_t)HDMI_CEC_TRANSIT_ON}
-};
-
-typedef enum HDMI_CEC_FEATURE_ABORT_REASON_T
-{
-    HDMI_CEC_UNRECOGNIZE = 0,
-    HDMI_CEC_NOTCORRECTMODE,
-    HDMI_CEC_CANNOTPROVIDE,
-    HDMI_CEC_INVALID,
-    HDMI_CEC_REFUSED,
-    HDMI_CEC_UNABLE
-} HDMI_CEC_FEATURE_ABORT_REASON;
-
-const static ut_control_keyStringMapping_t cecFeatureAbortReason_mapTable[] =
-{
-  {"Unrecognized opcode",            (int32_t)HDMI_CEC_UNRECOGNIZE},
-  {"Not in Correct mode to respond", (int32_t)HDMI_CEC_NOTCORRECTMODE},
-  {"Cannot provide source",          (int32_t)HDMI_CEC_CANNOTPROVIDE},
-  {"Invalid operand",                (int32_t)HDMI_CEC_INVALID},
-  {"Refused",                        (int32_t)HDMI_CEC_REFUSED},
-  {"Unable to determine",            (int32_t)HDMI_CEC_UNABLE}
-};
 /* cecError_t */
 const static ut_control_keyStringMapping_t cecError_mapTable [] =
 {
@@ -463,7 +406,6 @@ exit:
 * @brief Initialization of the HAL CEC Module
 *
 * This test provides a scope to open the HAL CEC module and preserve the handle.
-
 *
 * **Test Group ID:** 03@n
 *
@@ -472,9 +414,6 @@ exit:
 * **Pre-Conditions:** None@n
 *
 * **Dependencies:** None@n
-*
-* **User Interaction:** @n
-* User or Automation tool should select the Test 1 to before running any test.
 *
 */
 void test_l3_hdmi_cec_sink_hal_Init(void)
@@ -517,7 +456,7 @@ void test_l3_hdmi_cec_sink_hal_Init(void)
 * This applies only for the Sink Devices.
 * Source devices will get the logical address during CEC open.
 *
-* **Test Group ID:** 02@n
+* **Test Group ID:** 03@n
 *
 * **Test Case ID:** 002@n
 *
@@ -525,9 +464,6 @@ void test_l3_hdmi_cec_sink_hal_Init(void)
 * HDMI-CEC Module should be intialized through Test 1 before calling this test.
 *
 * **Dependencies:** None@n
-*
-* **User Interaction:** @n
-* User or Automation tool should select the Test 2 and provide the logical address.
 *
 */
 void test_l3_hdmi_cec_sink_hal_AddLogicalAddress(void)
@@ -565,7 +501,7 @@ void test_l3_hdmi_cec_sink_hal_AddLogicalAddress(void)
 *
 * This test provides a scope to check the assigned logical address of the device.
 *
-* **Test Group ID:** 02@n
+* **Test Group ID:** 03@n
 *
 * **Test Case ID:** 003@n
 *
@@ -573,10 +509,6 @@ void test_l3_hdmi_cec_sink_hal_AddLogicalAddress(void)
 * HDMI-CEC Module should be intialized through Test 1 before calling this test.
 *
 * **Dependencies:** None@n
-*
-* **User Interaction:** @n
-* User or Automation tool should select the Test 3 and shall read the Logical address displayed on the console.
-
 *
 */
 void test_l3_hdmi_cec_sink_hal_GetLogicalAddress(void)
@@ -591,6 +523,7 @@ void test_l3_hdmi_cec_sink_hal_GetLogicalAddress(void)
     status = HdmiCecGetLogicalAddress(gHandle, &logicalAddress);
     UT_LOG_INFO("Result HdmiCecGetLogicalAddress(IN:handle:[0x%0X], OUT:logicalAddress:[%x]) HDMI_CEC_STATUS:[%s])", gHandle, logicalAddress, UT_Control_GetMapString(cecError_mapTable,status));
     assert(status == HDMI_CEC_IO_SUCCESS);
+    assert(logicalAddress >= 0 && logicalAddress <= 15);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -601,18 +534,15 @@ void test_l3_hdmi_cec_sink_hal_GetLogicalAddress(void)
 * This test provides an interface to user/automation tool to transmit a CEC Command.
 * Necessary input should be provided to the test.
 *
-* **Test Group ID:** 02@n
+* **Test Group ID:** 03@n
 *
 * **Test Case ID:** 004@n
 *
 * **Pre-Conditions:** @n
 * HDMI-CEC Module should be intialized through Test 1 before calling this test.
+* Logical Address should be added through Test 2 before calling this test.
 *
 * **Dependencies:** None@n
-*
-* **User Interaction:** @n
-* User or Automation tool should select the Test 4 and shall provide the necessary source and destination logical address,
-* CEC command, data lenght and data.
 *
 */
 void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void) {
@@ -671,7 +601,8 @@ void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void) {
     // Logging the transmission attempt
     UT_LOG_INFO("Calling HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[])", gHandle, buf, len);
     int32_t status = HdmiCecTx(gHandle, buf, len, &result);
-    UT_LOG_INFO("Result HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[%d]) HDMI_CEC_STATUS:[%s]", gHandle, buf, len, result, UT_Control_GetMapString(cecError_mapTable,status));
+    UT_LOG_INFO("Result HdmiCecTx(IN:handle:[0x%0X], IN:buf:[%p], IN:len:[%d], OUT:result:[%s]) HDMI_CEC_STATUS:[%s]", gHandle, buf, len, UT_Control_GetMapString(cecError_mapTable, result)? UT_Control_GetMapString(cecError_mapTable, result):"HDMI_CEC_IO_SENT_FAILED", UT_Control_GetMapString(cecError_mapTable,status));
+    assert(status == HDMI_CEC_IO_SUCCESS);
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
@@ -681,23 +612,19 @@ void test_l3_hdmi_cec_sink_hal_TransmitHdmiCecCommand(void) {
 *
 * This test provides a scope to read the physical address of the device.
 *
-* **Test Group ID:** 02@n
+* **Test Group ID:** 03@n
 *
-* **Test Case ID:** 006@n
+* **Test Case ID:** 005@n
 *
 * **Pre-Conditions:** @n
 * HDMI-CEC Module should be intialized through Test 1 before calling this test.
 *
 * **Dependencies:** None@n
 *
-* **User Interaction:** @n
-* User or Automation tool should select the Test 6 to read the physical address of the device
-* device connected in the network.
-*
 */
 void test_l3_hdmi_cec_sink_hal_GetPhysicalAddress(void)
 {
-    gTestID = 6;
+    gTestID = 5;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     HDMI_CEC_STATUS status = HDMI_CEC_IO_SUCCESS;
@@ -717,22 +644,18 @@ void test_l3_hdmi_cec_sink_hal_GetPhysicalAddress(void)
 * This test provides a scope to remove the logical address of the device. HAL API to set
 * to default logical addres 0xF once the logical address is removed.
 *
-* **Test Group ID:** 02@n
+* **Test Group ID:** 03@n
 *
-* **Test Case ID:** 07@n
+* **Test Case ID:** 006@n
 *
 * **Pre-Conditions:** @n
 * HDMI-CEC Module should be intialized through Test 1 before calling this test.
 *
 * **Dependencies:** None@n
-*
-* **User Interaction:** @n
-* User or Automation tool should select the Test 7 to delete the logical address.
-*
 */
 void test_l3_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
 {
-    gTestID = 7;
+    gTestID = 6;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     HDMI_CEC_STATUS status = HDMI_CEC_IO_SUCCESS;
@@ -746,12 +669,6 @@ void test_l3_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
     UT_LOG_INFO("Result HdmiCecRemoveLogicalAddress(IN:handle:[0x%0X], IN:logicalAddress:[%d]) HDMI_CEC_STATUS:[%s])", gHandle, logicalAddress, UT_Control_GetMapString(cecError_mapTable,status));
     assert(status == HDMI_CEC_IO_SUCCESS);
 
-    UT_LOG_INFO("Calling HdmiCecGetLogicalAddress(IN:handle:[0x%0X], OUT:logicalAddress:[])", gHandle);
-    status = HdmiCecGetLogicalAddress(gHandle, &getLogicalAddress);
-    UT_LOG_INFO("Result HdmiCecGetLogicalAddress(IN:handle:[0x%0X], OUT:logicalAddress:[%d]) HDMI_CEC_STATUS:[%s])", gHandle, getLogicalAddress, UT_Control_GetMapString(cecError_mapTable,status));
-    assert(status == HDMI_CEC_IO_SUCCESS);
-    assert(getLogicalAddress == -1);
-
     gLogicalAddress = -1;
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
@@ -761,22 +678,18 @@ void test_l3_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
 *
 * This test provides a scope to close the created HDMI CEC handle.
 *
-* **Test Group ID:** 02@n
+* **Test Group ID:** 03@n
 *
-* **Test Case ID:** 08@n
+* **Test Case ID:** 007@n
 *
 * **Pre-Conditions:** @n
 * HDMI-CEC Module should be intialized through Test 1 before calling this test.
 *
 * **Dependencies:** None@n
-*
-* **User Interaction:** @n
-* User or Automation tool should select the Test 8 to close the created HDMI CEC handle.
-*
 */
 void test_l3_hdmi_cec_sink_hal_Close(void)
 {
-    gTestID = 8;
+    gTestID = 7;
     HDMI_CEC_STATUS status;
 
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);

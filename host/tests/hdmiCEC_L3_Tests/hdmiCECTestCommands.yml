@@ -21,6 +21,7 @@
 #* ******************************************************************************
 
 hdmicec:
+  logicalAddress: '0'
   test01_TransmitCECCommands:
     - command: "0x82"  # Active Soruce
       payload: ["0x00", "0x00"]

@@ -48,7 +48,6 @@ class hdmiCEC_test02_ReceiveCECCommands(hdmiCECHelperClass):
         # Class variables
         self.testName  = "test02_ReceiveCECCommands"
         self.qcID = '2'
-        self.tvLogicalAddress = '0'
         self.broadcastAddress = 'f'
 
         # Initialize the parent class
@@ -101,7 +100,7 @@ class hdmiCEC_test02_ReceiveCECCommands(hdmiCECHelperClass):
         self.testhdmiCEC.initialise()
 
         # Add the logical Address.
-        self.testhdmiCEC.addLogicalAddress(self.tvLogicalAddress)
+        self.testhdmiCEC.addLogicalAddress(self.testLogicalAddress)
 
         # Get the logical Address.
         deviceLogicalAddress = self.testhdmiCEC.getLogicalAddress()
