@@ -98,8 +98,6 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
         # Final test result
         finalResult = True
 
-        self.hdmiCECController.startMonitoring()
-
         for device in self.cecDevices:
             logicalAddress = device["logical address"]
 
@@ -130,13 +128,11 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
 
                 self.log.stepStart(f'HdmiCecTx Receive Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
                 # Validate the transmission
-                rxResult = self.hdmiCECController.checkTransmitStatus(deviceLogicalAddress, destinationLogicalAddress, cec, payload)
+                rxResult = self.hdmiCECController.receiveMessage(deviceLogicalAddress, destinationLogicalAddress, cec, payload)
 
                 self.log.stepResult(rxResult, f'HdmiCecTx Receive Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
 
                 finalResult &= rxResult
-
-        self.hdmiCECController.stopMonitoring()
 
         # Remove the Logical Address
         self.testhdmiCEC.removeLogicalAddress()

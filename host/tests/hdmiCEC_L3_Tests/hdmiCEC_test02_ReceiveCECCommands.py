@@ -23,6 +23,7 @@
 
 import os
 import sys
+import time
 
 # Append the current and parent directory paths to sys.path for module imports
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -105,62 +106,69 @@ class hdmiCEC_test02_ReceiveCECCommands(hdmiCECHelperClass):
         # Get the logical Address.
         deviceLogicalAddress = self.testhdmiCEC.getLogicalAddress()
 
+        # Get Physical Address
+        devicePhysicalAddress = self.testhdmiCEC.getPhysicalAddress()
+
         # Ensure the logical address is retrieved successfully
         if deviceLogicalAddress is None:
             self.log.error("Failed to get the device logical address")
             return False
 
-         # Retrieve details of the HDMI-CEC adapter
-        self.cecAdaptor = self.hdmiCECController.adaptorDetails
+        # List all connected CEC devices
+        self.cecDevices = self.hdmiCECController.listDevices()
 
-        if self.cecAdaptor is None:
-            return False
-
-        # Get the logical address of the HDMI-CEC adapter
-        cecAdapterLogicalAddress = self.cecAdaptor["logical address"]
-
-        self.hdmiCECController.startMonitoring()
         finalResult = True
-        for command in self.cecCommands:
-            result = False
-            cecOpcode = command.get("command")
-            payload = command.get("payload")
-            response = command.get("response")
-            type = command.get("type")
 
-            # Determine the destination logical address
-            destinationLogicalAddress = deviceLogicalAddress
-            if type == "Broadcast":
-                destinationLogicalAddress = self.broadcastAddress
+        for device in self.cecDevices:
+            logicalAddress = device["logical address"]
 
-            self.log.stepStart(f'Send Test: {cecAdapterLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
+            # Skip sending messages to TV
+            if logicalAddress == deviceLogicalAddress:
+                continue
 
-            self.hdmiCECController.sendMessage(cecAdapterLogicalAddress, destinationLogicalAddress, cecOpcode, payload)
+            cecAdapterLogicalAddress = logicalAddress
 
-            # Read the callback details and verify the received data
-            callbackData = self.testhdmiCEC.readCallbackDetails()
-            result = self.testVerifyReceivedData(callbackData, cecAdapterLogicalAddress, destinationLogicalAddress, cecOpcode, payload)
+            for command in self.cecCommands:
+                result = False
+                cecOpcode = command.get("command")
+                payload = command.get("payload")
+                response = command.get("response")
+                type = command.get("type")
 
-            finalResult &= result
-
-            self.log.stepResult(result, f'Send Test: {cecAdapterLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
-
-            # If a response is expected, validate the response
-            if response:
-                destinationLogicalAddress = cecAdapterLogicalAddress
-                if response.get("type") == "Broadcast":
+                # Determine the destination logical address
+                destinationLogicalAddress = deviceLogicalAddress
+                if type == "Broadcast":
                     destinationLogicalAddress = self.broadcastAddress
 
-                cecOpcode = response.get("command")
-                payload = response.get("payload")
+                self.log.stepStart(f'Send Test: Source: {cecAdapterLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
 
-                self.log.stepStart(f'Response Test: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
-                result = self.hdmiCECController.checkTransmitStatus(deviceLogicalAddress, destinationLogicalAddress, cecOpcode, payload)
-                self.log.stepResult(result, f'Response Test: {cecAdapterLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
+                self.hdmiCECController.sendMessage(cecAdapterLogicalAddress, destinationLogicalAddress, cecOpcode, payload)
+
+                # Read the callback details and verify the received data
+                callbackData = self.testhdmiCEC.readCallbackDetails()
+                result = self.testVerifyReceivedData(callbackData, cecAdapterLogicalAddress, destinationLogicalAddress, cecOpcode, payload)
 
                 finalResult &= result
 
-        self.hdmiCECController.stopMonitoring()
+                self.log.stepResult(result, f'Send Test: Source: {cecAdapterLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
+
+                # If a response is expected, validate the response
+                if response:
+                    destinationLogicalAddress = cecAdapterLogicalAddress
+                    if response.get("type") == "Broadcast":
+                        destinationLogicalAddress = self.broadcastAddress
+
+                    cecOpcode = response.get("command")
+                    payload = response.get("payload")
+                    if response.get("update_payload"):
+                        payload[0] = devicePhysicalAddress[0]
+                        payload[1] = devicePhysicalAddress[1]
+
+                    self.log.stepStart(f'Response Test: Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
+                    result = self.hdmiCECController.receiveMessage(deviceLogicalAddress, destinationLogicalAddress, cecOpcode, payload)
+                    self.log.stepResult(result, f'Response Test: Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
+
+                    finalResult &= result
 
         # Remove the Logical Address
         self.testhdmiCEC.removeLogicalAddress()

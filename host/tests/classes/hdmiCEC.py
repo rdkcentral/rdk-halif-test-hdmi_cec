@@ -56,7 +56,7 @@ class hdmiCECClass():
         """
         self.moduleName = "hdmicec"
         self.testConfigFile = os.path.join(dir_path, "hdmiCEC_testConfig.yml")
-        self.testSuite = "L3 HDMICEC Sink Functions"
+        self.testSuite = "L3 HDMICEC Functions"
 
         # Prepare the profile file on the target workspace
         self.moduleConfigProfile = ConfigRead( moduleConfigProfileFile , self.moduleName)
@@ -180,10 +180,17 @@ class hdmiCECClass():
             str: Physical Address of the DUT.
         """
         result = self.utMenu.select( self.testSuite, "Get Phyiscal Address")
-        typeStatusPattern = r"Result HdmiCecGetPhysicalAddress\(IN:handle:[.*\], OUT:physicalAddress:[.*\]) HDMI_CEC_STATUS:[.*\]"
-        physicalAddress = self.searchPattern(result, typeStatusPattern)
 
-        return physicalAddress
+        addressBytes = None
+        pattern = r"Result HdmiCecGetPhysicalAddress\(IN:handle:.*OUT:physicalAddress:\[([\da-fA-F]\.[\da-fA-F]\.[\da-fA-F]\.[\da-fA-F])\]"
+        physicalAddress = self.searchPattern(result, pattern)
+        if physicalAddress:
+            parts = physicalAddress.split(".")
+            high_byte = hex(int(parts[0], 16) << 4 | int(parts[1], 16))
+            low_byte = hex(int(parts[2], 16) << 4 | int(parts[3], 16))
+            addressBytes = [high_byte, low_byte]
+
+        return addressBytes
 
     def cecTransmitCmd(self, destLogicalAddress:str, cecCommand:str, cecData:list=None):
         """

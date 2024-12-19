@@ -36,7 +36,7 @@ from raft.framework.core.logModule import logModule
 def Runall_L3():
     skipTests = []
     # Summery log for all the tests
-    hdmiCECSummerLog = logModule("hdmiCEC_Sink", level=logModule.INFO)
+    hdmiCECSummerLog = logModule("hdmiCEC", level=logModule.INFO)
 
     testDirectory = Path(dir_path)
 
