@@ -192,7 +192,7 @@ typedef enum HDMI_CEC_DEVICE_TYPE_t
 
 static int32_t gTestGroup = 3;
 static int32_t gTestID = 1;
-static int32_t gHandle = 1;
+static int32_t gHandle = 0;
 static int32_t gLogicalAddress = -1;
 static uint32_t gPhysicalAddress = -1;
 static uint8_t  *gPhysicalAddressBytes;
