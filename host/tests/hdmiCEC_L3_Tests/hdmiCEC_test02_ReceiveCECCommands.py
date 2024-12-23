@@ -165,7 +165,7 @@ class hdmiCEC_test02_ReceiveCECCommands(hdmiCECHelperClass):
                         payload[1] = devicePhysicalAddress[1]
 
                     self.log.stepStart(f'Response Test: Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
-                    result = self.hdmiCECController.receiveMessage(deviceLogicalAddress, destinationLogicalAddress, cecOpcode, payload)
+                    result = self.hdmiCECController.checkMessageReceived(deviceLogicalAddress, destinationLogicalAddress, cecOpcode, payload=payload)
                     self.log.stepResult(result, f'Response Test: Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cecOpcode} Payload: {payload}')
 
                     finalResult &= result

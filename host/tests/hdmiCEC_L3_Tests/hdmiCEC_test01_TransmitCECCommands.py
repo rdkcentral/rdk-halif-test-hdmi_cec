@@ -128,7 +128,7 @@ class hdmiCEC_test01_TransmitCECCommands(hdmiCECHelperClass):
 
                 self.log.stepStart(f'HdmiCecTx Receive Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
                 # Validate the transmission
-                rxResult = self.hdmiCECController.receiveMessage(deviceLogicalAddress, destinationLogicalAddress, cec, payload)
+                rxResult = self.hdmiCECController.checkMessageReceived(deviceLogicalAddress, destinationLogicalAddress, cec, payload=payload)
 
                 self.log.stepResult(rxResult, f'HdmiCecTx Receive Source: {deviceLogicalAddress} Destination: {destinationLogicalAddress} CEC OPCode: {cec} Payload: {payload}')
 

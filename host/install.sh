@@ -158,7 +158,7 @@ setup_and_enable_venv
 
 ### Clone required repos ###
 # Setup raft
-clone_repo git@github.com:rdkcentral/python_raft.git "${RAFT_DIR}" "1.1.1" "in ./raft"
+clone_repo git@github.com:rdkcentral/python_raft.git "${RAFT_DIR}" "1.2.0" "in ./raft"
 install_pip_requirements "${RAFT_DIR}"/requirements.txt
 
 # Setup ut-raft
