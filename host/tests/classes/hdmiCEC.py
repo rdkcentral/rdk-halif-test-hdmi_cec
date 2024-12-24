@@ -188,7 +188,7 @@ class hdmiCECClass():
             parts = physicalAddress.split(".")
             high_byte = hex(int(parts[0], 16) << 4 | int(parts[1], 16))
             low_byte = hex(int(parts[2], 16) << 4 | int(parts[3], 16))
-            addressBytes = [high_byte, low_byte]
+            addressBytes = [f"0x{int(high_byte, 16):02X}",f"0x{int(low_byte, 16):02X}"]
 
         return addressBytes
 
