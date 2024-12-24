@@ -4,11 +4,10 @@
 
 - [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
 - [Setting Up Test Environment](#setting-up-test-environment)
-- [Streams Required](#streams-required)
 - [Test Cases](#test-cases)
-  - [dsAudio_L3_Runall_Sink.py](#dsaudio_l3_runall_sinkpy)
-  - [dsAudio_L3_Runall_Source.py](#dsaudio_l3_runall_sourcepy)
-  - [dsaudio_test01_enabledisableandverifyaudioportstatus.py](#dsaudio_test01_enabledisableandverifyaudioportstatuspy)
+  - [hdmiCEC_L3_Runall.py](#hdmicec_l3_runallpy)
+  - [hdmiCEC_test01_TransmitCECCommands.py](#hdmicec_test01_transmitceccommandspy)
+  - [hdmiCEC_test02_ReceiveCECCommands.py](#hdmicec_test02_receivececcommandspy)
 
 ## Acronyms, Terms and Abbreviations
 
@@ -26,6 +25,64 @@
 
 ## Setting Up Test Environment
 
+The picture below depicts the HDMI CEC L3 Test Functionality Setup. This simple setup has an HDMI CEC Pulse-eight USB adaptor, which acts as a source device and can send the required commands (using libcec tool commands) and respond to the received CEC Commands.
+
+### Prerequisites
+
+- Ensure all devices in the test setup support the `HDMI` `CEC` feature for the test duration.
+- HDMI drivers must be properly installed and active on the platform before initiating the test.
+
+```mermaid
+graph TB
+C[PC] <--> A
+A[Pulse-Eight CEC Adaptor ] <--> |HDMI| B[DUT]
+```
+
+### Pulse-Eight CEC Adaptor tool
+
+The Pulse-Eight CEC adaptor is used to frame and send commands to the DUT. It utilizes the libCEC library for HDMI CEC activities, and the cec-client tool plays a key role in test automation within RAFT.
+
+- Adaptor Details: [Pulse Eight](https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter)
+
+#### Installation Instructions
+
+- Linux
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install cec-utils
+```
+
+- Windows
+
+Download the [libcec Tool](https://www.pulse-eight.com/Download/Get/51) and follow installation steps.
+
+#### Example `cec-client` Commands
+
+- List Device Details:
+
+```bash
+cec-client -l
+```
+
+- Scan for Connected Devices:
+
+```bash
+echo 'scan' | cec-client -s -d 1
+```
+
+- Send CEC Commands:
+
+```bash
+echo 'tx 10:8F' | cec-client -s -d 1
+
+Command Format:
+tx <source Logical address><Destination logical Address>:<Opcode>:<Payload bytes>
+```
+
+### Python Environment
+
 To execute `HAL` `L3` Python test cases, need a Python environment. Follow these steps mentioned in [HPK Public Documentation](https://github.com/rdkcentral/rdk-hpk-documentation/blob/main/README.md)
 
 ### Update Configuration Files
@@ -34,14 +91,48 @@ To execute `HAL` `L3` Python test cases, need a Python environment. Follow these
 
 Example Rack configuration File: [example_rack_config.yml](../../../ut/host/tests/configs/example_rack_config.yml)
 
-For more details refer [RAFT](https://github.com/rdkcentral/python_raft/blob/1.0.0/README.md) and [example_rack_config.yml](https://github.com/rdkcentral/python_raft/blob/1.0.0/examples/configs/example_rack_config.yml)
+Refer to the following resources for more details:
 
-In this file, update the configuration to define the console sessions for the `DUT` and the outbound settings:
+- [RAFT](https://github.com/rdkcentral/python_raft/blob/1.0.0/README.md)
+- [example_rack_config.yml](https://github.com/rdkcentral/python_raft/blob/1.0.0/examples/configs/example_rack_config.yml)
+
+Update the configuration to define the console sessions for the DUT, cec-client details, and outbound settings.
+
+##### Console Sessions
 
 |Console Session|Description|
 |---------------|-----------|
-|default|Downloads the streams required for test cases|
+|default|Downloads the bins required for test cases|
 |ssh_hal_test|Executes the `HAL` binary for the test case|
+
+##### CEC Controller
+
+`RAFT` supports two types of cec controllers:
+
+###### Remote controller
+
+For adaptors connected to a remote server, use the configuration below:
+
+```yaml
+      hdmiCECController:
+        type: remote-cec-client    # Use remote cec controller
+        adaptor: /dev/ttyACM0      # Adaptor port
+        address: XXX.XXX.XXX.XXX   # IP address of the server
+        username: root             # Login username
+        password: ' '              # Login password
+```
+
+###### Local controller
+
+For adaptors connected directly to the server running the tests, use the configuration below:
+
+```yaml
+      hdmiCECController:
+        type: cec-client           # Use local cec controller
+        adaptor: /dev/ttyACM0      # adaptor port
+```
+
+##### Example Rack Configuration
 
 ```yaml
 rackConfig:
@@ -66,19 +157,27 @@ rackConfig:
         download_url: "http://localhost:8000/"    # download location for the CPE device
         httpProxy:   # Local Proxy if required
         workspaceDirectory: './logs/workspace'   # Local working directory
+      hdmiCECController:
+        type: remote-cec-client
+        adaptor: /dev/ttyACM0
+        address: XXX.XXX.XXX.XXX
+        username: root
+        password: ' '
 ```
 
 #### Device Configuration File
 
 Example Device configuration File: [deviceConfig.yml](../../../ut/host/tests/configs/deviceConfig.yml)
 
-For more details refer [RAFT](https://github.com/rdkcentral/python_raft/blob/1.0.0/README.md) and [example_device_config.yml](https://github.com/rdkcentral/python_raft/blob/1.0.0/examples/configs/example_device_config.yml)
+Refer to the following resources for more details:
+- [RAFT](https://github.com/rdkcentral/python_raft/blob/1.0.0/README.md)
+- [example_device_config.yml](https://github.com/rdkcentral/python_raft/blob/1.0.0/examples/configs/example_device_config.yml)
 
-Update below fileds in the device configuration file:
+Update the following fields:
 
-- Set the path for `target_directory` where `HAL` binaries will be copied onto the device.
-- Specify the device profile path in `test/profile`
-- Ensure the `platform` should match with the `DUT` `platform` in [Rack Configuration](#rack-configuration-file)
+- **Target Directory**: Specify the `target_directory` path where HAL binaries will be copied.
+- **Device Profile**: Provide the path and profile file for the `test/profile`.
+- **Platform**: Ensure the platform matches the `dut` platform in the [Rack Configuration](#rack-configuration-file)
 
 ```yaml
 deviceConfig:
@@ -96,7 +195,7 @@ deviceConfig:
 
 Example Test Setup configuration File: [hdmiCEC_testConfig.yml](../../../ut/host/tests/classes/hdmiCEC_testConfig.yml)
 
-Execute command to run te HAL binary was provided in this file.
+Specify the command to run the HAL binary within this file.
 
 ```yaml
 hdmicec:
@@ -120,74 +219,48 @@ python <TestCaseName.py> --config </PATH>/ut/host/tests/configs/example_rack_con
 
 ## Test Cases
 
-### dsAudio_L3_Runall_Sink.py
+### hdmiCEC_L3_Runall.py
 
-This python file runs all the tests supported by `sink` devices
-
-```bash
-python dsAudio_L3_Runall_Sink.py --config </PATH>/ut/host/tests/configs/example_rack_config.yml --deviceConfig </PATH>/ut/host/tests/configs/deviceConfig.yml
-```
-
-### dsAudio_L3_Runall_Source.py
-
-This python file runs all the tests supported by `source` devices
+This python file runs all the tests
 
 ```bash
-python dsAudio_L3_Runall_Source.py --config </PATH>/ut/host/tests/configs/example_rack_config.yml --deviceConfig </PATH>/ut/host/tests/configs/deviceConfig.yml
+python hdmiCEC_L3_Runall.py --config </PATH>/ut/host/tests/configs/example_rack_config.yml --deviceConfig </PATH>/ut/host/tests/configs/deviceConfig.yml
 ```
 
-### dsAudio_test01_EnableDisableAndVerifyAudioPortStatus.py
+### hdmiCEC_test01_TransmitCECCommands.py
 
 #### Platform Support - test01
 
 - Source
 - Sink
 
-#### User Input Required - test01
-
-**Yes**: User interaction is necessary to confirm audio playback status (This will be automated later).
-
 #### Acceptance Criteria - test01
 
-Play **Stream #1** and confirm that audio is heard through the supported ports.
-
 #### Expected Results - test01
-
-The test enables the specified audio ports, plays the audio stream, and subsequently disables the ports
-
-Success Criteria
-
-- User should hear audio through the enabled port during playback
-- User should not hear any audio when the port is disabled.
 
 #### Test Steps - test01
 
 - Initiate the Test:
 
-  - Select and execute the Python file: **`dsAudio_test01_EnableDisableAndVerifyAudioPortStatus.py`**
-  - The test will automatically download all required artifacts and streams, copying them to the designated target directory before commencing execution.
-
-- Audio Playback Verification:
-
-    The test will play the designated audio stream and prompt the user with the following:
-
-  - Question: "Is audio playing on the enabled audio port? (Y/N)"
-  - Press **Y** if audio is heard (this will mark the step as PASS).
-  - Press **N** if no audio is heard (this will mark the step as FAIL).
-
-- Audio Status Confirmation (Port Disabled):
-
-  After confirming audio playback, the test will disable the audio port and prompt the user again:
-
-  - Question: "Is audio playing when the port is disabled? (Y/N)"
-  - Press **N** if no audio is heard (this will mark the step as PASS).
-  - Press **Y** if audio is heard (this will mark the step as FAIL).
-
-- Repeat for All Ports:
-
-  The test will iterate through all available audio ports, enabling/disabling each one and collecting user feedback accordingly.
+  - Select and execute the Python file: **`hdmiCEC_test01_TransmitCECCommands.py`**
 
 - Test Conclusion:
 
-  Upon receiving user responses for all ports, the test will conclude and present a final result: PASS or FAIL based on the user inputs throughout the test execution.
+### hdmiCEC_test02_ReceiveCECCommands.py
 
+#### Platform Support - test02
+
+- Source
+- Sink
+
+#### Acceptance Criteria - test02
+
+#### Expected Results - test02
+
+#### Test Steps - test02
+
+- Initiate the Test:
+
+  - Select and execute the Python file: **`hdmiCEC_test02_ReceiveCECCommands.py`**
+
+- Test Conclusion:
