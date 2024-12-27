@@ -96,7 +96,7 @@ int register_hdmicec_hal_sink_l2_tests( void )
     return registerFailed;
 }
 
-int register_hdmicec_hal_sink_l3_tests( void )
+int register_hdmicec_hal_l3_tests( void )
 {
     int registerFailed=0;
 

@@ -68,8 +68,7 @@
 extern int register_hdmicec_hal_l1_tests( void );
 extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
-extern int register_hdmicec_hal_sink_l3_tests( void );
-
+extern int register_hdmicec_hal_l3_tests( void );
 
 #ifdef VCOMPONENT
 extern int register_vcomponent_tests ( char* profile );
@@ -116,16 +115,36 @@ int main(int argc, char** argv)
     /* Register tests as required, then call the UT-main to support switches and triggering */
     UT_init( argc, argv );
 
-    register_hdmicec_hal_common_l1_tests();
+    status = ut_kvp_getStringField(ut_kvp_profile_getInstance(), "hdmicec/type", szReturnedString, UT_KVP_MAX_ELEMENT_SIZE);
+    if (status == UT_KVP_STATUS_SUCCESS ) {
+        UT_LOG_DEBUG("Device Type: %s", szReturnedString);
+    }
+    else {
+        UT_LOG_ERROR("Failed to get the platform Device Type");
+        return -1;
+    }
+
+    registerReturn = register_hdmicec_hal_l1_tests();
+    if ( registerReturn == -1 )
+    {
+        UT_LOG_ERROR("\n register_hdmicec_hal_l1_tests() returned failure");
+        return -1;
+    }
 #ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath);
     test_l3_hdmi_cec_driver_register (pValidationProfilePath);
 #endif
-    register_hdmicec_hal_source_l1_tests ();
-    register_hdmicec_hal_source_l2_tests ();
-    register_hdmicec_hal_sink_l1_tests ();
-    register_hdmicec_hal_sink_l2_tests ();
-	register_hdmicec_hal_sink_l3_tests ();
+
+    if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+         register_hdmicec_hal_source_l2_tests ();
+    }
+
+    if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
+         register_hdmicec_hal_sink_l2_tests ();
+    }
+
+    register_hdmicec_hal_l3_tests ();
+
     UT_run_tests();
 
 #ifdef VCOMPONENT
