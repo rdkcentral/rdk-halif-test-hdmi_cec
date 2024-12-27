@@ -34,8 +34,9 @@ The picture below depicts the HDMI CEC L3 Test Functionality Setup. This simple 
 
 ```mermaid
 graph TB
-C[PC] <--> A
+C[PC] <--> |USB| A
 A[Pulse-Eight CEC Adaptor ] <--> |HDMI| B[DUT]
+A[Pulse-Eight CEC Adaptor ] <--> |HDMI| D[Other Test Device]
 ```
 
 ### Pulse-Eight CEC Adaptor tool
@@ -170,6 +171,7 @@ rackConfig:
 Example Device configuration File: [deviceConfig.yml](../../../ut/host/tests/configs/deviceConfig.yml)
 
 Refer to the following resources for more details:
+
 - [RAFT](https://github.com/rdkcentral/python_raft/blob/1.0.0/README.md)
 - [example_device_config.yml](https://github.com/rdkcentral/python_raft/blob/1.0.0/examples/configs/example_device_config.yml)
 
@@ -234,17 +236,65 @@ python hdmiCEC_L3_Runall.py --config </PATH>/ut/host/tests/configs/example_rack_
 - Source
 - Sink
 
+#### User Input Required - test01
+
+No - (This is a automated case)
+
 #### Acceptance Criteria - test01
+
+- The test verifies that the device under test (DUT) can successfully transmit HDMI-CEC commands to connected devices as defined in the test profile.
+- Transmission should be correctly initiated and logged by the HDMI-CEC controller.
 
 #### Expected Results - test01
 
+The test is considered successful if:
+
+- All HDMI-CEC commands listed in the `YAML` profile are transmitted without errors.
+- The test script validates that the transmission is initiated and logged correctly by the HDMI-CEC controller.
+
 #### Test Steps - test01
 
-- Initiate the Test:
+Preparation:
 
-  - Select and execute the Python file: **`hdmiCEC_test01_TransmitCECCommands.py`**
+- Ensure the `DUT` is connected to the HDMI-CEC controller devices via HDMI cables.
+- Verify that configuration files for the test environment are correctly set up.
 
-- Test Conclusion:
+Execution:
+
+Run the Python script with the following command:
+
+```bash
+python hdmiCEC_test01_TransmitCECCommands.py --config </PATH>/ut/host/tests/configs/example_rack_config.yml --deviceConfig </PATH>/ut/host/tests/configs/deviceConfig.yml
+```
+
+Functionality:
+
+- The script initializes the HDMI-CEC controller session.
+- It transmits HDMI-CEC commands from the DUT to the connected devices.
+
+Validation:
+
+- The script checks if the HDMI-CEC controller logs confirm the transmission of each command.
+- Transmission status is logged with details such as source, destination, opcode, and payload.
+
+#### Test Logs and Artifacts - test01
+
+Summary Logs:
+
+- A comprehensive log file is generated, detailing the execution status of each command.
+- Log file path: <"PATH">/ut/logs/rack<#>/slot<#>/<"DATE-TIME">/test_summary.log.
+
+- Transmission Status:
+  - Logs include information about the success or failure of each transmitted command.
+
+#### Test Conclusion - test01
+
+The test script will display a final PASS/FAIL result based on the following conditions:
+
+- PASS: All CEC commands are successfully transmitted as listed in the YAML profile, and transmission logs confirm initiation by the HDMI-CEC controller.
+- FAIL: Any transmission error or failure to initiate commands.
+
+Summary logs are saved for further review and debugging.
 
 ### hdmiCEC_test02_ReceiveCECCommands.py
 
@@ -253,14 +303,64 @@ python hdmiCEC_L3_Runall.py --config </PATH>/ut/host/tests/configs/example_rack_
 - Source
 - Sink
 
+#### User Input Required - test02
+
+No -  (This is a automated case)
+
 #### Acceptance Criteria - test02
+
+- The test verifies whether the device under test (DUT) can reliably receive HDMI-CEC commands.
+- The received callback data must match the expected values, including:
+  - Source logical address
+  - Destination logical address
+  - Opcode
+  - Payload
 
 #### Expected Results - test02
 
+The test is considered successful if:
+
+- All transmitted HDMI-CEC commands are successfully received by the DUT.
+- The callback data accurately reflects the transmitted command parameters (source, destination, opcode, and payload).
+
 #### Test Steps - test02
 
-- Initiate the Test:
+Preparation:
 
-  - Select and execute the Python file: **`hdmiCEC_test02_ReceiveCECCommands.py`**
+- Ensure the DUT is powered on and connected to the HDMI-CEC controller.
+- Verify the configuration files for the test environment are properly set up.
 
-- Test Conclusion:
+Execution:
+
+Run the Python script with the following command:
+
+```bash
+python hdmiCEC_test02_ReceiveCECCommands.py --config </PATH>/ut/host/tests/configs/example_rack_config.yml --deviceConfig </PATH>/ut/host/tests/configs/deviceConfig.yml
+```
+
+Functionality:
+
+- The script initializes the HDMI-CEC controller.
+- It sends HDMI-CEC commands to the DUT's logical address, including directed and broadcast messages.
+- The DUT processes these commands, and the script reads the callback data.
+
+Verification:
+
+- The script validates the callback data received by the DUT against the transmitted parameters (source, destination, opcode, payload).
+
+#### Test Logs and Artifacts - test02
+
+Summary Logs:
+
+- The script generates a detailed log file summarizing the test execution.
+- Log file path: <"PATH">/ut/logs/rack<#>/slot<#>/<"DATE-TIME">/test_summary.log
+- Logs include information on received commands, validation results, and any discrepancies.
+
+#### Test Conclusion - test02
+
+The test script will display a final PASS/FAIL result based on the following conditions:
+
+- PASS: All received HDMI-CEC commands and callback data match the expected values.
+- FAIL: Any mismatch in the callback data or failure to receive commands.
+
+Summary logs are saved for review and troubleshooting
