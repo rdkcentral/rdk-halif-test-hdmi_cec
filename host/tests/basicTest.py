@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 #** *****************************************************************************
 # *
 # * If not stated otherwise in this file or this component's LICENSE file the
@@ -20,15 +20,28 @@
 # * limitations under the License.
 # *
 #* ******************************************************************************
-MY_PATH="$(realpath ${BASH_SOURCE[0]})"
-MY_DIR="$(dirname ${MY_PATH})"
-VENV_DIR="${MY_DIR}/python_venv"  # Default virtual environment directory name
 
-# Check if the script is sourced
-if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-    source "$VENV_DIR"/bin/activate
-    echo "Virtual environment '$VENV_DIR' activated."
-else
-    echo "The script must be sourced. 'source ./activate_venv.sh' or '. ./activate_venv.sh'"
-    echo "Once activated you can deactivate with 'deactivate' command"
-fi
+import os
+import sys
+
+from helpers.testHelper import testHelperClass
+
+class basicTest(testHelperClass):
+           
+    def __init__(self):
+        super().__init__('basic_test', '1')
+
+    def testFunction(self):
+        """This test will provide basic functionality and call the framework
+
+        Returns:
+            bool: true
+        """
+        print("unit_test2 called.")
+        return True
+
+if __name__ == '__main__':
+    test = basicTest()
+    test.run()
+
+# Transmit receive

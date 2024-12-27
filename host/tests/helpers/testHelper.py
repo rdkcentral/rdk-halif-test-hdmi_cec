@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 #** *****************************************************************************
 # *
 # * If not stated otherwise in this file or this component's LICENSE file the
@@ -20,15 +20,23 @@
 # * limitations under the License.
 # *
 #* ******************************************************************************
-MY_PATH="$(realpath ${BASH_SOURCE[0]})"
-MY_DIR="$(dirname ${MY_PATH})"
-VENV_DIR="${MY_DIR}/python_venv"  # Default virtual environment directory name
+import os
+import sys
 
-# Check if the script is sourced
-if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-    source "$VENV_DIR"/bin/activate
-    echo "Virtual environment '$VENV_DIR' activated."
-else
-    echo "The script must be sourced. 'source ./activate_venv.sh' or '. ./activate_venv.sh'"
-    echo "Once activated you can deactivate with 'deactivate' command"
-fi
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(dir_path+"/../")
+
+from raft.framework.plugins.ut_raft.utHelper import utHelperClass
+
+class testHelperClass(utHelperClass):
+
+    """
+    Test Helper Code
+
+    This module provides common extensions for teams unit testing.
+    Rather than being generic common modules, maybe more team centric on the way that the team will require to create their testing suites
+    """
+    def __init__(self, testName, qcId, log=None ):
+        super().__init__(testName, qcId, log=log )
+
+    # Engineering team adds any functions they require for the testing classes suite for this specific module.

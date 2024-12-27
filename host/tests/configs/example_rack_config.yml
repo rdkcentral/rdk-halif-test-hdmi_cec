@@ -66,12 +66,6 @@ rackConfig:
                             username: "root"
                             ip: "127.0.0.1"
                             password: ' '
-                        - ssh_player:
-                            type: "ssh"
-                            port: 22
-                            username: "root"
-                            ip: "127.0.0.1"
-                            password: ' '
                         - ssh_hal_test:
                             type: "ssh"
                             port: 22

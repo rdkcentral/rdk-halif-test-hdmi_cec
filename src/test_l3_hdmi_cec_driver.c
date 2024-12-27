@@ -756,7 +756,7 @@ static UT_test_suite_t * pSuite = NULL;
  *
  * @return int32_t - 0 on success, otherwise failure
  */
-int32_t test_register_hdmicec_hal_sink_l3_tests(void)
+int32_t test_register_hdmicec_hal_l3_tests(void)
 {
     ut_kvp_status_t status;
     char deviceType[HDMI_CEC_DEVICE_TYPE_SIZE] = {0};

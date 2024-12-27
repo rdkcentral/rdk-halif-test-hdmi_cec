@@ -39,6 +39,7 @@ typedef enum
   CEC_MSG_TYPE_COMMAND,
   CEC_MSG_TYPE_EVENT,
   CEC_MSG_TYPE_CONFIG,
+  CEC_MSG_TYPE_STATE,
   CEC_MSG_TYPE_EXIT_REQUESTED
 } vcHdmiCec_msg_type_t;
 
@@ -120,6 +121,13 @@ const static vcCommand_strVal_t gPortStrVal [] = {
   { "unknown", (int)PORT_TYPE_UNKNOWN }
 };
 
+const static vcCommand_strVal_t gMsgStrVal [] = {
+  { CEC_MSG_PREFIX"/"CEC_MSG_COMMAND, (int)CEC_MSG_TYPE_COMMAND },
+  { CEC_MSG_PREFIX"/"CEC_MSG_CONFIG, (int)CEC_MSG_TYPE_CONFIG },
+  { CEC_MSG_PREFIX"/"CEC_MSG_EVENT, (int)CEC_MSG_TYPE_EVENT },
+  { CEC_MSG_PREFIX"/"CEC_MSG_STATE, (int)CEC_MSG_TYPE_STATE }
+};
+
 static void TeardownHal (vcHdmiCec_hal_t* hal);
 static void EnqueueMessage(vcHdmiCec_hal_t *hal, vcHdmiCec_message_t *msg);
 static void DequeueMessage(vcHdmiCec_hal_t *hal, vcHdmiCec_message_t* out_msg);
@@ -129,7 +137,9 @@ static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size);
 static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t *cec_cmd);
 static void LoadPortsInfo (ut_kvp_instance_t* instance, vcHdmiCec_port_info_t* ports, unsigned int nPorts);
 static void ResetMessage(vcHdmiCec_message_t *msg);
-
+static void PrintStatus(vcHdmiCec_hal_t *cec);
+static void PrintDevicesInfo(vcHdmiCec_hal_t *cec);
+static void PrintPortsInfo(vcHdmiCec_hal_t *cec);
 
 static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size)
 {
@@ -140,7 +150,6 @@ static ut_kvp_instance_t* KVPInstanceOpen(char* msg, int size)
   {
       return NULL;
   }
-
   kvpInstance = ut_kvp_createInstance();
   assert(kvpInstance != NULL);
   //ut_kvp_openMemory expects msg to be malloc'ed.
@@ -162,15 +171,11 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
   vcCommand_opcode_t opcode = CEC_OPCODE_UNKNOWN;
   struct vcDevice_info_t *src, *dest;
   vcCommand_logical_address_t la;
-  uint32_t len;
-
-  if(cec_cmd == NULL)
-  {
-    return;
-  }
+  assert(cmd != NULL);
 
   vcCommand_Clear(cec_cmd);
   ut_kvp_instance_t *kvpInstance = KVPInstanceOpen(cmd, size);
+  assert(kvpInstance != NULL);
   ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_MSG_COMMAND, str, UT_KVP_MAX_ELEMENT_SIZE);
   opcode = vcCommand_GetOpCode(str);
   if(opcode == CEC_OPCODE_UNKNOWN)
@@ -226,7 +231,7 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
     case CEC_SET_OSD_NAME:
     {
       ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CMD_DATA_OSD_NAME, str, UT_KVP_MAX_ELEMENT_SIZE);
-      vcCommand_PushBackArray(cec_cmd, str, strlen(str));
+      vcCommand_PushBackArray(cec_cmd, (uint8_t *)str, strlen(str));
     }
     break;
 
@@ -239,30 +244,112 @@ static void ParseCommand(vcHdmiCec_hal_t *hal, char* cmd, int size, vcCommand_t 
 }
 
 
+static void HandleStateMessages( vcHdmiCec_hal_t *hal, char* cmd, int size)
+{
+  char str[UT_KVP_MAX_ELEMENT_SIZE];
+  ut_kvp_instance_t *kvpInstance = KVPInstanceOpen(cmd, size);
+  struct vcDevice_info_t *device = NULL, *parent = NULL;
+  assert(kvpInstance != NULL);
+  ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_MSG_STATE, str, UT_KVP_MAX_ELEMENT_SIZE);
+
+  if(!strcmp(str, CEC_MSG_STATE_ADD_DEVICE))
+  {
+     device = vcDevice_CreateMapFromProfile(kvpInstance, "hdmicec/parameters");
+     if(device == NULL)
+     {
+        VC_LOG_ERROR("HandleStateMessages: AddDevice failed to create device");
+        ut_kvp_destroyInstance(kvpInstance);
+        return;
+     }
+     ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_CMD_PARAMETERS"/parent", str, UT_KVP_MAX_ELEMENT_SIZE);
+     parent = vcDevice_Get(hal->devices_map, str);
+     if(parent == NULL)
+     {
+        VC_LOG_ERROR("HandleStateMessages: AddDevice failed to get parent");
+        vcDevice_DestroyMap(device);
+        ut_kvp_destroyInstance(kvpInstance);
+        return;
+     }
+     //Check if the new device can be added to a free port
+     if(parent == hal->emulated_device && parent->type == DEVICE_TYPE_TV)
+     {
+        if(parent->number_children >= hal->num_ports)
+        {
+          VC_LOG_ERROR("HandleStateMessages: AddDevice: No free port to Add Device");
+          vcDevice_DestroyMap(device);
+          ut_kvp_destroyInstance(kvpInstance);
+          return;
+        }
+     }
+     vcDevice_InsertChild(parent, device);
+     vcDevice_AllocatePhysicalLogicalAddresses(hal->devices_map, hal->emulated_device,&hal->address_pool);
+     //Now we have added the device sucessfully. Lets announce the device.
+     {
+        vcCommand_t cmd;
+        uint32_t len;
+        uint8_t buf[2];
+        uint8_t cec_data[VCCOMMAND_MAX_DATA_SIZE];
+        vcCommand_Clear(&cmd);
+        vcCommand_Format(&cmd, device->logical_address, LOGICAL_ADDRESS_BROADCAST, CEC_REPORT_PHYSICAL_ADDRESS);
+        buf[0] = (device->physical_address >> 8) & 0xFF;
+        buf[1] = device->physical_address & 0xFF;
+        vcCommand_PushBackArray(&cmd, buf, sizeof(buf));
+        vcCommand_PushBackByte(&cmd, (uint8_t)device->type);
+        len = vcCommand_GetRawBytes(&cmd, cec_data, VCCOMMAND_MAX_DATA_SIZE);
+        if(hal->callbacks.rx_cb_func != NULL)
+        {
+          hal->callbacks.rx_cb_func((intptr_t)hal, hal->callbacks.rx_cb_data, cec_data, len);
+        }
+      }
+  }
+  else if(!strcmp(str, CEC_MSG_STATE_REMOVE_DEVICE))
+  {
+     ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_CMD_PARAMETERS"/name", str, UT_KVP_MAX_ELEMENT_SIZE);
+     device = vcDevice_Get(hal->devices_map, str);
+     if(device == NULL)
+     {
+        VC_LOG_ERROR("HandleStateMessages: RemoveDevice failed to get device");
+        ut_kvp_destroyInstance(kvpInstance);
+        return;
+     }
+     vcDevice_RemoveChild(hal->devices_map, str);
+  }
+  else if(!strcmp(str, CEC_MSG_STATE_PRINT_STATUS))
+  {
+    ut_kvp_getStringField(kvpInstance, CEC_MSG_PREFIX"/"CEC_CMD_PARAMETERS"/status", str, UT_KVP_MAX_ELEMENT_SIZE);
+    if(!strcmp(str, "Devices"))
+    {
+      PrintDevicesInfo(hal);
+    }
+    else if(!strcmp(str, "Ports"))
+    {
+      PrintPortsInfo(hal);
+    }
+    else
+    {
+      PrintStatus(hal);
+    }
+  }
+  else
+  {
+    VC_LOG_ERROR("Unknown State Message: %s", str);
+  }
+}
+
 static void ProcessMsg( char *key, ut_kvp_instance_t *instance, void* user_data)
 {
   vcHdmiCec_message_t msg;
   char *message;
   vcHdmiCec_internal_t *vc = (vcHdmiCec_internal_t*) user_data;
-
-  if(vc == NULL || vc->cec_hal == NULL || vc->cec_hal->state != HAL_STATE_READY)
+  assert(vc != NULL);
+  if(vc->cec_hal == NULL || vc->cec_hal->state != HAL_STATE_READY)
   {
+    VC_LOG_ERROR("ProcessMsg: HAL not ready", key);
     return;
   }
+  msg.type = vcCommand_GetValue(gMsgStrVal, COUNT_OF(gMsgStrVal), key, CEC_MSG_TYPE_NONE);
 
-  if(strstr(key, CEC_MSG_COMMAND))
-  {
-    msg.type = CEC_MSG_TYPE_COMMAND;
-  }
-  else if(strstr(key, CEC_MSG_EVENT))
-  {
-    msg.type = CEC_MSG_TYPE_EVENT;
-  }
-  else if(strstr(key, CEC_MSG_CONFIG))
-  {
-    msg.type = CEC_MSG_TYPE_CONFIG;
-  }
-  else
+  if(msg.type == CEC_MSG_TYPE_NONE)
   {
     VC_LOG_ERROR("ProcessMsg: Unknown Message Type [%s]", key);
     return;
@@ -335,7 +422,6 @@ static void* MessageHandler(void *data)
   while (!hal->exit_request)
   {
     DequeueMessage(hal, &msg);
-
     switch (msg.type)
     {
       case CEC_MSG_TYPE_EXIT_REQUESTED:
@@ -354,7 +440,7 @@ static void* MessageHandler(void *data)
         len = vcCommand_GetRawBytes(&cmd, cec_data, VCCOMMAND_MAX_DATA_SIZE);
         if(hal->callbacks.rx_cb_func != NULL)
         {
-          hal->callbacks.rx_cb_func((int)hal, hal->callbacks.rx_cb_data, cec_data, len);
+          hal->callbacks.rx_cb_func((intptr_t)hal, hal->callbacks.rx_cb_data, cec_data, len);
         }
       }
       break;
@@ -368,6 +454,12 @@ static void* MessageHandler(void *data)
       case CEC_MSG_TYPE_CONFIG:
       {
 
+      }
+      break;
+
+      case CEC_MSG_TYPE_STATE:
+      {
+        HandleStateMessages(hal, msg.message, msg.size);
       }
       break;
 
@@ -411,6 +503,45 @@ static void LoadPortsInfo (ut_kvp_instance_t* instance, vcHdmiCec_port_info_t* p
     ports[i].arc_supported = ut_kvp_getBoolField(instance, tmp);
 
   }
+}
+
+static void PrintStatus(vcHdmiCec_hal_t *cec)
+{
+  assert(cec != NULL);
+  VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
+  VC_LOG("Emulated Device               : %s", cec->emulated_device->osd_name);
+  VC_LOG("Number of Ports               : %d", cec->num_ports);
+  VC_LOG("Number of devices in Network  : %d", cec->num_devices);
+  VC_LOG("===========================");
+
+  vcDevice_PrintMap(cec->devices_map, 0);
+  VC_LOG("=================================");
+}
+
+static void PrintDevicesInfo(vcHdmiCec_hal_t *cec)
+{
+  assert(cec != NULL);
+  VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
+  VC_LOG("Number of devices in Network  : %d", cec->num_devices);
+  VC_LOG("===========================");
+  vcDevice_PrintMap(cec->devices_map, 0);
+  VC_LOG("=================================");
+}
+
+static void PrintPortsInfo(vcHdmiCec_hal_t *cec)
+{
+  assert(cec != NULL);
+  VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
+  VC_LOG("Number of Ports               : %d", cec->num_ports);
+  VC_LOG("=================================");
+  for(int i = 0; i < cec->num_ports; ++i)
+  {
+    VC_LOG("Port Id        : %d", cec->ports[i].id);
+    VC_LOG("Port type      : %s", vcCommand_GetString(gPortStrVal, COUNT_OF(gPortStrVal), (int)cec->ports[i].type));
+    VC_LOG("CEC Supported  : %s", (cec->ports[i].cec_supported ? "true" : "false"));
+    VC_LOG("ARC Supported  : %s", (cec->ports[i].arc_supported ? "true" : "false"));
+  }
+  VC_LOG("=================================");
 }
 
 static void TeardownHal (vcHdmiCec_hal_t* hal)
@@ -501,6 +632,7 @@ if(pProfilePath == NULL)
     vcHdmiCec->cp_instance = UT_ControlPlane_Init(CONTROL_PLANE_PORT);
     assert(vcHdmiCec->cp_instance != NULL);
     UT_ControlPlane_RegisterCallbackOnMessage(gvcHdmiCec->cp_instance, "hdmicec/command", &ProcessMsg, (void*) vcHdmiCec);
+    UT_ControlPlane_RegisterCallbackOnMessage(gvcHdmiCec->cp_instance, "hdmicec/state", &ProcessMsg, (void*) vcHdmiCec);
     UT_ControlPlane_Start(vcHdmiCec->cp_instance);
   }
   vcHdmiCec->bOpened = true;
@@ -646,17 +778,9 @@ HDMI_CEC_STATUS HdmiCecOpen(int* handle)
     VC_LOG("HdmiCecOpen: Emulating a Source device");
     //TODO Auto Allocate Logical addresses
   }
+  PrintStatus(cec);
 
-  VC_LOG(">>>>>>> >>>>> >>>> >> >> >");
-  VC_LOG("Emulated Device               : %s", cec->emulated_device->osd_name);
-  VC_LOG("Number of Ports               : %d", cec->num_ports);
-  VC_LOG("Number of devices in Network  : %d", cec->num_devices);
-  VC_LOG("===========================");
-
-  vcDevice_PrintMap(cec->devices_map, 0);
-  VC_LOG("=================================");
-
-  *handle = (int) cec;
+  *handle = (intptr_t) cec;
   gvcHdmiCec->cec_hal = cec;
   cec->state = HAL_STATE_READY;
 
