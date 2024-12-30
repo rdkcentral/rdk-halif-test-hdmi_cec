@@ -100,7 +100,7 @@ class hdmiCECClass():
 
     def initialise(self):
         """
-        Initializes the HDMI CEC module for sink.
+        Initializes the HDMI CEC module.
 
         Args:
             None.
@@ -300,7 +300,7 @@ class hdmiCECClass():
 
     def getDeviceType(self):
         """
-        Retrieves the type of the audio device.
+        Retrieves the type of dut.
 
         Args:
             None.

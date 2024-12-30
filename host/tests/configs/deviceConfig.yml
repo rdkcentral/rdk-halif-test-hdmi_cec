@@ -24,7 +24,7 @@
 
 deviceConfig:
     cpe1:
-        platform: "element"
+        platform: "tv"
         model: "uk"
         soc_vendor: "amlogic"
         target_directory: "/tmp/"  # Target Directory on device

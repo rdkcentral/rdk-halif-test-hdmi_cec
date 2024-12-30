@@ -1,4 +1,4 @@
-# dsAudio HAL L3 Python Test Procedure
+# HDMI CEC HAL L3 Python Test Procedure
 
 ## Table of Contents
 

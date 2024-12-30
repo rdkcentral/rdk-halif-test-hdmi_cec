@@ -72,7 +72,7 @@ extern int register_hdmicec_hal_l3_tests( void );
 
 #ifdef VCOMPONENT
 extern int register_vcomponent_tests ( char* profile );
-extern int test_l3_hdmi_cec_driver_register ( char* pValidationProfilePath );
+extern int test_vd_hdmi_cec_driver_register ( char* pValidationProfilePath );
 #endif
 
 int main(int argc, char** argv)
