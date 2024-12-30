@@ -132,7 +132,7 @@ int main(int argc, char** argv)
     }
 #ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath);
-    test_l3_hdmi_cec_driver_register (pValidationProfilePath);
+    test_vd_hdmi_cec_driver_register (pValidationProfilePath);
 #endif
 
     if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
