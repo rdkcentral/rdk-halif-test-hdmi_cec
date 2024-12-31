@@ -32,11 +32,11 @@
  */
 
 /**
- * @defgroup HDMI_CEC_HALTESTS_L3 HDMI CEC HAL Tests L2 File
+ * @defgroup HDMI_CEC_HALTESTS_L3 HDMI CEC HAL Tests L3 File
  * @{
  * @parblock
  *
- * ### L2 Test Cases for HDMI CEC HAL :
+ * ### L3 Test Cases for HDMI CEC HAL :
  *
  *
  * ## Module's Role
@@ -298,6 +298,14 @@ static bool getCommandResponse(uint8_t opcode, cecResponse_t *pResponse)
             return true;
         }
     }
+
+    /* If the received opcode is not found in the supported list send feature abort response */
+    pResponse->cecCommand = 0x00; //Feature abort
+    pResponse->payloadSize = 2;
+    pResponse->payload[0] = opcode;
+    pResponse->payload[1] = 0x01; //Unsupported opcode
+    strncpy(pResponse->type, "Direct", UT_KVP_MAX_ELEMENT_SIZE);
+
     return false;
 }
 
@@ -803,7 +811,7 @@ int32_t test_register_hdmicec_hal_l3_tests(void)
     return 0;
 }
 
-/** @} */ // End of HDMI CEC HAL Tests L1 File
+/** @} */ // End of HDMI CEC HAL Tests L3 File
 /** @} */ // End of HDMI CEC HAL Tests
 /** @} */ // End of HDMI CEC Module
 /** @} */ // End of HPK

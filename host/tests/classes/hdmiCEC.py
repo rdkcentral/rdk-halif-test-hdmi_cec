@@ -57,12 +57,14 @@ class hdmiCECClass():
         self.moduleName = "hdmicec"
         self.testConfigFile = os.path.join(dir_path, "hdmiCEC_testConfig.yml")
         self.testSuite = "L3 HDMICEC Functions"
+        cecResponseFile = "cec_responses.yml"
 
         # Prepare the profile file on the target workspace
         self.moduleConfigProfile = ConfigRead( moduleConfigProfileFile , self.moduleName)
         profileOnTarget = os.path.join(targetWorkspace, os.path.basename(moduleConfigProfileFile))
+        cecResponseFileOnTarget = os.path.join(targetWorkspace, cecResponseFile)
         self.testConfig    = ConfigRead(self.testConfigFile, self.moduleName)
-        self.testConfig.test.execute = os.path.join(targetWorkspace, self.testConfig.test.execute) + f" -p {profileOnTarget}"
+        self.testConfig.test.execute = os.path.join(targetWorkspace, self.testConfig.test.execute) + f" -p {profileOnTarget}" + f" -p {cecResponseFileOnTarget}"
         self.utMenu        = UTSuiteNavigatorClass(self.testConfig, None, session)
         self.testSession   = session
         self.utils         = utBaseUtils()
