@@ -68,10 +68,11 @@
 extern int register_hdmicec_hal_l1_tests( void );
 extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
+extern int register_hdmicec_hal_l3_tests( void );
 
 #ifdef VCOMPONENT
 extern int register_vcomponent_tests ( char* profile );
-extern int test_l3_hdmi_cec_driver_register ( char* pValidationProfilePath );
+extern int test_vd_hdmi_cec_driver_register ( char* pValidationProfilePath );
 #endif
 
 int main(int argc, char** argv)
@@ -131,7 +132,7 @@ int main(int argc, char** argv)
     }
 #ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath);
-    test_l3_hdmi_cec_driver_register (pValidationProfilePath);
+    test_vd_hdmi_cec_driver_register (pValidationProfilePath);
 #endif
 
     if(strncmp(szReturnedString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
@@ -141,6 +142,8 @@ int main(int argc, char** argv)
     if(strncmp(szReturnedString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) {
          register_hdmicec_hal_sink_l2_tests ();
     }
+
+    register_hdmicec_hal_l3_tests ();
 
     UT_run_tests();
 
