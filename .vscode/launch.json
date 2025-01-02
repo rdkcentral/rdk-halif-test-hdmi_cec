@@ -5,19 +5,33 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "bashdb",
-            "request": "launch",
-            "name": "Bash-Debug (hardcoded script name)",
-            "cwd": "${workspaceFolder}",
-            "program": "${file}",
-            "args": []
-        },
-        {
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
+            "args": [ "--config", "example_rack_config.yml",
+                       "--deviceConfig", "deviceConfig.yml"],
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "C/C++ Runner: Debug Session",
+            "type": "cppdbg",
+            "request": "launch",
+            "stopAtEntry": false,
+            "externalConsole": false,
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/bin/hal_test",
+            "environment": [ {"name": "LD_LIBRARY_PATH", "value":"${workspaceFolder}/bin/"} ],
+            "args": [ "-l", "${workspaceFolder}/logs/", "-p", "${workspaceFolder}/profiles/sink/Sink_AudioSettings.yaml" ],
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb",
+            "setupCommands": [
+              {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+              }
+            ]
+          }
     ]
 }

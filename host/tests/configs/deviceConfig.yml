@@ -24,5 +24,17 @@
 
 deviceConfig:
     cpe1:
-        platform:   "linux"
-        model:      "PC"
+        platform: "tv"
+        model: "uk"
+        soc_vendor: "amlogic"
+        target_directory: "/tmp/"  # Target Directory on device
+        prompt: "" # Prompt string on console
+        test:
+            profile: "../../../profiles/sink/sink_hdmiCEC.yml"
+    cpe2:
+        platform: "test"
+        model: "test"
+        vendor: "test"
+        target_directory: "/tmp"
+        profile: ""
+        test:

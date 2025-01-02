@@ -1,0 +1,102 @@
+#** *****************************************************************************
+# *
+# * If not stated otherwise in this file or this component's LICENSE file the
+# * following copyright and licenses apply:
+# *
+# * Copyright 2024 RDK Management
+# *
+# * Licensed under the Apache License, Version 2.0 (the "License");
+# * you may not use this file except in compliance with the License.
+# * You may obtain a copy of the License at
+# *
+# *
+# http://www.apache.org/licenses/LICENSE-2.0
+# *
+# * Unless required by applicable law or agreed to in writing, software
+# * distributed under the License is distributed on an "AS IS" BASIS,
+# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# * See the License for the specific language governing permissions and
+# * limitations under the License.
+# *
+#* ******************************************************************************
+
+hdmicec:
+  logicalAddress: '0'
+  test01_TransmitCECCommands:
+    - command: "0x82"  # Active Soruce
+      payload: ["0x00", "0x00"] # Physical address of the device
+      type: "Broadcast"
+    - command: "0x90"  # Report power status
+      payload: ["0x00"]
+      type: "Direct"
+      response: null
+    - command: "0x47"  # Set OSD Name
+      # Paylod contain ascii values of osd name "RDK VTS Device"
+      payload: ['0x52', '0x44', '0x4b', '0x20', '0x56', '0x54', '0x53', '0x20', '0x44', '0x65', '0x76', '0x69', '0x63', '0x65']
+      type: "Direct"
+      response: null
+  test02_ReceiveCECCommands:
+    - command: "0x04"  # Image View on
+      payload:
+      type: "Direct"
+      response: null
+    - command: "0x85"  # Request Active source
+      payload:
+      type: "Broadcast"
+      response:
+        type: "Broadcast"
+        command: "0x82"  # Active Soruce
+        update_payload: true
+        payload: ["0x00", "0x00"]  # Physical address of the device
+        description: "Active Soruce"
+    - command: "0x91"  # Get Menu Language
+      payload:
+      type: "Direct"
+      response:
+        type: "Broadcast"
+        command: "0x32" # Set menu language
+        update_payload: false
+        # payload contains the menu lanaguage 'eng' in ascii
+        payload: ["0x65", "0x6E", "0x67"]
+        description: "Set Menu Language"
+    - command: "0x8C"  # Give Vendor ID
+      payload:
+      type: "Direct"
+      response:
+        type: "Broadcast"
+        command: "0x87" # Report vendor ID
+        update_payload: false
+        # Payload contains the example vendor id 0x0000001
+        payload: ["0x00", "0x00","0x01"]
+        description: "Device Vendor Id"
+    - command: "0x8F"  # Give power status
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x90" # Report power status
+        update_payload: false
+        # Payload contains the power status of the device
+        # 0x00 - on, 0x01 - Standby, 0x02 - in transition Standby to On, 0x03 - in transition On to Standby
+        payload: ["0x00"]
+        description: "Report power status"
+    - command: "0x9F"  # Get CEC version
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x9E" # Report CEC Version
+        update_payload: false
+        # CEC Version 0x05 - "version 1.4"
+        payload: ["0x05"]
+        description: "Device request for CEC version"
+    - command: "0x46"  # Give OSD Name
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x47" # Set OSD Name
+        update_payload: false
+        # Paylod contain ascii values of osd name "RDK VTS Device"
+        payload: ['0x52', '0x44', '0x4b', '0x20', '0x56', '0x54', '0x53', '0x20', '0x44', '0x65', '0x76', '0x69', '0x63', '0x65']
+        description: "Device request OSD name"
