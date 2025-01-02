@@ -56,7 +56,7 @@
 
 /**
  * @file test_vcomponent.c
- * 
+ *
  */
 
 
@@ -85,7 +85,7 @@ struct vcomponent_info gVCInfo = {NULL, NULL};
 void start_virtual_component (void)
 {
     vcHdmiCec_Status_t status;
-    
+
     if(gVCInfo.pProfilePath == NULL)
     {
         assert(gVCInfo.pProfilePath != NULL);
@@ -121,7 +121,7 @@ void stop_virtual_component(void)
     }
     gVCInfo.handle = NULL;
     UT_LOG("Virtual Component stopped\n");
-    
+
 }
 
 static UT_test_suite_t * pSuite = NULL;
@@ -133,7 +133,7 @@ static UT_test_suite_t * pSuite = NULL;
  */
 int register_vcomponent_tests ( char* profile)
 {
-    if(profile == NULL) 
+    if(profile == NULL)
     {
         return -1;
     }

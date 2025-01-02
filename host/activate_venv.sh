@@ -32,4 +32,3 @@ else
     echo "The script must be sourced. 'source ./activate_venv.sh' or '. ./activate_venv.sh'"
     echo "Once activated you can deactivate with 'deactivate' command"
 fi
-

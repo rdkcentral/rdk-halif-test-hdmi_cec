@@ -1,0 +1,131 @@
+hdmicec:
+  cec_responses:
+    - command: "0x04"  # Image View on
+      payload:
+      type: "Direct"
+      response: null
+    - command: "0x0D"  # Text View On
+      payload:
+      type: "Direct"
+      response: null
+    - command: "0x32"  # Set Menu Language
+      payload:
+      type: "Broadcast"
+      response: null
+    - command: "0x36"  # Standby
+      payload:
+      type: "Both"
+      response: null
+    - command: "0x46"  # Give OSD Name
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x47"  # Set OSD Name
+        update_payload: false
+        # Paylod contain ascii values of osd name "RDK VTS Device"
+        payload: ["0x52", "0x44", "0x4b", "0x20", "0x56", "0x54", "0x53", "0x20", "0x44", "0x65", "0x76", "0x69", "0x63", "0x65"]
+        description: "Device request OSD name"
+    - command: "0x47"  # report OSD Name
+      payload:
+      type: "Direct"
+      response: null
+    - command: "0x64"  # Set OSD String
+      payload:
+      type: "Direct"
+      response: null
+    - command: "0x82"  # Active source
+      payload:
+      type: "Broadcast"
+      response: null
+    - command: "0x83"  # Give Physical Address
+      payload:
+      type: "Direct"
+      response:
+        type: "Broadcast"
+        command: "0x84" # Report Physical address
+        update_payload: true
+        # Payload with phycical address
+        payload: ["0x00", "0x00", "0x00"]
+        description: "Report Physical Address"
+    - command: "0x84"  # Report Physical address
+      payload:
+      type: "Broadcast"
+      response: null
+    - command: "0x85"  # Request Active source
+      payload:
+      type: "Broadcast"
+      response:
+        type: "Broadcast"
+        command: "0x82" # Report Active source
+        update_payload: true
+        # Payload with physical address
+        payload: ["0x00", "0x00"]
+        description: "Active Soruce"
+    - command: "0x87"  # Device Vendor ID
+      payload:
+      type: "Broadcast"
+      response: null
+    - command: "0x8C"  # Give Vendor ID
+      payload:
+      type: "Direct"
+      response:
+        type: "Broadcast"
+        command: "0x87" # Report Vendor ID
+        update_payload: false
+        # Payload with example vendor ID 0x000001
+        payload: ["0x00", "0x00", "0x01"]
+        description: "Device Vendor Id"
+    - command: "0x8F"  # Give power status
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x90" # Report power Status
+        update_payload: false
+        payload: ["0x00"] # Power Status on
+        description: "Report power status"
+    - command: "0x90"  # Power Status
+      payload:
+      type: "Direct"
+      response: null
+    - command: "0x91"  # Get Menu Language
+      payload:
+      type: "Direct"
+      response:
+        type: "Broadcast"
+        command: "0x32" # Report Menu language
+        update_payload: false
+        # 'eng' language in ascii value
+        payload: ["0x65", "0x6E", "0x67"]
+        description: "Set Menu Language"
+    - command: "0x9E"  # CEC Version
+      response: null
+    - command: "0x9F"  # Get CEC version
+      payload:
+      type: "Direct"
+      response:
+        type: "Direct"
+        command: "0x9E" # Report CEC Version
+        update_payload: false
+        # CEC Version 0x05 - "version 1.4"
+        payload: ["0x05"]
+        description: "Device request for CEC version"
+    - command: "0xA7"  # Request Latency
+      payload:
+      type: "Broadcast"
+      response:
+        type: "Broadcast"
+        command: "0xA8" # Report Latency
+        update_payload: true
+        # 100msec video delay ((number of milliseconds/2) + 1)
+        # 200msec audio delay ((number of milliseconds/2) + 1)
+        # (Bits 1-0) : Audio Ouput Compensated (0 - N/A, 1 - TV audio output is delay compensated, 2 - TV audio output is NOT delay compensated, 3 - TV audio output is Par delay compensated)
+        # (Bit 2) : 0 - normal latency, 1 - low latency
+        # Bit(7-3) : Reserved
+        payload: ["0x00", "0x00", "0x65", "0x00", "0x33"]
+        description: "Report Physical Address"
+    - command: "0xA8"  # Report Physical Address
+      payload:
+      type: "Broadcast"
+      response: null

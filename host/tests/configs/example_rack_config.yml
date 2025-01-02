@@ -37,15 +37,6 @@ globalConfig:
         # [ includes: ]
         # [ deviceConfig: "required.yml file"  ]
         deviceConfig: "example_device_config.yml"
-    capture:
-        # [capture: optional]
-            # [ocrEnginePath: "/usr/bin/tesseract"] # "C:\\Program Files\\Tesseract-OCR\\tesseract.exe" (For Windows) - tesseract binary
-            # [resolution: "1080p"] - Capture resolution
-            # [input: 0] - which input is connected to the video path
-        # Note: Video capture will not be installed unless screenRegions: is defined in deviceConfig:
-        ocrEnginePath: "/usr/bin/tesseract" # "C:\\Program Files\\Tesseract-OCR\\tesseract.exe" (For Windows)
-        resolution: "1080p"
-        input: 0
     local:
         log:                # log for each slot
             directory: "./logs"
@@ -65,52 +56,30 @@ rackConfig:
                 # [ type: "ssh": port: 22 username: "test" password: "test" ]
                 # [ type: "telnet": port: 23 username: "test" password: "test" ]
                 - dut:
-                    ip: "127.0.0.1"  # IP Address of the ADA Hub
-                    description: "local PC"
-                    platform: "linux PC"
+                    ip: "127.0.0.1"
+                    description: "tv"
+                    platform: "tv"
                     consoles:
                         - default:
-                            type: "serial"
-                            port: "/dev/ttyUSB0"
-                        - ssh:
-                            port: 22
-                            username: "root"
-                            ip: "192.168.99.1"
-                    remoteController:
-                        # [ remoteController: ]
-                        # [ type: "olimex" ip: "192.168.0.17" port: 7 map: "llama_rc6", config: "remote_commander.yml" ]
-                        # [ type: "skyProc" map: "skyq_map", config: "remote_commander.yml" ]
-                        # [ type: "None" ]
-                        type: "none"
-                        map: "skyq_map"
-                        config: "example_remote_commander.yml"
-                    outbound:
-                        download_url: "tftp://tftp-server.com/rack1/slot1/"    # download location for the CPE device
-                        upload_url: "sftp://server-address/home/workspace/tftp/rack1/slot1/" # upload location
-                        upload_url_base_dir: "sftp://server-address/home/workspace/tftp/rack1/slot1" # alternative upload location
-                        httpProxy: 'socks5h://localhost:1234'   # Local Proxy if required
-                        workspaceDirectory: './logs/workspace'   # Local working directory
-                    powerSwitch:       # Specific power switch for each slot    
-                        # supported types, if this section is undefined this is ok
-                        # [type: "orvbioS20", ip: "", mac: "", port:"optional", relay:"optional"]
-                        # [type: "kasa", ip: "", options:"--plug" ] #  <- Plug
-                        # [type: "kasa", ip: "", options:"--strip", args:'--index 2' ] # <- Power Strip
-                        # [type: "hs100", ip:"", port:"optional" ]  kara also supports hs100
-                        # [type: "apc", ip:"", username:"", password:"" ]  rack apc switch
-                        # [type: "olimex", ip:"", port:"optional", relay:""  ]  
-                        # [type: "SLP", ip:"", username: "", password: "", outlet_id:"", port:"optional"]
-                        # [type: "none" ] if section doesn't exist then type:none will be used
-                        type: "HS100"
-                        ip: "192.168.1.7"
-                        port: 9999
-                - pi2:
-                    ip: "192.168.99.1"
-                    description: "local pi4"
-                    platform: "pi4"
-                    consoles:
-                        - ssh:
                             type: "ssh"
                             port: 22
                             username: "root"
-
-
+                            ip: "127.0.0.1"
+                            password: ' '
+                        - ssh_hal_test:
+                            type: "ssh"
+                            port: 22
+                            username: "root"
+                            ip: "127.0.0.1"
+                            password: ' '
+                    outbound:
+                        download_url: "http://localhost:8000/"    # download location for the CPE device
+                        httpProxy:   # Local Proxy if required
+                        workspaceDirectory: './logs/workspace'   # Local working directory
+                    hdmiCECController:
+                        type: remote-cec-client
+                        vendor: "Pulse Eight"
+                        adaptor: /dev/ttyACM0 # Adaptor device entry
+                        address: "127.0.0.1" # Needs to be be filled out with IP address
+                        username: "root" # Needs to be filled out with login username
+                        password: ' ' # Needs to be filled out with login password
