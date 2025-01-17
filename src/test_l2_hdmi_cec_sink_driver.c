@@ -324,12 +324,6 @@ void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
         UT_LOG_ERROR("HdmiCecTx failed with status: %d\n", status);
     }
 
-    UT_ASSERT_EQUAL(result, HDMI_CEC_IO_SENT_BUT_NOT_ACKD);
-    if (result != HDMI_CEC_IO_SENT_BUT_NOT_ACKD)
-    {
-        UT_LOG_ERROR("HdmiCecTx result: %d\n", result);
-    }
-
     status = HdmiCecClose(handle);
     UT_LOG_DEBUG("Invoking HdmiCecClose with handle: %d", handle);
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);

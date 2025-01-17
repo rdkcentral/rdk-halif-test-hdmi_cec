@@ -1390,7 +1390,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
  * |01|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |02|Call HdmiCecAddLogicalAddress() - call add logical address for sink devices with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Specific to sink devices. Should Pass |
  * |03|Call HdmiCecGetLogicalAddress() - call get logical address with valid arguments. API should return the logical address added in the above step | handle, devType, &logicalAddress | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |04|Call HdmiCecTx() - send the cec message with valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS and ret=HDMI_CEC_IO_SENT_AND_ACKD| Should Pass |
+ * |04|Call HdmiCecTx() - send the cec message with direct address and other valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS and ret=HDMI_CEC_IO_SENT_BUT_NOT_ACKD| Should Pass |
+ * |04|Call HdmiCecTx() - send the cec message with broadcast address and other valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS | Should Pass |
  * |02|Call HdmiCecremoveLogicalAddress() - call add logical address for sink devices with valid arguments | handle, logicalAddress | HDMI_CEC_IO_SUCCESS| Specific to sink devices. Should Pass |
  * |05|Call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  */
@@ -1436,10 +1437,19 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     UT_LOG("\n hdmicec destination address (from buf): 0x%x\n", destinationAddress);
     buf[0] = ((logicalAddress&0xFF)<<4)|(0x03); UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
-    /* Positive result */
+    /* Positive result for direct address */
     result = HdmiCecTx(handle, buf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD  != ret) { UT_FAIL("HdmiCecTx failed"); }
+    
+    /* Positive result for broadcast address */
+    buf[0] = ((logicalAddress&0xFF)<<4)|(0x0F); UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    initiatorAddress = (buf[0] & 0xF0) >> 4;    // Upper nibble of buf[0]
+    destinationAddress = (buf[0] & 0x0F);       // Lower nibble of buf[0]
+    UT_LOG("\n hdmicec initiator address (from buf): 0x%x\n", initiatorAddress);
+    UT_LOG("\n hdmicec destination address (from buf): 0x%x\n", destinationAddress);
+    result = HdmiCecTx(handle, buf, len, &ret);
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
 
     /* Remove Logical address*/
     result = HdmiCecRemoveLogicalAddress( handle, logicalAddress );
@@ -1571,8 +1581,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
 
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
-    //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, CEC_GET_CEC_VERSION};
+    //Sender as 3 and destination as 0
+    unsigned char buf[] = {0x30, CEC_GET_CEC_VERSION};
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
@@ -1581,19 +1591,22 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
 
-    buf[0] = 0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
-
     //Get logical address
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
     UT_LOG ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    buf[0] = ((logicalAddress&0xFF)<<4)|0x00; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
-    /* Positive result */
+    /* Positive result for direct address*/
     result = HdmiCecTx(handle, buf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
+    
+    /* Positive result for broadcast address*/
+    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    result = HdmiCecTx(handle, buf, len, &ret);
+    if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
 
     /*calling hdmicec_close should pass */
     result = HdmiCecClose (handle);

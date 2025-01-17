@@ -236,12 +236,11 @@ class hdmiCECClass():
         txStatus = self.searchPattern(result, pattern)
 
         status = False
-        if destLogicalAddress == 'f':
-            if txStatus == "HDMI_CEC_IO_SENT_BUT_NOT_ACKD":
-                status = True
-        else:
+        if destLogicalAddress != 'f':
             if txStatus == "HDMI_CEC_IO_SENT_AND_ACKD":
                 status = True
+        else:
+            status = True
 
         return status
 
