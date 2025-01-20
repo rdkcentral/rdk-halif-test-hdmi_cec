@@ -87,6 +87,7 @@ static int gTestID = 1;
 static bool extendedEnumsSupported=false;
 
 #define CEC_GET_CEC_VERSION (0x9F)
+#define CEC_GET_ACTIVE_SOURCE (0x85)
 #define CEC_BROADCAST_ADDR (0xF)
 
 #define CHECK_FOR_EXTENDED_ERROR_CODE( result, enhanced, old )\
@@ -501,54 +502,52 @@ void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     UT_KVP_PROFILE_GET_STRING("hdmicec/type",typeString);
+
+    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
     {
-
-        result = HdmiCecAddLogicalAddress(handle, logicalAddress);
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
-
-        result = HdmiCecOpen(&handle);
-        // if init is failed no need to proceed further
-        UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
-
-        result = HdmiCecAddLogicalAddress(0, logicalAddress);
-        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
-
-        result = HdmiCecAddLogicalAddress(handle, -1);
-        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
-
-        result = HdmiCecAddLogicalAddress(handle, 0x10);
-        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
-
-        result = HdmiCecClose(handle);
-        UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
-
-        result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
-
     } else if(strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
-        result = HdmiCecAddLogicalAddress(handle, logicalAddress);
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_INVALID_ARGUMENT);
+    }
 
-        result = HdmiCecOpen(&handle);
-        // if init is failed no need to proceed further
-        UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecOpen(&handle);
+    // if init is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
 
-        result = HdmiCecAddLogicalAddress(0, logicalAddress);
+    result = HdmiCecAddLogicalAddress(0, logicalAddress);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if(strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_INVALID_HANDLE, HDMI_CEC_IO_INVALID_ARGUMENT);
+    }
 
-        result = HdmiCecAddLogicalAddress(handle, -1);
+    result = HdmiCecAddLogicalAddress(handle, -1);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if(strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_INVALID_ARGUMENT, HDMI_CEC_IO_GENERAL_ERROR);
+    }
 
-        result = HdmiCecAddLogicalAddress(handle, 0x10);
+    result = HdmiCecAddLogicalAddress(handle, 0x10);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if(strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_INVALID_ARGUMENT, HDMI_CEC_IO_GENERAL_ERROR);
+    }
 
-        result = HdmiCecClose(handle);
-        UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecClose(handle);
+    UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
 
-        result = HdmiCecAddLogicalAddress(handle, logicalAddress);
+    result = HdmiCecAddLogicalAddress(handle, logicalAddress);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if(strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_INVALID_ARGUMENT);
-
     }
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
@@ -659,82 +658,67 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
     UT_KVP_PROFILE_GET_STRING("hdmicec/type", typeString);
+    logicalAddress = DEFAULT_LOGICAL_ADDRESS_STB;
+
+    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
     if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
     {
-        logicalAddress = DEFAULT_LOGICAL_ADDRESS_STB;
-        result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_INVALID_ARGUMENT);
+    }
 
-        result = HdmiCecOpen(&handle);
-        // if init is failed no need to proceed further
-        UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
+    result = HdmiCecOpen(&handle);
+    // if init is failed no need to proceed further
+    UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
 
-        result = HdmiCecRemoveLogicalAddress(0, logicalAddress);
+    result = HdmiCecRemoveLogicalAddress(0, logicalAddress);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
+        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_INVALID_HANDLE, HDMI_CEC_IO_INVALID_ARGUMENT);
+    }
 
-        result = HdmiCecRemoveLogicalAddress(handle, 0x10);
+    result = HdmiCecRemoveLogicalAddress(handle, 0x10);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_INVALID_ARGUMENT);
+    }
 
-        result = HdmiCecRemoveLogicalAddress(handle, -1);
+    result = HdmiCecRemoveLogicalAddress(handle, -1);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+    } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_INVALID_ARGUMENT);
+    }
 
-        result = HdmiCecClose(handle);
-        UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
+    if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
+        result = HdmiCecAddLogicalAddress(handle, logicalAddress);
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_SUCCESS);
 
         result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+        UT_ASSERT_EQUAL(result,HDMI_CEC_IO_SUCCESS);
+
+        result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_ADDED, HDMI_CEC_IO_SUCCESS);
+    }
+
+    result = HdmiCecClose(handle);
+    UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
+
+    result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
+    if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
+    {
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
 
     } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
-        result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_INVALID_ARGUMENT);
-
-        result = HdmiCecOpen(&handle);
-        // if init is failed no need to proceed further
-        UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
-
-        result = HdmiCecRemoveLogicalAddress(0, logicalAddress);
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_INVALID_HANDLE, HDMI_CEC_IO_INVALID_ARGUMENT);
-
-        result = HdmiCecRemoveLogicalAddress(handle, 0x10);
-        if (HDMI_CEC_IO_INVALID_ARGUMENT != result)
-        {
-            UT_FAIL("HdmiCecRemoveLogicalAddress failed");
-        }
-
-        result = HdmiCecRemoveLogicalAddress(handle, -1);
-        if (HDMI_CEC_IO_INVALID_ARGUMENT != result)
-        {
-            UT_FAIL("HdmiCecRemoveLogicalAddress failed");
-        }
-
-        result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_ADDED, HDMI_CEC_IO_SUCCESS);
-
-        result = HdmiCecAddLogicalAddress(handle, logicalAddress);
-        if (HDMI_CEC_IO_SUCCESS != result)
-        {
-            UT_FAIL("HdmiCecAddLogicalAddress failed");
-        }
-
-        result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-        if (HDMI_CEC_IO_SUCCESS != result)
-        {
-            UT_FAIL("HdmiCecRemoveLogicalAddress failed");
-        }
-
-        result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_ADDED, HDMI_CEC_IO_SUCCESS);
-
-        result = HdmiCecClose(handle);
-        if (HDMI_CEC_IO_SUCCESS != result)
-        {
-            UT_FAIL_FATAL("close failed");
-        }
-
-        result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_INVALID_ARGUMENT);
     }
+
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
 }
@@ -1310,7 +1294,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, CEC_GET_CEC_VERSION};
+    unsigned char buf[] = {0x3F, CEC_GET_ACTIVE_SOURCE};
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -1408,7 +1392,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 0 and to CEC address 3
-    unsigned char buf[] = {0x03, CEC_GET_CEC_VERSION};
+    unsigned char directBuf[] = {0x03, CEC_GET_CEC_VERSION};
+    unsigned char broadcastBuf[] = {0x0F, CEC_GET_ACTIVE_SOURCE};
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -1431,24 +1416,24 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
 
 
     // Extract and log initiator and destination addresses from buf
-    initiatorAddress = (buf[0] & 0xF0) >> 4;    // Upper nibble of buf[0]
-    destinationAddress = (buf[0] & 0x0F);       // Lower nibble of buf[0]
+    initiatorAddress = (directBuf[0] & 0xF0) >> 4;    // Upper nibble of buf[0]
+    destinationAddress = (directBuf[0] & 0x0F);       // Lower nibble of buf[0]
     UT_LOG("\n hdmicec initiator address (from buf): 0x%x\n", initiatorAddress);
     UT_LOG("\n hdmicec destination address (from buf): 0x%x\n", destinationAddress);
-    buf[0] = ((logicalAddress&0xFF)<<4)|(0x03); UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    UT_LOG ("\n hdmicec buf: 0x%x\n", directBuf[0]);
 
     /* Positive result for direct address */
-    result = HdmiCecTx(handle, buf, len, &ret);
+    result = HdmiCecTx(handle, directBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD  != ret) { UT_FAIL("HdmiCecTx failed"); }
     
     /* Positive result for broadcast address */
-    buf[0] = ((logicalAddress&0xFF)<<4)|(0x0F); UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
-    initiatorAddress = (buf[0] & 0xF0) >> 4;    // Upper nibble of buf[0]
-    destinationAddress = (buf[0] & 0x0F);       // Lower nibble of buf[0]
+    initiatorAddress = (broadcastBuf[0] & 0xF0) >> 4;    // Upper nibble of buf[0]
+    destinationAddress = (broadcastBuf[0] & 0x0F);       // Lower nibble of buf[0]
     UT_LOG("\n hdmicec initiator address (from buf): 0x%x\n", initiatorAddress);
     UT_LOG("\n hdmicec destination address (from buf): 0x%x\n", destinationAddress);
-    result = HdmiCecTx(handle, buf, len, &ret);
+    UT_LOG ("\n hdmicec buf: 0x%x\n", broadcastBuf[0]);
+    result = HdmiCecTx(handle, broadcastBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
 
     /* Remove Logical address*/
@@ -1504,7 +1489,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and broadcast
-    unsigned char buf[] = {0x3F, CEC_GET_CEC_VERSION};
+    unsigned char buf[] = {0x3F, CEC_GET_ACTIVE_SOURCE};
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
@@ -1517,7 +1502,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
 
-    buf[0] = 0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
+    UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     //Get logical address
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
@@ -1582,7 +1567,8 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     int len = 2;
     //Get CEC Version. return expected is opcode: CEC Version :43 9E 05
     //Sender as 3 and destination as 0
-    unsigned char buf[] = {0x30, CEC_GET_CEC_VERSION};
+    unsigned char broadcastBuf[] = {0x30, CEC_GET_CEC_VERSION};
+    unsigned char directBuf[] = {0x3F, CEC_GET_ACTIVE_SOURCE};
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
@@ -1596,16 +1582,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
 
     UT_LOG ("\n hdmicec logicalAddress: 0x%x\n", (logicalAddress&0xFF)<<4);
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x00; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
 
     /* Positive result for direct address*/
-    result = HdmiCecTx(handle, buf, len, &ret);
+    result = HdmiCecTx(handle, directBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
     
     /* Positive result for broadcast address*/
-    buf[0] = ((logicalAddress&0xFF)<<4)|0x0F; UT_LOG ("\n hdmicec buf: 0x%x\n", buf[0]);
-    result = HdmiCecTx(handle, buf, len, &ret);
+    result = HdmiCecTx(handle, broadcastBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
 
     /*calling hdmicec_close should pass */
