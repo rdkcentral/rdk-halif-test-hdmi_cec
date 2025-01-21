@@ -81,7 +81,6 @@
 
 /// Set the CEC sink (Display device) logical address here
 #define DEFAULT_LOGICAL_ADDRESS_PANEL 0
-#define DEFAULT_LOGICAL_ADDRESS_BROADCAST 0xF
 static int gTestGroup = 1;
 static int gTestID = 1;
 static bool extendedEnumsSupported=false;
@@ -719,6 +718,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
     result = HdmiCecRemoveLogicalAddress(handle, logicalAddress);
     if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0){
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
+
     } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
         CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_ADDED, HDMI_CEC_IO_SUCCESS);
     }
@@ -1295,7 +1295,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
 
     int len = 2;
     //Sender as 0 and broadcast
-    unsigned char buf[] = {((DEFAULT_LOGICAL_ADDRESS_PANEL<<4)|(DEFAULT_LOGICAL_ADDRESS_BROADCAST)), CEC_GET_ACTIVE_SOURCE};
+    unsigned char buf[] = {((DEFAULT_LOGICAL_ADDRESS_PANEL<<4)|(CEC_BROADCAST_ADDR)), CEC_GET_ACTIVE_SOURCE};
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -1371,7 +1371,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     //Sender as 0 and to CEC address 3
     unsigned char directBuf[] = {((DEFAULT_LOGICAL_ADDRESS_PANEL<<4)|(DEFAULT_LOGICAL_ADDRESS_STB)), CEC_GET_CEC_VERSION};
     //Sender as 0 and broadcast
-    unsigned char broadcastBuf[] = {((DEFAULT_LOGICAL_ADDRESS_PANEL<<4)|(DEFAULT_LOGICAL_ADDRESS_BROADCAST)), CEC_GET_ACTIVE_SOURCE};
+    unsigned char broadcastBuf[] = {((DEFAULT_LOGICAL_ADDRESS_PANEL<<4)|(CEC_BROADCAST_ADDR)), CEC_GET_ACTIVE_SOURCE};
 
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -1440,7 +1440,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
 
     int len = 2;
     //Sender as 3 and broadcast
-    unsigned char buf[] = {((DEFAULT_LOGICAL_ADDRESS_STB<<4)|(DEFAULT_LOGICAL_ADDRESS_BROADCAST)), CEC_GET_ACTIVE_SOURCE};
+    unsigned char buf[] = {((DEFAULT_LOGICAL_ADDRESS_STB<<4)|(CEC_BROADCAST_ADDR)), CEC_GET_ACTIVE_SOURCE};
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
@@ -1514,7 +1514,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     //Sender as 3 and destination as 0
     unsigned char broadcastBuf[] = {((DEFAULT_LOGICAL_ADDRESS_STB<<4)|(DEFAULT_LOGICAL_ADDRESS_PANEL)), CEC_GET_CEC_VERSION};
     //Sender as 3 and broadcast
-    unsigned char directBuf[] = {((DEFAULT_LOGICAL_ADDRESS_STB<<4)|(DEFAULT_LOGICAL_ADDRESS_BROADCAST)), CEC_GET_ACTIVE_SOURCE};
+    unsigned char directBuf[] = {((DEFAULT_LOGICAL_ADDRESS_STB<<4)|(CEC_BROADCAST_ADDR)), CEC_GET_ACTIVE_SOURCE};
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
