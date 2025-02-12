@@ -507,7 +507,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
     {
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
     } else if(strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_INVALID_ARGUMENT);
+        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_GENERAL_ERROR);
     }
 
     result = HdmiCecOpen(&handle);
@@ -587,8 +587,6 @@ void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
 
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     UT_KVP_PROFILE_GET_STRING("hdmicec/type",typeString);
-    if(strncmp(typeString,"source",UT_KVP_MAX_ELEMENT_SIZE) == 0)
-        logicalAddress = DEFAULT_LOGICAL_ADDRESS_STB;
 
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
