@@ -58,7 +58,7 @@ export CC="arm-rdk-linux-gnueabi-gcc  -march=armv7-a -mthumb -mfpu=neon -mfloat-
 - Clone the `HAL` Repository:
 
 ```bash
-git clone git@github.com:rdkcentral/rdk-halif-test-hdmi_cec.git
+git clone git@github.com:rdkcentral/rdk-halif-hdmi_cec.git
 ```
 
 - Set Project Version:
