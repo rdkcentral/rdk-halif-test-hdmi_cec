@@ -235,14 +235,11 @@ class hdmiCECClass():
 
         txStatus = self.searchPattern(result, pattern)
 
-        status = False
-        if destLogicalAddress == 'f':
-            if txStatus == "HDMI_CEC_IO_SENT_BUT_NOT_ACKD":
-                status = True
-        else:
-            if txStatus == "HDMI_CEC_IO_SENT_AND_ACKD":
-                status = True
-
+        status = True
+        if destLogicalAddress != 'f':
+            if txStatus != "HDMI_CEC_IO_SENT_AND_ACKD":
+                status = False
+                
         return status
 
     def readCallbackDetails (self):
@@ -353,7 +350,7 @@ if __name__ == '__main__':
     test.cecTransmitCmd('f', '0x85')
 
     # Transmitt 0x04 cec command to '1'
-    test.cecTransmitCmd('1', '0x85')
+    test.cecTransmitCmd('1', '0x04')
 
     # Read the callback details
     result = test.readCallbackDetails()
