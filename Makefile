@@ -37,6 +37,7 @@ ASSETS_DIR := $(ROOT_DIR)/assets
 CEC_RESP_DIR := $(ASSETS_DIR)/cec_responses
 HAL_LIB := RCECHal
 SKELTON_SRCS := $(ROOT_DIR)/skeletons/src/hdmi_cec_driver.c
+TARGET_EXEC :=hal_test_$(HAL_LIB)
 VCOMPONENT_SRCS := $(wildcard $(ROOT_DIR)/vcomponent/src/*.c)
 VCOMPONENT_OBJS := $(subst src,build,$(VCOMPONENT_SRCS:.c=.o))
 
@@ -77,6 +78,7 @@ export INC_DIRS
 export TARGET
 export TOP_DIR
 export HAL_LIB_DIR
+export TARGET_EXEC
 
 .PHONY: clean list build skeleton vcomponent
 
