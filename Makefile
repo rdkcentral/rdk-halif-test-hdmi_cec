@@ -41,6 +41,9 @@ TARGET_EXEC :=hal_test_$(HAL_LIB)
 VCOMPONENT_SRCS := $(wildcard $(ROOT_DIR)/vcomponent/src/*.c)
 VCOMPONENT_OBJS := $(subst src,build,$(VCOMPONENT_SRCS:.c=.o))
 
+VERSION := $(shell git describe --tags --abbrev=0| head -n1)
+KCFLAGS = -DHALIF_TEST_TAG_VERSION=\"$(VERSION)\"
+
 ifeq ($(TARGET),)
 $(info TARGET NOT SET )
 $(info TARGET FORCED TO Linux)
@@ -65,9 +68,9 @@ override TARGET := linux
 #YLDFLAGS = -Wl,-rpath,$(HAL_LIB_DIR) -L$(HAL_LIB_DIR) -l$(HAL_LIB)  -lpthread -lrt
 SRC_DIRS += $(ROOT_DIR)/vcomponent/src
 INC_DIRS += $(ROOT_DIR)/vcomponent/include $(ROOT_DIR)/ut-core/include $(ROOT_DIR)/ut-core/framework/ut-control/include
-KCFLAGS = -DVCOMPONENT
-export KCFLAGS
+KCFLAGS += -DVCOMPONENT
 endif
+
 
 .PHONY: clean list all
 
@@ -79,6 +82,7 @@ export TARGET
 export TOP_DIR
 export HAL_LIB_DIR
 export TARGET_EXEC
+export KCFLAGS
 
 .PHONY: clean list build skeleton vcomponent
 
