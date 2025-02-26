@@ -144,7 +144,7 @@ void test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress(void)
     gTestID = 2;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
-    int handle;
+    int handle = 0;
     HDMI_CEC_STATUS status;
     int logicalAddress;
 
@@ -152,6 +152,7 @@ void test_l2_hdmi_cec_sink_hal_AddAndGetLogicalAddress(void)
     status = HdmiCecOpen(&handle);
     UT_LOG_DEBUG("Invoking HdmiCecOpen with valid handle");
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     // Step 2: Call the API HdmiCecAddLogicalAddress and HdmiCecGetLogicalAddress for each logical address
     for (int i = 0x00; i <= 0x0F; i++)
@@ -212,7 +213,7 @@ void test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
     gTestID = 3;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
-    int handle;
+    int handle = 0;
     int logicalAddress = 0x00; // valid logical address
     HDMI_CEC_STATUS status;
     int getLogicaladdress;
@@ -221,6 +222,7 @@ void test_l2_hdmi_cec_sink_hal_RemoveLogicalAddress(void)
     status = HdmiCecOpen(&handle);
     UT_LOG_DEBUG("Invoking HdmiCecOpen with handle: %d", handle);
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     // Invoke the API HdmiCecAddLogicalAddress
     status = HdmiCecAddLogicalAddress(handle, logicalAddress);
@@ -290,7 +292,7 @@ void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
     gTestID = 4;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
-    int handle;
+    int handle=0;
     int logicalAddresses = 0x0; // valid logical address
     unsigned char buf[] = {0x0F, 0x84, 0x00, 0x00}; // valid CEC message
     int len = sizeof(buf);
@@ -299,6 +301,7 @@ void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
     HDMI_CEC_STATUS status = HdmiCecOpen(&handle);
     UT_LOG_DEBUG("Invoking HdmiCecOpen with handle: %d", handle);
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     status = HdmiCecAddLogicalAddress(handle, logicalAddresses);
     UT_LOG_DEBUG("Invoking HdmiCecAddLogicalAddress with handle: %d and logicalAddress: %d", handle, logicalAddresses);
@@ -352,7 +355,7 @@ void test_l2_hdmi_cec_sink_hal_BroadcastHdmiCecCommand(void)
 void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
 {
     gTestID = 5;
-    int handle;
+    int handle=0;
     unsigned int physicalAddress;
     HDMI_CEC_STATUS status;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -361,6 +364,7 @@ void test_l2_hdmi_cec_sink_hal_VerifyPhysicalAddress(void)
     UT_LOG_DEBUG("Invoking HdmiCecOpen with valid handle");
     status = HdmiCecOpen(&handle);
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     // Step 2: Call the API HdmiCecGetPhysicalAddress()
     UT_LOG_DEBUG("Invoking HdmiCecGetPhysicalAddress with handle: %d", handle);
@@ -406,7 +410,7 @@ void test_l2_hdmi_cec_sink_hal_TransmitCECCommand(void)
     gTestID = 6;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
-    int handle;
+    int handle=0;
     int logicalAddresses = 0x0; // Example logical address
     unsigned char buf[] = {0x47, 0x9F}; // Example CEC message
     int len = sizeof(buf);
@@ -415,6 +419,7 @@ void test_l2_hdmi_cec_sink_hal_TransmitCECCommand(void)
     HDMI_CEC_STATUS status = HdmiCecOpen(&handle);
     UT_LOG_DEBUG("Invoking HdmiCecOpen with valid handle");
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     status = HdmiCecAddLogicalAddress(handle, logicalAddresses);
     UT_LOG_DEBUG("Invoking HdmiCecAddLogicalAddress with handle: %d and logicalAddress: %d", handle, logicalAddresses);
