@@ -41,7 +41,7 @@ TARGET_EXEC :=hal_test_$(HAL_LIB)
 VCOMPONENT_SRCS := $(wildcard $(ROOT_DIR)/vcomponent/src/*.c)
 VCOMPONENT_OBJS := $(subst src,build,$(VCOMPONENT_SRCS:.c=.o))
 
-VERSION := $(shell git describe --tags --abbrev=0| head -n1)
+VERSION := $(shell git describe --tags | head -n1)
 KCFLAGS = -DHALIF_TEST_TAG_VERSION=\"$(VERSION)\"
 
 ifeq ($(TARGET),)
