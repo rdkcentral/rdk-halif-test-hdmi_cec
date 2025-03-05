@@ -209,6 +209,7 @@ void test_hdmicec_hal_l1_open_negative( void )
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecOpen( &handle );
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_ALREADY_OPEN,HDMI_CEC_IO_SUCCESS);
