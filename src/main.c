@@ -65,6 +65,10 @@
 #include <ut_log.h>
 #include <ut_kvp_profile.h>
 
+#ifndef HALIF_TEST_TAG_VERSION
+#define HALIF_TEST_TAG_VERSION "Not Defined"
+#endif
+
 extern int register_hdmicec_hal_l1_tests( void );
 extern int register_hdmicec_hal_source_l2_tests( void );
 extern int register_hdmicec_hal_sink_l2_tests( void );
@@ -80,6 +84,10 @@ int main(int argc, char** argv)
     ut_kvp_status_t status;
     char szReturnedString[UT_KVP_MAX_ELEMENT_SIZE];
     int registerReturn = 0;
+
+    printf("\n\n==========================================================================\n");
+    printf("\n\t\tHdmiCEC HALIF Test Version: \033[0;32m%s\033[0m\n",HALIF_TEST_TAG_VERSION);
+    printf("\n==========================================================================\n\n");
 
 #ifdef VCOMPONENT
     int opt;
