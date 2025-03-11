@@ -42,7 +42,7 @@ class hdmiCECClass():
     HDMI CEC (Consumer Electronics Control) operations in the test environment.
     """
 
-    def __init__(self, moduleConfigProfileFile:str, session=None, targetWorkspace:str="/tmp"):
+    def __init__(self, moduleConfigProfileFile:str, session=None,testSuite:str="L3 HDMICEC Functions", targetWorkspace:str="/tmp"):
         """
         Initialize the HDMI CEC Class with configuration settings.
 
@@ -56,7 +56,7 @@ class hdmiCECClass():
         """
         self.moduleName = "hdmicec"
         self.testConfigFile = os.path.join(dir_path, "hdmiCEC_testConfig.yml")
-        self.testSuite = "L3 HDMICEC Functions"
+        self.testSuite = testSuite
         cecResponseFile = "cec_responses.yml"
 
         # Prepare the profile file on the target workspace
@@ -99,6 +99,20 @@ class hdmiCECClass():
         if match:
             return match.group(1)
         return None
+    
+    def runTest(self, test_case:str=None):
+        """
+        Runs the test case passed to this funtion
+        Args:
+            test_case (str, optional): test case name to run, default runs all test
+        Returns:
+            bool: True - test pass, False - test fails
+        """
+        output = self.utMenu.select( self.testSuite, test_case)
+        results = self.utMenu.collect_results(output)
+        if results == None:
+            results = False
+        return results
 
     def initialise(self):
         """

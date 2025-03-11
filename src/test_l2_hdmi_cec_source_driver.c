@@ -145,7 +145,7 @@ int test_register_hdmicec_hal_source_l2_tests(void)
     }
     // List of test function names and strings
 
-    UT_add_test( pSuite, "L2_ValidateLogicalAddressUnavailability_source", test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability);
+    UT_add_test( pSuite, "L2_LogicalAddressUnavailability", test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability);
 
     return 0;
 }
