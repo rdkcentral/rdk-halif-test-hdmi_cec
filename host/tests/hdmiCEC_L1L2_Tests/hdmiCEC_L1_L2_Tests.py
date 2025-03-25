@@ -59,7 +59,7 @@ class hdmiCEC_L1_L2_tests(utHelperClass):
         self.targetWorkspace = os.path.join(targetWorkspace, moduleName)
 
         # Load test setup configuration
-        if deviceType == "sink": 
+        if deviceType == "sink":
             testSetupPath = os.path.join(dir_path, "hdmiCEC_L1_L2_sink_testSetup.yml")
         elif deviceType =="source":
             testSetupPath = os.path.join(dir_path, "hdmiCEC_L1_L2_source_testSetup.yml")
@@ -76,25 +76,29 @@ class hdmiCEC_L1_L2_tests(utHelperClass):
         testsuites = self.testSetup.fields.get('test_suites')
 
         finalresult = True
+        copyArtifacts = True
 
         for testsuite in testsuites:
             testsuite_name = testsuite.get("name")
 
             # Create the hdmiCEC class
-            testhdmiCEC = hdmiCECClass(self.moduleConfigProfileFile, self.hal_session, testsuite_name, self.targetWorkspace)
+            testhdmiCEC = hdmiCECClass(self.moduleConfigProfileFile, self.hal_session, testsuite_name, self.targetWorkspace, copyArtifacts)
+            copyArtifacts = False
             test_cases = testsuite.get("test_cases")
 
             if len(test_cases) == 1 and test_cases[0] == "all":
                 self.log.stepStart(f'Test Suit: {testsuite_name} Run all Tests cases')
                 # If 'all' test case mentioned in list, run all tests with 'r' option
                 result = testhdmiCEC.runTest()
-                finalresult &= result
+                if not result:
+                    finalresult = False
                 self.log.stepResult(result, f'Test Suit: {testsuite_name} Run all Tests cases')
             else:
                 for test_case in testsuite.get("test_cases"):
                     self.log.stepStart(f'Test Suit: {testsuite_name} Test Case: {test_case}')
                     result = testhdmiCEC.runTest(test_case)
-                    finalresult &= result
+                    if not result:
+                        finalresult = False
                     self.log.stepResult(result, f'Test Suit: {testsuite_name} Test Case: {test_case}')
 
             del testhdmiCEC

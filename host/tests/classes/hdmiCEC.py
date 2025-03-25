@@ -42,7 +42,7 @@ class hdmiCECClass():
     HDMI CEC (Consumer Electronics Control) operations in the test environment.
     """
 
-    def __init__(self, moduleConfigProfileFile:str, session=None,testSuite:str="L3 HDMICEC Functions", targetWorkspace:str="/tmp"):
+    def __init__(self, moduleConfigProfileFile:str, session=None,testSuite:str="L3 HDMICEC Functions", targetWorkspace:str="/tmp", copyArtifacts:bool=True):
         """
         Initialize the HDMI CEC Class with configuration settings.
 
@@ -69,13 +69,14 @@ class hdmiCECClass():
         self.testSession   = session
         self.utils         = utBaseUtils()
 
-        # Copy required artifacts to the target workspace
-        for artifact in self.testConfig.test.artifacts:
-            filesPath = os.path.join(dir_path, artifact)
-            self.utils.rsync(self.testSession, filesPath, targetWorkspace)
+        if copyArtifacts:
+            # Copy required artifacts to the target workspace
+            for artifact in self.testConfig.test.artifacts:
+                filesPath = os.path.join(dir_path, artifact)
+                self.utils.rsync(self.testSession, filesPath, targetWorkspace)
 
-        # Copy the profile configuration to the target workspace
-        self.utils.scpCopy(self.testSession, moduleConfigProfileFile, targetWorkspace)
+            # Copy the profile configuration to the target workspace
+            self.utils.scpCopy(self.testSession, moduleConfigProfileFile, targetWorkspace)
 
         # Start the user interface menu
         self.utMenu.start()
