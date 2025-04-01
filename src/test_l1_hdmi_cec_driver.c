@@ -209,6 +209,7 @@ void test_hdmicec_hal_l1_open_negative( void )
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecOpen( &handle );
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_ALREADY_OPEN,HDMI_CEC_IO_SUCCESS);
@@ -254,6 +255,7 @@ void test_hdmicec_hal_l1_open_positive( void )
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
@@ -297,6 +299,7 @@ void test_hdmicec_hal_l1_close_negative( void )
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecClose( 0 );
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
@@ -341,12 +344,14 @@ void test_hdmicec_hal_l1_close_positive( void )
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecClose( handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("close failed"); }
@@ -395,6 +400,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_negative( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle,0);
 
     result = HdmiCecGetPhysicalAddress(0, &physicalAddress);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_HANDLE);
@@ -447,6 +453,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle,0);
 
     result = HdmiCecGetPhysicalAddress(handle, &physicalAddress);
     if (HDMI_CEC_IO_SUCCESS  != result) { UT_FAIL("HdmiCecGetPhysicalAddress failed"); }
@@ -513,6 +520,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
     result = HdmiCecOpen(&handle);
     // if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle,0);
 
     result = HdmiCecAddLogicalAddress(0, logicalAddress);
     if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0)
@@ -591,6 +599,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle,0);
 
     result = HdmiCecAddLogicalAddress( handle, logicalAddress );
     if (((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_SUCCESS != result)) || \
@@ -660,6 +669,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
     result = HdmiCecOpen(&handle);
     // if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL(result, HDMI_CEC_IO_SUCCESS);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle,0);
 
     result = HdmiCecRemoveLogicalAddress(0, logicalAddress);
     if (strncmp(typeString, "source", UT_KVP_MAX_ELEMENT_SIZE) == 0){
@@ -718,7 +728,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
 
     } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_ADDED, HDMI_CEC_IO_SUCCESS);
+        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_SUCCESS);
     }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -765,6 +775,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_positive( void )
     result = HdmiCecOpen(&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle,0);
 
     result = HdmiCecAddLogicalAddress(handle, logicalAddress);
     if (((strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0) && (HDMI_CEC_IO_SUCCESS != result)) || \
@@ -829,6 +840,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_negative( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle,0);
 
     result = HdmiCecGetLogicalAddress(0, &logicalAddress);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
@@ -903,6 +915,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sinkDevice_positive ( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
@@ -956,6 +969,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_negative( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecGetLogicalAddress(0,  &logicalAddress);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
@@ -1012,6 +1026,7 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecGetLogicalAddress(handle, &logicalAddress);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecGetLogicalAddress failed"); }
@@ -1068,6 +1083,7 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
     //Add Logic Address for Sink devices.
     if(strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0)
     {
@@ -1133,6 +1149,7 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
     //Add Logic address for Sink devices
     if(strncmp(typeString,"sink",UT_KVP_MAX_ELEMENT_SIZE) == 0)
     {
@@ -1180,7 +1197,7 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecSetTxCallback() - set TX Call back with invalid handle | handle=0, DriverTransmitCallback, data address  | HDMI_CEC_IO_INVALID_HANDLE| Should Pass |
  * |04|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|Call HdmiCecSetTxCallback()  - call the API, after module is closed | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_NOT_OPENED| Should Pass | 
+ * |05|Call HdmiCecSetTxCallback()  - call the API, after module is closed | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_NOT_OPENED| Should Pass |
  */
 void test_hdmicec_hal_l1_setTxCallback_negative( void )
 {
@@ -1196,6 +1213,7 @@ void test_hdmicec_hal_l1_setTxCallback_negative( void )
     result = HdmiCecOpen ( &handle );
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecSetTxCallback(0, NULL, (void*)0xDEADBEEF);
     CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
@@ -1242,6 +1260,7 @@ void test_hdmicec_hal_l1_setTxCallback_positive( void )
     result = HdmiCecOpen ( &handle );
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     result = HdmiCecSetTxCallback( handle, DriverTransmitCallback, (void*)0xDEADBEEF );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecSetTxCallback failed"); }
@@ -1304,6 +1323,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_negative( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     /* Invalid return variable */
     result = HdmiCecTx(handle, buf, len, NULL);
@@ -1374,6 +1394,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     UT_LOG ("\n hdmicec directBuf: [0x%x,0x%x]\n", directBuf[0],directBuf[1]);
 
@@ -1381,7 +1402,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     result = HdmiCecTx(handle, directBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD  != ret) { UT_FAIL("HdmiCecTx failed"); }
-    
+
     /* Positive result for broadcast address */
     UT_LOG ("\n hdmicec broadcastBuf: [0x%x,0x%x]\n", broadcastBuf[0],broadcastBuf[1]);
     result = HdmiCecTx(handle, broadcastBuf, len, &ret);
@@ -1446,6 +1467,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     UT_LOG ("\n hdmicec buf: [0x%x,0x%x]\n", buf[0],buf[1]);
 
@@ -1516,13 +1538,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     /* Positive result for direct address*/
     UT_LOG ("\n hdmicec directBuf: [0x%x,0x%x]\n", directBuf[0],directBuf[1]);
     result = HdmiCecTx(handle, directBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
-    
+
     /* Positive result for broadcast address*/
     UT_LOG ("\n hdmicec broadcastBuf: [0x%x,0x%x]\n", broadcastBuf[0],broadcastBuf[1]);
     result = HdmiCecTx(handle, broadcastBuf, len, &ret);
@@ -1586,6 +1609,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_negative( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     /* Positive result */
     result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
@@ -1675,6 +1699,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sinkDevice_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     /* Positive result */
     result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
@@ -1758,6 +1783,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_negative( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     /* Positive result */
     result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);
@@ -1835,6 +1861,7 @@ void test_hdmicec_hal_l1_hdmiCecTxAsync_sourceDevice_positive( void )
     result = HdmiCecOpen (&handle);
     //if init is failed no need to proceed further
     UT_ASSERT_EQUAL_FATAL( result, HDMI_CEC_IO_SUCCESS );
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     /* Positive result */
     result = HdmiCecSetTxCallback(handle, DriverTransmitCallback, 0);

@@ -106,7 +106,7 @@ void test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability(void)
     gTestID = 1;
     UT_LOG_INFO("In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
 
-    int handle;
+    int handle=0;
     HDMI_CEC_STATUS status;
 
     UT_LOG_DEBUG("Invoking HdmiCecOpen with valid handle");
@@ -114,6 +114,7 @@ void test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability(void)
     UT_LOG_DEBUG("Returned status: %d and handle: %d", status, handle);
     // Return value should be HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE, when the DUT is not connected to a Sink device.
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_LOGICALADDRESS_UNAVAILABLE);
+    UT_ASSERT_NOT_EQUAL_FATAL(handle, 0);
 
     if (status == HDMI_CEC_IO_SUCCESS || status == HDMI_CEC_IO_ALREADY_OPEN)
     {
@@ -145,7 +146,7 @@ int test_register_hdmicec_hal_source_l2_tests(void)
     }
     // List of test function names and strings
 
-    UT_add_test( pSuite, "L2_ValidateLogicalAddressUnavailability_source", test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability);
+    UT_add_test( pSuite, "L2_LogicalAddressUnavailability", test_l2_hdmi_cec_source_hal_ValidateLogicalAddressUnavailability);
 
     return 0;
 }

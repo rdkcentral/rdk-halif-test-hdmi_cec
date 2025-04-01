@@ -42,7 +42,7 @@ class hdmiCECClass():
     HDMI CEC (Consumer Electronics Control) operations in the test environment.
     """
 
-    def __init__(self, moduleConfigProfileFile:str, session=None, targetWorkspace:str="/tmp"):
+    def __init__(self, moduleConfigProfileFile:str, session=None,testSuite:str="L3 HDMICEC Functions", targetWorkspace:str="/tmp", copyArtifacts:bool=True):
         """
         Initialize the HDMI CEC Class with configuration settings.
 
@@ -56,7 +56,7 @@ class hdmiCECClass():
         """
         self.moduleName = "hdmicec"
         self.testConfigFile = os.path.join(dir_path, "hdmiCEC_testConfig.yml")
-        self.testSuite = "L3 HDMICEC Functions"
+        self.testSuite = testSuite
         cecResponseFile = "cec_responses.yml"
 
         # Prepare the profile file on the target workspace
@@ -69,13 +69,14 @@ class hdmiCECClass():
         self.testSession   = session
         self.utils         = utBaseUtils()
 
-        # Copy required artifacts to the target workspace
-        for artifact in self.testConfig.test.artifacts:
-            filesPath = os.path.join(dir_path, artifact)
-            self.utils.rsync(self.testSession, filesPath, targetWorkspace)
+        if copyArtifacts:
+            # Copy required artifacts to the target workspace
+            for artifact in self.testConfig.test.artifacts:
+                filesPath = os.path.join(dir_path, artifact)
+                self.utils.rsync(self.testSession, filesPath, targetWorkspace)
 
-        # Copy the profile configuration to the target workspace
-        self.utils.scpCopy(self.testSession, moduleConfigProfileFile, targetWorkspace)
+            # Copy the profile configuration to the target workspace
+            self.utils.scpCopy(self.testSession, moduleConfigProfileFile, targetWorkspace)
 
         # Start the user interface menu
         self.utMenu.start()
@@ -99,6 +100,20 @@ class hdmiCECClass():
         if match:
             return match.group(1)
         return None
+    
+    def runTest(self, test_case:str=None):
+        """
+        Runs the test case passed to this funtion
+        Args:
+            test_case (str, optional): test case name to run, default runs all test
+        Returns:
+            bool: True - test pass, False - test fails
+        """
+        output = self.utMenu.select( self.testSuite, test_case)
+        results = self.utMenu.collect_results(output)
+        if results == None:
+            results = False
+        return results
 
     def initialise(self):
         """
