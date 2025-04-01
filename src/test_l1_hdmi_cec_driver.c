@@ -728,7 +728,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
         UT_ASSERT_EQUAL(result,HDMI_CEC_IO_OPERATION_NOT_SUPPORTED);
 
     } else if (strncmp(typeString, "sink", UT_KVP_MAX_ELEMENT_SIZE) == 0){
-        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_ADDED, HDMI_CEC_IO_SUCCESS);
+        CHECK_FOR_EXTENDED_ERROR_CODE(result, HDMI_CEC_IO_NOT_OPENED, HDMI_CEC_IO_SUCCESS);
     }
 
     UT_LOG("\n Exit %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
@@ -1197,7 +1197,7 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecSetTxCallback() - set TX Call back with invalid handle | handle=0, DriverTransmitCallback, data address  | HDMI_CEC_IO_INVALID_HANDLE| Should Pass |
  * |04|Call HdmiCecClose () - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |05|Call HdmiCecSetTxCallback()  - call the API, after module is closed | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_NOT_OPENED| Should Pass | 
+ * |05|Call HdmiCecSetTxCallback()  - call the API, after module is closed | handle, DriverTransmitCallback, data address | HDMI_CEC_IO_NOT_OPENED| Should Pass |
  */
 void test_hdmicec_hal_l1_setTxCallback_negative( void )
 {
@@ -1402,7 +1402,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sinkDevice_positive( void )
     result = HdmiCecTx(handle, directBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD  != ret) { UT_FAIL("HdmiCecTx failed"); }
-    
+
     /* Positive result for broadcast address */
     UT_LOG ("\n hdmicec broadcastBuf: [0x%x,0x%x]\n", broadcastBuf[0],broadcastBuf[1]);
     result = HdmiCecTx(handle, broadcastBuf, len, &ret);
@@ -1545,7 +1545,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     result = HdmiCecTx(handle, directBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
-    
+
     /* Positive result for broadcast address*/
     UT_LOG ("\n hdmicec broadcastBuf: [0x%x,0x%x]\n", broadcastBuf[0],broadcastBuf[1]);
     result = HdmiCecTx(handle, broadcastBuf, len, &ret);
