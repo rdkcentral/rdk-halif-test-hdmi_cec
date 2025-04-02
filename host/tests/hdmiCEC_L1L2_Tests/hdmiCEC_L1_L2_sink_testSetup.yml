@@ -16,6 +16,18 @@ hdmicec:
     #######################################
     - name: "L1 HDMI CEC SINK TestCase"
       test_cases:
+        - getLogicalAddress_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - getLogicalAddress_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - Tx_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - Tx_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
         - open_Positive
     - name: "L1 HDMI CEC SINK TestCase"
       test_cases:
@@ -50,18 +62,7 @@ hdmicec:
     - name: "L1 HDMI CEC SINK TestCase"
       test_cases:
         - removeLogicalAddress_negative
-    - name: "L1 HDMI CEC SINK TestCase"
-      test_cases:
-        - getLogicalAddress_Positive
-    - name: "L1 HDMI CEC SINK TestCase"
-      test_cases:
-        - getLogicalAddress_negative
-    - name: "L1 HDMI CEC SINK TestCase"
-      test_cases:
-        - Tx_Positive
-    - name: "L1 HDMI CEC SINK TestCase"
-      test_cases:
-        - Tx_negative
+
     #######################################
     # Entries to run individual test cases
     #######################################
