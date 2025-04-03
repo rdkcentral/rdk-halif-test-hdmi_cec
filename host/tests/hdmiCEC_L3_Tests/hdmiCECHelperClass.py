@@ -55,6 +55,7 @@ class hdmiCECHelperClass(utHelperClass):
         self.testName  = ""
         self.moduleName = "hdmicec"
         self.rackDevice = "dut"
+        self.testsuite  = "L3 HDMICEC Functions"
 
         # Initialize the base helper class
         super().__init__(testName, qcId, log)
@@ -90,7 +91,7 @@ class hdmiCECHelperClass(utHelperClass):
         """
 
         # Create the hdmiCEC class
-        self.testhdmiCEC = hdmiCECClass(self.moduleConfigProfileFile, self.hal_session, self.targetWorkspace)
+        self.testhdmiCEC = hdmiCECClass(self.moduleConfigProfileFile, self.hal_session, self.testsuite, self.targetWorkspace)
         self.deviceType  = self.testhdmiCEC.getDeviceType()
 
         return True
