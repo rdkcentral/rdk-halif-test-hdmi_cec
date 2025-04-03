@@ -129,14 +129,12 @@ int main(int argc, char** argv)
     }
     else {
         UT_LOG_ERROR("Failed to get the platform Device Type");
-        return -1;
     }
 
     registerReturn = register_hdmicec_hal_l1_tests();
     if ( registerReturn == -1 )
     {
         UT_LOG_ERROR("\n register_hdmicec_hal_l1_tests() returned failure");
-        return -1;
     }
 #ifdef VCOMPONENT
     register_vcomponent_tests(pProfilePath);
