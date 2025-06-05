@@ -205,7 +205,7 @@ void test_hdmicec_hal_l1_open_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Check Null even before calling the positive case
     result = HdmiCecOpen( NULL );
-    CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
+    CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_ARGUMENT,HDMI_CEC_IO_INVALID_ARGUMENT);
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
@@ -1544,7 +1544,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     UT_LOG ("\n hdmicec directBuf: [0x%x,0x%x]\n", directBuf[0],directBuf[1]);
     result = HdmiCecTx(handle, directBuf, len, &ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
-    if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
+    if (HDMI_CEC_IO_SENT_AND_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
 
     /* Positive result for broadcast address*/
     UT_LOG ("\n hdmicec broadcastBuf: [0x%x,0x%x]\n", broadcastBuf[0],broadcastBuf[1]);
