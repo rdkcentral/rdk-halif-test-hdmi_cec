@@ -1543,12 +1543,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     /* Positive result for direct address*/
     UT_LOG ("\n hdmicec directBuf: [0x%x,0x%x]\n", directBuf[0],directBuf[1]);
     result = HdmiCecTx(handle, directBuf, len, &ret);
+    UT_LOG_DEBUG ("\n result: %d, ret: %d\n", result, ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
 
     /* Positive result for broadcast address*/
     UT_LOG ("\n hdmicec broadcastBuf: [0x%x,0x%x]\n", broadcastBuf[0],broadcastBuf[1]);
     result = HdmiCecTx(handle, broadcastBuf, len, &ret);
+    UT_LOG_DEBUG ("\n result: %d, ret: %d\n", result, ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
 
     /*calling hdmicec_close should pass */
