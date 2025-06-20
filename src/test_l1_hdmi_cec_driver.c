@@ -190,7 +190,7 @@ void DriverTransmitCallback(int handle, void *callbackData, int result )
  * **Test Procedure:**@n
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
- * |01|Call HdmiCecOpen() - call API with invalid handle | handle | HDMI_CEC_IO_INVALID_HANDLE| Should Pass |
+ * |01|Call HdmiCecOpen() - call API with invalid handle | handle | HDMI_CEC_IO_INVALID_ARGUMENT| Should Pass |
  * |02|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |03|Call HdmiCecOpen() - repeat the Call | handle | HDMI_CEC_IO_ALREADY_OPEN| Should Pass |
  * |04|Call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
@@ -205,7 +205,7 @@ void test_hdmicec_hal_l1_open_negative( void )
     UT_LOG("\n In %s [%02d%03d]\n", __FUNCTION__, gTestGroup, gTestID);
     //Check Null even before calling the positive case
     result = HdmiCecOpen( NULL );
-    CHECK_FOR_EXTENDED_ERROR_CODE(result,HDMI_CEC_IO_INVALID_HANDLE,HDMI_CEC_IO_INVALID_ARGUMENT);
+    UT_ASSERT_EQUAL(result, HDMI_CEC_IO_INVALID_ARGUMENT);
 
     result = HdmiCecOpen( &handle );
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL_FATAL("open failed"); }
@@ -1515,7 +1515,7 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_negative( void )
  * |Variation / Step|Description|Test Data|Expected Result|Notes|
  * |:--:|---------|----------|--------------|-----|
  * |01|Call HdmiCecOpen() - open interface | handle | HDMI_CEC_IO_SUCCESS| Should Pass |
- * |02|Call HdmiCecTx() - send the cec direct addressing message with valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS and ret=HDMI_CEC_IO_SENT_AND_ACKD| Should Pass |
+ * |02|Call HdmiCecTx() - send the cec direct addressing message with valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS and ret=HDMI_CEC_IO_SENT_BUT_NOT_ACKD| Should Pass |
  * |03|Call HdmiCecTx() - send the cec broadcasting message with valid arguments after module initialization | handle, buf, len, &ret | HDMI_CEC_IO_SUCCESS| Should Pass |
  * |04|Call HdmiCecClose() - close interface | handle=hdmiHandle | HDMI_CEC_IO_SUCCESS| Should Pass |
  */
@@ -1543,12 +1543,14 @@ void test_hdmicec_hal_l1_hdmiCecTx_sourceDevice_positive( void )
     /* Positive result for direct address*/
     UT_LOG ("\n hdmicec directBuf: [0x%x,0x%x]\n", directBuf[0],directBuf[1]);
     result = HdmiCecTx(handle, directBuf, len, &ret);
+    UT_LOG_DEBUG ("\n result: %d, ret: %d\n", result, ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
     if (HDMI_CEC_IO_SENT_BUT_NOT_ACKD != ret) { UT_FAIL("HdmiCecTx failed"); }
 
     /* Positive result for broadcast address*/
     UT_LOG ("\n hdmicec broadcastBuf: [0x%x,0x%x]\n", broadcastBuf[0],broadcastBuf[1]);
     result = HdmiCecTx(handle, broadcastBuf, len, &ret);
+    UT_LOG_DEBUG ("\n result: %d, ret: %d\n", result, ret);
     if (HDMI_CEC_IO_SUCCESS != result) { UT_FAIL("HdmiCecTx failed"); }
 
     /*calling hdmicec_close should pass */
