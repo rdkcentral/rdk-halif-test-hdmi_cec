@@ -102,7 +102,8 @@ Alternatively, use the run.sh script with the profile file:
 ./run.sh -p /absolute/path/to/profile/file
  ```
 
-- Profile files define the configuration for the platform available here [profile yaml file](./profiles/)
+- Profile files define the configuration for the platform available here 
+  [sink_profile_yaml_file](https://github.com/rdkcentral/rdk-halif-test-hdmi_cec/blob/main/profiles/sink/sink_hdmiCEC.yml),[source_profile_yaml_file](https://github.com/rdkcentral/rdk-halif-test-hdmi_cec/blob/main/profiles/source/source_hdmiCEC.yml)
 
 ### Setting Python environment for running the `L1` `L2` and `L3` automation test cases
 
@@ -110,4 +111,3 @@ Alternatively, use the run.sh script with the profile file:
 - Install Python Environment and Activation Scripts as detailed in the [HPK Documentation](https://github.com/rdkcentral/rdk-hpk-documentation/blob/main/README.md#installing-the-python-environment-for-l3-testing-suite)
 - To run the `L1` and `L2` test cases follow the [hdmi-cec-L1_L2_TestProcedure.md](docs/pages/hdmi-cec-L1_L2_TestProcedure.md)
 - To run the `L3` test cases follow the [hdmi-cec-L3_TestProcedure.md ](docs/pages/hdmi-cec-L3_TestProcedure.md)
-
