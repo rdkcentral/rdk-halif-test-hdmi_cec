@@ -90,7 +90,7 @@ To execute `HAL` `L3` Python test cases, need a Python environment. Follow these
 
 #### Rack Configuration File
 
-Example Rack configuration File: [example_rack_config.yml](../../../ut/host/tests/configs/example_rack_config.yml)
+Example Rack configuration File: [example_rack_config.yml](../../host/tests/configs/example_rack_config.yml)
 
 Refer to the following resources for more details:
 
@@ -168,7 +168,7 @@ rackConfig:
 
 #### Device Configuration File
 
-Example Device configuration File: [deviceConfig.yml](../../../ut/host/tests/configs/deviceConfig.yml)
+Example Device configuration File: [deviceConfig.yml](../../host/tests/configs/deviceConfig.yml)
 
 Refer to the following resources for more details:
 
@@ -195,7 +195,7 @@ deviceConfig:
 
 #### Test Configuration
 
-Example Test Setup configuration File: [hdmiCEC_testConfig.yml](../../../ut/host/tests/classes/hdmiCEC_testConfig.yml)
+Example Test Setup configuration File: [hdmiCEC_testConfig.yml](../../host/tests/classes/hdmiCEC_testConfig.yml)
 
 Specify the command to run the HAL binary within this file.
 
