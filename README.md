@@ -47,7 +47,7 @@ Alternatively, use the run.sh script with the profile file:
 
 ```bash
 ./run.sh -p /absolute/path/to/profile/file
-
+```
 - Profile files define the configuration for the platform available at [sink HDMI CEC](./profiles/sink/sink_hdmiCEC.yml), [source HDMI CEC](./profiles/source/source_hdmiCEC.yml), [stb source device](./profiles/stb-source-device.yaml), [tv panel](./profiles/tv_panel_5_devices.yaml )
 
 ### Setting Python environment for running the `L1` `L2` and `L3` automation test cases
