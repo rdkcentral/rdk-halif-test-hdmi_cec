@@ -1,0 +1,86 @@
+# This is a sample test configuration file. Users can customize the YAML entries as needed
+# This test configuration file includes sample YAML entries for executing various combinations
+hdmicec:
+  description: "HDMI CEC L1 and L2 test setup"
+  test_suites: # List of L1 and L2 test suites
+
+    ######################################
+    # Entry to run all test case
+    ######################################
+    #- name: "L1 HdmiCEC" # Name of the test suit to run
+    #  test_cases: # List of test cases to execute, to run all test cases in test suite with R option use `all`
+    #    - all
+
+    #######################################
+    # Entries to run individual test cases
+    #######################################
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - getLogicalAddress_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - getLogicalAddress_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - Tx_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - Tx_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - open_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - open_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - close_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - close_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - getPhysicalAddress_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - getPhysicalAddress_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - setRxCallback_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - setRxCallback_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - addLogicalAddress_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - addLogicalAddress_negative
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - removeLogicalAddress_Positive
+    - name: "L1 HDMI CEC SINK TestCase"
+      test_cases:
+        - removeLogicalAddress_negative
+
+    #######################################
+    # Entries to run individual test cases
+    #######################################
+    - name: "L2 HDMICEC Sink Test Case"
+      test_cases:
+        - L2_GetDefaultLogicalAddress_Sink
+    - name: "L2 HDMICEC Sink Test Case"
+      test_cases:
+        - L2_AddAndGetLogicalAddress_Sink
+    - name: "L2 HDMICEC Sink Test Case"
+      test_cases:
+        - L2_RemoveLogicalAddress_Sink
+    - name: "L2 HDMICEC Sink Test Case"
+      test_cases:
+        - L2_BroadcastHdmiCecCommand_Sink
+    - name: "L2 HDMICEC Sink Test Case"
+      test_cases:
+        - L2_VerifyPhysicalAddress_Sink
+    - name: "L2 HDMICEC Sink Test Case"
+      test_cases:
+        - L2_TransmitCECCommand_Sink
