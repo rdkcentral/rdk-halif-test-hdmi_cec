@@ -1,13 +1,5 @@
 # HDMI CEC L3 Test Document
 
-## Table of Contents
-
-- [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
-- [Overview](#overview)
-- [References](#references)
-- [Level 3 Test Procedure](#level-3-test-cases-high-level-overview)
-- [Level 3 Python Test](#level-3-python-test-cases-high-level-overview)
-
 ## Overview
 
 This document describes the L3 Test Procedure for the HDMI CEC module.

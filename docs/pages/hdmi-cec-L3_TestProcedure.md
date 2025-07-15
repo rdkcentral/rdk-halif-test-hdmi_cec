@@ -1,14 +1,5 @@
 # HDMI CEC HAL L3 Python Test Procedure
 
-## Table of Contents
-
-- [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
-- [Setting Up Test Environment](#setting-up-test-environment)
-- [Test Cases](#test-cases)
-  - [hdmiCEC_L3_Runall.py](#hdmicec_l3_runallpy)
-  - [hdmiCEC_test01_TransmitCECCommands.py](#hdmicec_test01_transmitceccommandspy)
-  - [hdmiCEC_test02_ReceiveCECCommands.py](#hdmicec_test02_receivececcommandspy)
-
 ## Acronyms, Terms and Abbreviations
 
 - `HAL`    - Hardware Abstraction Layer

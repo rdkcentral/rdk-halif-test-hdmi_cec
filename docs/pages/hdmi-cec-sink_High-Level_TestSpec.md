@@ -1,12 +1,5 @@
 # HDMI CEC Sink High-Level Test Specification Document
 
-## Table of Contents
-
-- [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
-- [Overview](#overview)
-- [HDMI-CEC RDK HAL Functionality](#hdmi-cec-rdk-hal-functionality)
-- [Test scenarios](#test-scenarios)
-
 ## Acronyms, Terms and Abbreviations
 
 - `CEC`  - Consumer Electronics Control

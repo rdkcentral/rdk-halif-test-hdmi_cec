@@ -1,11 +1,5 @@
 # HDMI CEC Test Document
 
-## Table of Contents
-
-- [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
-- [Overview](#overview)
-- [HDMI-CEC RDK HAL Functionality](#hdmi-cec-rdk-hal-functionality)
-
 ## Acronyms, Terms and Abbreviations
 
 - `CEC`  - Consumer Electronics Control
