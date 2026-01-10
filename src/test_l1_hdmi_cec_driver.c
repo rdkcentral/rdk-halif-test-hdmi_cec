@@ -181,7 +181,7 @@ void DriverTransmitCallback(int handle, void *callbackData, int result )
  * **Test Case ID:** 001@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -233,7 +233,7 @@ void test_hdmicec_hal_l1_open_negative( void )
  * **Test Case ID:** 002@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -273,7 +273,7 @@ void test_hdmicec_hal_l1_open_positive( void )
  * **Test Case ID:** 004@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:** None@n
  * **User Interaction:** None@n
@@ -320,7 +320,7 @@ void test_hdmicec_hal_l1_close_negative( void )
  * **Test Case ID:** 005@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:** None@n
  * **User Interaction:** None@n
@@ -480,7 +480,7 @@ void test_hdmicec_hal_l1_getPhysicalAddress_positive( void )
  * **Test Case ID:** 008@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:**None@n
  * **User Interaction:** None
@@ -571,7 +571,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_negative( void )
  * **Test Case ID:** 009@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:**None@n
  * **User Interaction:** None
@@ -625,7 +625,7 @@ void test_hdmicec_hal_l1_addLogicalAddress_positive( void )
  * **Test Case ID:** 012@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -744,7 +744,7 @@ void test_hdmicec_hal_l1_removeLogicalAddress_negative( void )
  * **Test Case ID:** 013@n
  *
  * **Pre-Conditions:**@n
- * None.
+ * Connect at least one CEC enabled device.
  *
  *
  * **Dependencies:** None@n
@@ -1049,7 +1049,8 @@ void test_hdmicec_hal_l1_getLogicalAddress_sourceDevice_positive( void )
  * **Test Case ID:** 019@n
  *
  *
- * **Pre-Conditions:**None@n
+ * **Pre-Conditions:**@n
+ * Connect at least one CEC enabled device.
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -1118,7 +1119,8 @@ void test_hdmicec_hal_l1_setRxCallback_negative ( void )
  * **Test Case ID:** 020@n
  *
  *
- * **Pre-Conditions:**None@n
+ * **Pre-Conditions:**@n
+ * Connect at least one CEC enabled device
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -1185,7 +1187,8 @@ void test_hdmicec_hal_l1_setRxCallback_positive( void )
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 021@n
  *
- * **Pre-Conditions:**None@n
+ * **Pre-Conditions:**@n
+ * Connect at least one CEC enabled device
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -1234,7 +1237,8 @@ void test_hdmicec_hal_l1_setTxCallback_negative( void )
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 022@n
  *
- * **Pre-Conditions:**None@n
+ * **Pre-Conditions:**@n
+ * Connect at least one CEC enabled device
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
@@ -1285,7 +1289,8 @@ void test_hdmicec_hal_l1_setTxCallback_positive( void )
  * **Test Group ID:** Basic: 01@n
  * **Test Case ID:** 023@n
  *
- * **Pre-Conditions:** None@n
+ * **Pre-Conditions:** @n
+ * Connect at least one CEC enabled device
  *
  * **Dependencies:** None@n
  * **User Interaction:** None
