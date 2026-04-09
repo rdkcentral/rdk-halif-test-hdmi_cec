@@ -455,7 +455,7 @@ void test_l3_hdmi_cec_hal_Init(void)
     status = HdmiCecOpen(&gHandle);
     UT_LOG_INFO("Result HdmiCecOpen(OUT:handle:[0x%0X]) HDMI_CEC_STATUS:[%s]",gHandle, UT_Control_GetMapString(cecError_mapTable,status));
     UT_ASSERT_EQUAL_FATAL(status, HDMI_CEC_IO_SUCCESS);
-    UT_ASSERT_NOT_EQUAL(gHandle, 0);
+    UT_ASSERT_NOT_EQUAL_FATAL(gHandle, 0);
 
     // Step 2: Register the call back
     UT_LOG_INFO("Calling HdmiCecSetRxCallback(IN:handle:[0x%0X], IN:cbfunc:[0x%0X])",gHandle, onRxDataReceived);
@@ -594,9 +594,18 @@ void test_l3_hdmi_cec_hal_GetLogicalAddress(void)
     status = HdmiCecGetLogicalAddress(gHandle, &logicalAddress);
     UT_LOG_INFO("Result HdmiCecGetLogicalAddress(IN:handle:[0x%0X], OUT:logicalAddress:[%x]) HDMI_CEC_STATUS:[%s])", gHandle, logicalAddress, UT_Control_GetMapString(cecError_mapTable,status));
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    UT_ASSERT_TRUE(logicalAddress >= 0 && logicalAddress <= 15);
 
-    gLogicalAddress = logicalAddress;
+    if (status == HDMI_CEC_IO_SUCCESS)
+    {
+        UT_ASSERT_TRUE(logicalAddress >= 0 && logicalAddress <= 15);
+        gLogicalAddress = logicalAddress;
+    }
+    else
+    {
+        UT_LOG_ERROR("HdmiCecGetLogicalAddress failed. HDMI_CEC_STATUS:[%d] [%s]",
+            status, UT_Control_GetMapString(cecError_mapTable, status));
+    }
+
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
 
@@ -630,6 +639,11 @@ void test_l3_hdmi_cec_hal_TransmitHdmiCecCommand(void) {
     int32_t expectedDataLength;
 
     UT_ASSERT_NOT_EQUAL(sourceLogicalAddress, -1);
+    if (sourceLogicalAddress == -1)
+    {
+        UT_LOG_ERROR("Invalid source logical address. Add a logical address before transmitting a CEC command.");
+        return;
+    }
 
     // Reading inputs from the user or test framework
     UT_LOG_MENU_INFO("Enter a valid Destination Logical Address: ");
@@ -707,7 +721,7 @@ void test_l3_hdmi_cec_hal_GetPhysicalAddress(void)
 
     if (status == HDMI_CEC_IO_SUCCESS)
     {
-
+        gPhysicalAddressBytes = (uint8_t*)&gPhysicalAddress;
         UT_LOG_INFO("Result HdmiCecGetPhysicalAddress(IN:handle:[0x%0X], OUT:physicalAddress:[%01x.%01x.%01x.%01x]) HDMI_CEC_STATUS:[%s]",
                     gHandle, gPhysicalAddressBytes[3], gPhysicalAddressBytes[2], gPhysicalAddressBytes[1], gPhysicalAddressBytes[0],
                     UT_Control_GetMapString(cecError_mapTable, status));
@@ -800,7 +814,10 @@ void test_l3_hdmi_cec_hal_Close(void)
     status = HdmiCecClose(gHandle);
     UT_LOG_INFO("Result HdmiCecClose(IN:handle:[0x%0X]) HDMI_CEC_STATUS:[%s]", gHandle, UT_Control_GetMapString(cecError_mapTable,status));
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
-    gHandle = 0;
+    if (status == HDMI_CEC_IO_SUCCESS)
+    {
+        gHandle = 0;
+    }
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
 }
