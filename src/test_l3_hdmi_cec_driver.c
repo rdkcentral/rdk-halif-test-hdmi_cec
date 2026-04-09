@@ -559,7 +559,7 @@ void test_l3_hdmi_cec_hal_AddLogicalAddress(void)
     }
     else
     {
-        UT_LOG_ERROR("HdmiCecGetLogicalAddress failed. Cannot validate logical address.");
+        UT_LOG_ERROR("HdmiCecGetLogicalAddress failed.");
     }
 
     UT_LOG_INFO("Out %s\n", __FUNCTION__);
