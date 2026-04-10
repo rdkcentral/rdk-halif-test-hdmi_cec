@@ -463,14 +463,13 @@ void test_l3_hdmi_cec_hal_Init(void)
     UT_LOG_INFO("Result HdmiCecSetRxCallback(IN:handle:[0x%0X], IN:cbfunc:[0x%0X]) HDMI_CEC_STATUS:[%s]",gHandle,onRxDataReceived, UT_Control_GetMapString(cecError_mapTable,status));
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
 
-    gPhysicalAddressBytes = (uint8_t*)&gPhysicalAddress;
-
     UT_LOG_INFO("Calling HdmiCecGetPhysicalAddress(IN:handle:[0x%0X], OUT:physicalAddress:[])", gHandle);
     status = HdmiCecGetPhysicalAddress(gHandle, &gPhysicalAddress);
     UT_ASSERT_EQUAL(status, HDMI_CEC_IO_SUCCESS);
 
     if (status == HDMI_CEC_IO_SUCCESS)
     {
+        gPhysicalAddressBytes = (uint8_t*)&gPhysicalAddress;
         UT_LOG_INFO("Result HdmiCecGetPhysicalAddress(IN:handle:[0x%0X], OUT:physicalAddress:[%01x.%01x.%01x.%01x]) HDMI_CEC_STATUS:[%s]",
             gHandle, gPhysicalAddressBytes[3], gPhysicalAddressBytes[2], gPhysicalAddressBytes[1], gPhysicalAddressBytes[0],
             UT_Control_GetMapString(cecError_mapTable, status));
@@ -555,7 +554,15 @@ void test_l3_hdmi_cec_hal_AddLogicalAddress(void)
 
         UT_ASSERT_EQUAL(logicalAddress, getLogicalAddress);
 
-        gLogicalAddress = getLogicalAddress;
+        if (logicalAddress == getLogicalAddress)
+        {
+            gLogicalAddress = getLogicalAddress;
+        }
+        else
+        {
+            UT_LOG_ERROR("Logical address mismatch. Expected: %x, Got: %x",
+                        logicalAddress, getLogicalAddress);
+        }
     }
     else
     {
@@ -599,7 +606,14 @@ void test_l3_hdmi_cec_hal_GetLogicalAddress(void)
 
         UT_ASSERT_TRUE(logicalAddress >= 0 && logicalAddress <= 15);
 
-        gLogicalAddress = logicalAddress;
+        if (logicalAddress >= 0 && logicalAddress <= 15)
+        {
+            gLogicalAddress = logicalAddress;
+        }
+        else
+        {
+            UT_LOG_ERROR("Logical address out of valid range: %x", logicalAddress);
+        }
     }
     else
     {
